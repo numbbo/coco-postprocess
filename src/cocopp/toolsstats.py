@@ -308,7 +308,7 @@ def randint_derandomized(low, high=None, size=None):
     >>> import numpy as np
     >>> from cocopp.toolsstats import randint_derandomized
     >>> np.random.seed(1)
-    >>> list(randint_derandomized(0, 4, 6))
+    >>> [int(i) for i in randint_derandomized(0, 4, 6)]
     [3, 2, 0, 1, 0, 2]
 
     A typical usecase is indexing of ``data`` like::
@@ -357,8 +357,8 @@ def simulated_evals(evals, nfails,
     >>> set_seed(4)
     >>> evals_succ = [1]  # only one evaluation in the successful trial
     >>> evals_unsucc = [2, 4, 2, 6, 100]
-    >>> simulated_evals(np.hstack([evals_succ, evals_unsucc]),
-    ...                 len(evals_unsucc), 13)  # doctest: +ELLIPSIS
+    >>> [int(i) for i in simulated_evals(np.hstack([evals_succ, evals_unsucc]),
+    ...                     len(evals_unsucc), 13)]  # doctest: +ELLIPSIS
     [1, 1, 3, ...
 
     Details:
