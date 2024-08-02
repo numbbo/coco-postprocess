@@ -1,6 +1,14 @@
 #!/usr/bin/env python
 """Tests the cocopp module.
+::
+    python -m cocopp.test doctest
 
+runs only the doctests (which is quick).
+
+::
+    python -m cocopp.test all
+
+runs also the most extensive tests.
 """
 
 from __future__ import absolute_import, division, print_function, unicode_literals
@@ -271,7 +279,8 @@ def main(arguments):
     #copy_latex_templates()
     #print('LaTeX templates copied.')
 
-    print('*** testing module cocopp ***')
+    print('*** testing module cocopp {0} ***'
+          .format('(all ~ 30 minutes)' if run_all_tests else '(~ 5 minutes)'))
     t0 = time.time()
     data_path = data_archive_get('BFGS_ros_noiseless')
     print(python + command + # '--conv ' +
@@ -447,8 +456,10 @@ def main(arguments):
             print('**  subtest 20 finished in ', time.time() - t0, ' seconds')
             assert result == 0, 'Test failed: running postprocessing on bbob-constrained data'
 
+    do_doctest()  # to be backwards compatible we run everything in main
 
-    print('launching doctest (it might be necessary to close a few pop up windows to finish)')
+def do_doctest():
+    print('\n*** launching doctest (it might be necessary to close a few pop up windows to finish) ***')
     t0 = time.time()
 
     failure_count = 0
@@ -467,7 +478,10 @@ def main(arguments):
                 test_count += current_test_count
                 if current_failure_count:
                     print('doctest file "%s" failed' % os.path.join(root, filename))
+                else:
+                    print('doctest {0}/{1} tests succeeded'.format(test_count - failure_count, test_count), end='\r')
         os.chdir(current_path)
+        print()
     else:
         stdout = sys.stdout
         fn = '_cocopp_doctest_.txt'
@@ -497,4 +511,7 @@ def main(arguments):
 """
 
 if __name__ == "__main__":
-    main(sys.argv[1:])
+    if 'doctest' in sys.argv or 'doctests' in sys.argv:
+        do_doctest()
+    else:
+        main(sys.argv[1:])
