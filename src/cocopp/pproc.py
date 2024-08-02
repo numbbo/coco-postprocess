@@ -2580,6 +2580,65 @@ class DataSetList(list):
         for i in o:
             self.append(i)
 
+    def filter(self, condition, verbose=0):
+        """discard DataSets for which ``condition(dataset)`` is not true.
+
+        The `filter` method makes changes in place and returns `None`
+        unless ``verbose >= 2``. It does nothing ``if not condition or
+        condition is True``.
+
+        Example: ``.filter(lambda ds: ds.funcId in [1, 2] +
+        list(range(5, 15)))`` keeps only the "effectively unimodal"
+        functions of the ``'bbob'`` suite.
+
+        Details: ``if verbose in [2, 3]``, return a list of the removed
+        data sets.
+
+        See also: `filtered`, `remove_if`, `genericsettings.filter_data_condition`
+        """
+        if not condition or condition is True:  # convenience feature
+            return
+        removed = []
+        for i in reversed(range(len(self))):
+            if not condition(self[i]):
+                removed += [self.pop(i)]
+        if verbose in [1, 3]:
+            print('  {0} DataSets removed'.format(len(removed)))
+        if verbose in [2, 3]:
+            return removed
+    def remove_if(self, condition):
+        """discard DataSets for which ``condition(self[i])`` is true.
+
+        To remove functions f1 and f5 we can use ``condition=lambda ds:
+        ds.funcId in [1, 5]`` which is equivalent with calling
+        ``.filter(lambda ds: ds.funcId not in [1, 5])``.
+        """
+        def inverted_condition(ds):
+            return not condition(ds)
+        self.filter(inverted_condition)
+    def filtered(self, condition, type_='DataSetList'):
+        """return a `list` of `DataSet` for which ``condition(dataset)`` holds.
+
+        For example, ``condition=lambda ds: ds.funcId in [1, 2] +
+        list(range(5, 15))`` returns for the ``'bbob'`` suite the data sets
+        on the "effectively unimodal" functions.
+
+        The `filtered` method returns an empty list ``if not condition``
+        and a `list` with all elements ``if condition is True`` (or
+        ``condition=lambda ds: True``). If ``type_ is list`` return a
+        simple `list`. If ``type_ != 'DataSetList'`` the resulting type is
+        a `list`, however this may change in future.
+
+        See also: `filter`
+        """
+        if not condition:  # convenience feature
+            res = []
+        elif condition is True:
+            res = [ds for ds in self]
+        else:
+            res = [self[i] for i in range(len(self)) if condition(self[i])]
+        return DataSetList(res) if type_ == 'DataSetList' else res
+
     def pickle(self, *args, **kwargs):
         """Loop over self to pickle each element."""
         for i in self:
