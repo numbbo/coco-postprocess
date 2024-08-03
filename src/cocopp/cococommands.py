@@ -226,29 +226,36 @@ def load(filename):
     """
     return _DataSetList(official_archives.all.get_extended(_StringList(filename)))
 
-def load2(args):
+def load2(args, keep=None, remove=None):
     """[WIP] return a `dict` of `dict` of `DataSetLists` with dimension and pathname as keys.
 
     `args` is a string or a list of strings passed to
     `cocopp.official_archives.all.get_extended` to determine the desired
     data sets which can also come from a local folder or a zip-file.
 
+    `keep` and `remove` are callables taking a `cocopp.pproc.DataSet` class
+    instance as argument and return a `bool` according to which data sets
+    are filtered (usually based on the ``funcId`` attribute, see below
+    example). In case, `remove` takes precedent. When ``keep is None`` all
+    elements are kept unless removed.
+
     Examples:
 
     >>> import cocopp
-    >>> def load2(s):
-    ...     print(s)  # predictable output
-    ...     return cocopp.load2(s)
-    >>> def pprld(dsl):
-    ...     print('_')  # predictable output
+    >>> def pprldmany(dsl):
+    ...     print('OK')  # circumvent output checking
     ...     with cocopp.toolsdivers.InfolderGoneWithTheWind():
     ...         cocopp.compall.pprldmany.main(dsl)  # writes pprldmany_default.*
-    >>> ddsl = load2('bbob/2009/B*')  # doctest:+ELLIPSIS
-    bbob/200...
-    >>> assert sorted(ddsl) == [2, 3, 5, 10, 20, 40], ddsl
+    ...
+    >>> _, ddsl = (print('OK'),  # circumvent output checking
+    ...     cocopp.load2('bbob/2009/B*',
+    ...                  remove=lambda ds: ds.funcId in [1, 5]))  # doctest:+ELLIPSIS
+    OK...
+    >>> assert sorted(ddsl) == [2, 3, 5, 10, 20, 40], sorted(ddsl)
     >>> assert all([len(ddsl[i]) == 3 for i in ddsl]), ddsl  # 3 algorithms
-    >>> pprld(ddsl[2])  # doctest:+ELLIPSIS
-    _...
+    >>> assert len(list(ddsl[3].values())[0]) == 22, list(ddsl[3].values())[0]
+    >>> pprldmany(ddsl[2])  # doctest:+ELLIPSIS
+    OK...
 
     ::
 
@@ -260,6 +267,10 @@ def load2(args):
     args2 = official_archives.all.get_extended(args)
     dsList, _sortedAlgs, dictAlg = _pproc.processInputArgs(args2, True)  # takes ~1 minutes per 10 data sets
     dsList2 = _pproc.DataSetList(_testbedsettings.current_testbed.filter(dsList))
+    if keep:
+        dsList2.filter(keep)
+    if remove:
+        dsList2.remove_if(remove)
     dictAlg = dsList2.dictByAlgName()
     _config.config() # make sure that the filtered settings are taken into account?
     return _pproc.dictAlgByDim(dictAlg)
