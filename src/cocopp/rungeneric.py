@@ -42,7 +42,7 @@ long_options = ["help", "output-dir=", "noisy", "noise-free",
                "expensive", "runlength-based",
                "los-only", "crafting-effort=", "pickle",
                "sca-only", "no-svg",
-               "include-fonts"]
+               "include-fonts", "no-interactive"]
 # thereby, "los-only", "crafting-effort=", and "pickle" affect only rungeneric1
 # and "sca-only" only affects rungenericmany
 
@@ -335,6 +335,8 @@ def main(argv=None):
                 genericsettings.isFig = False
                 genericsettings.isRLDistr = False
                 genericsettings.isLogLoss = False
+            elif o == "--no-interactive":
+                genericsettings.interactive_mode = False
             else:
                 is_assigned = False
                 if o in longoptlist or o in shortoptlist:
@@ -455,7 +457,7 @@ def main(argv=None):
         if genericsettings.interactive_mode:
             try:
                 webbrowser.open("file://" + os.getcwd() + '/' + outputdir + "/index.html")
-            except:
+            except Exception:
                 pass
         return dsld
 

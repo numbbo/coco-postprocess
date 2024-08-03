@@ -1052,7 +1052,8 @@ class DataSet(object):
                                 str(self.instancenumbers) + 
                                 ' (f' + str(self.funcId) + ', ' + str(self.dim)
                                 + 'D)')
-        elif len(self.instancenumbers) < expectedNumberOfInstances:
+        elif len(self.instancenumbers) < expectedNumberOfInstances and (
+                not hasattr(self, 'used_algorithms') and self.algId != 'bestCustomAlg'):
             is_consistent = False
             warnings.warn('  less than ' + str(expectedNumberOfInstances) +
                                 ' instances in the set ' + 
@@ -1066,9 +1067,12 @@ class DataSet(object):
                                 str(self.instancenumbers)+ 
                                 ' (f' + str(self.funcId) + ', ' + 
                                 str(self.dim) + 'D)')
-        elif (instancedict not in genericsettings.instancesOfInterest):
+        elif instancedict not in genericsettings.instancesOfInterest and (
+                not hasattr(self, 'used_algorithms') and self.algId != 'bestCustomAlg'):
             is_consistent = False
-            warnings.warn('  instance numbers not among the ones specified in 2009, 2010, 2012, 2013, and 2015-2018')
+            warnings.warn('  instance numbers not among the ones specified'
+                          ' by cocopp.genericsettings.instancesOfInterest={0}'
+                          .format(genericsettings.instancesOfInterest))
         if not is_consistent:
             warnings.warn('Some DataSet of {0} was not consistent'.format(self.algId))  # should rather be in the previous messages
         assert self._evals.shape[1] - 1 == len(self.instancenumbers), self

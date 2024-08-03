@@ -125,12 +125,15 @@ class BestAlgSet(DataSet):
         tmpdictAlg = {}
         best_algorithms = []
         self.success_ratio = []
+        self._missing_dimfunalgs = []
 
         for alg, i in dict_alg.items():
             if len(i) == 0:
-                warnings.warn('Algorithm %s was not tested on f%d %d-D.'
-                              % (alg, f, d))
+                self._missing_dimfunalgs.append((d, f, alg))
                 continue
+                # if not ('MCS_huyer' in alg and d == 40):
+                #     warnings.warn('Algorithm %s was not tested on f%d %d-D.'
+                #                 % (alg, f, d))
             elif len(i) > 1:
                 warnings.warn('Algorithm %s has a problem on f%d %d-D.'
                               % (alg, f, d))
@@ -235,6 +238,13 @@ class BestAlgSet(DataSet):
                 algbestfinalfunvals = alg
         self.bestfinalfunvals = bestfinalfunvals
         self.algbestfinalfunvals = algbestfinalfunvals
+        if self._missing_dimfunalgs:
+            missed = self._missing_dimfunalgs
+            if len(missed) > 1 or not (
+                    'MCS_huyer' in missed[0][2] and missed[0][0] == 40):
+                warnings.warn(
+                    'Missing data for the following (dimension, funcId, algorithm)'
+                    ' list\n{0}'.format(missed))
 
     def __eq__(self, other):
         return (self.__class__ is other.__class__ and

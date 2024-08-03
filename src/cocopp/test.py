@@ -274,7 +274,7 @@ def main(arguments):
     # old_data_path = ' ' + prepare_data(run_all_tests)
 
 
-    command = ' cocopp --no-svg --settings=grayscale '  # TODO: grayscale has to go
+    command = ' cocopp --no-svg --no-interactive '
 
     #copy_latex_templates()
     #print('LaTeX templates copied.')
