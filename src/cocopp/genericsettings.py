@@ -44,6 +44,12 @@ target_runlengths_ppscatter = np.logspace(np.log10(0.5), np.log10(50), 8) # used
 target_runlength = 10  # used in ppfigs.main
 single_runlength_factors = [0.5, 1.2, 3, 10] + [10 ** i for i in range(2, 12)] # used in pprldistr
 
+filter_data_condition = None
+'''a `callable` which is used in `rungenericmany` to filter the list of
+   `DataSet`. For example, to keep only the "effectively unimodal"
+   functions of the 'bbob' testbed, set ``filter_data_condition = lambda
+   ds: ds.funcId in [1, 2,] + list(range(5, 15))``'''
+
 xlimit_pprldmany = 1e7
 """maximal run length multiplier used in `pprldmany`.
 

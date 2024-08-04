@@ -115,6 +115,7 @@ def main(args, outputdir):
 
     # filter data set lists to be compliant with all suites
     dsList = DataSetList(testbedsettings.current_testbed.filter(dsList))
+    dsList.filter(genericsettings.filter_data_condition)  # after the above filter to prevent unnecessary warnings
     dictAlg = dsList.dictByAlgName()
 
     config.config() # make sure that the filtered settings are taken into account
