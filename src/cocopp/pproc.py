@@ -3535,6 +3535,7 @@ def dictAlgByDim(dictAlg):
         tmpdictAlg[alg] = tmp
         dims |= set(tmp.keys())
 
+    warning_txts = []
     for d in dims:
         for alg in dictAlg:
             tmp = DataSetList()
@@ -3543,9 +3544,8 @@ def dictAlgByDim(dictAlg):
             elif testbedsettings.current_testbed:
                 try:  # TODO: this is at the wrong place in the dictAlgByDim function
                     if d in testbedsettings.current_testbed.dimensions_to_display[:-1]:
-                        txt = ('No data for algorithm %s in %d-D.'
-                            % (alg, d))
-                        warnings.warn(txt)
+                        warning_txts += ['No data for algorithm %s in %d-D.'
+                                         % (alg, d)]
                 except AttributeError: pass
             # try:
             #     tmp = tmpdictAlg[alg][d]
@@ -3555,9 +3555,8 @@ def dictAlgByDim(dictAlg):
             #     warnings.warn(txt)
 
             if alg in res.setdefault(d, {}):
-                txt = ('Duplicate data for algorithm %s in %d-D.'
-                       % (alg, d))
-                warnings.warn(txt)
+                warning_txts += ['Duplicate data for algorithm %s in %d-D.'
+                                 % (alg, d)]
 
             res.setdefault(d, OrderedDict()).setdefault(alg, tmp)
             # Only the first data for a given algorithm in a given dimension
@@ -3566,6 +3565,9 @@ def dictAlgByDim(dictAlg):
         #for i in dsList:
             #res.setdefault(i.dim, {}).setdefault(alg, DataSetList()).append(i)
 
+    if warning_txts and genericsettings.verbose:
+        warnings.warn('The following warnings appeared at least once: {}\n'
+                      .format(collections.Counter(warning_txts)))
     return res
 
 def dictAlgByDim2(dictAlg, remove_empty=False):
