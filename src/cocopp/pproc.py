@@ -45,6 +45,37 @@ do_assertion = genericsettings.force_assertions # expensive assertions
 targets_displayed_for_info = [10, 1., 1e-1, 1e-3, 1e-5, 1e-8]  # only to display info in DataSetList.info
 maximal_evaluations_only_to_last_target = False  # was true in release 13.03, leads naturally to better results
 
+_block_using_recommendations = True
+'''meta flag to control setting and changing of _using_recommendations.
+
+    `rungenericmany.main` unblocks `_using_recommendations` before calling
+    `processInputArgs`. The latter sets `_block_using_recommendations` to
+    `True` after calling `process_arguments` once and background algorithms
+    are then processed without recommendations and `_using_recommendations`
+    is blocked to `False` as postcondition.
+    '''
+_using_recommendations = None
+'''`bool` to determine which data are used in the `DataSet` constructor'''
+
+def _set_using_recommendations(index):
+    """set module variable `_using_recommendations`
+
+    as ``genericsettings.use_recommendations(index)`` handling the cases
+    when `index` is in ``(True, False, None)`` or a too large index. Return
+    previous value such that it is easy to restore.
+    """
+    global _using_recommendations
+    previous_value = _using_recommendations
+    if _block_using_recommendations:
+        _using_recommendations = False
+    elif index is False or index is True or index is None:
+        _using_recommendations = index
+    else:
+        try:
+            _using_recommendations = genericsettings.use_recommendations[index]
+        except IndexError:
+            _using_recommendations = genericsettings.use_recommendations[-1]
+    return previous_value
 
 def _DataSet_complement_data(self, step=10**0.2, final_target=1e-8):
     """insert a line for each target value, never used (detEvals(targets) does the job on the fly).
@@ -832,7 +863,7 @@ class DataSet(object):
                 # We just skip the element.
                 continue
             else:
-                if not ':' in elem:
+                if ':' not in elem:
                     
                     # We might take only a subset of the given instances,
                     # given in testbedsettings.current_testbed.instancesOfInterest:
@@ -876,12 +907,17 @@ class DataSet(object):
                     self.readmaxevals.append(int(readmaxevals))
                     self.readfinalFminusFtarget.append(float(readfinalf))
 
+        if _using_recommendations and self.dataFiles:  # in DataSet.__init__
+            self.dataFiles = [filename.replace('.dat', '.mdat')
+                              for filename in self.dataFiles]
         if genericsettings.verbose:
             print("%s" % self.__repr__())
 
         # Treat successively the data in dat and tdat files:
         # put into variable dataFiles the files where to look for data
-        dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0] + '.dat')
+        # this should not be necessary, as we just re-add the same ending!?
+        dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0]
+                            + ('.mdat' if _using_recommendations else '.dat'))
                          for i in self.dataFiles)
         datasets, algorithms, reference_values, success_ratio = split(dataFiles, idx_to_load=idx_of_instances_to_load)
         dataformatsettings.current_data_format = dataformatsettings.data_format_name_to_class_mapping[self.get_data_format()]()
@@ -910,7 +946,8 @@ class DataSet(object):
             try:
                 for i in range(len(maxevals)):
                     self._maxevals[i] = max(maxevals[i], self._maxevals[i])
-                    self.finalfunvals[i] = min(finalfunvals[i], self.finalfunvals[i])
+                    self.finalfunvals[i] = (finalfunvals[i] if _using_recommendations
+                        else min(finalfunvals[i], self.finalfunvals[i]))
             except AttributeError:
                 self._maxevals = maxevals
                 self.finalfunvals = finalfunvals
@@ -1447,8 +1484,14 @@ class DataSet(object):
         instance.
 
         This method will overwrite existing files.
+
+        This method is not in use. Instead, `get_DataSetList` pickles a `DataSetList`.
         
         """
+        if _using_recommendations:
+            warnings.warn('no pickle file is created because cocopp.pproc._using_recommendations={}'
+                          .format(_using_recommendations))
+            return
         # the associated pickle file does not exist
         if outputdir is not None and getattr(self, 'pickleFile', False):
             NotImplementedError('outputdir and pickleFile attribute are in conflict')
@@ -2317,27 +2360,39 @@ def get_DataSetList(*args, **kwargs):
         not isinstance(arg1[0], string_types) or
         not findfiles.is_recognized_repository_filetype2(arg1[0])):
         return fallback()
-    try: import pickle
-    except: return fallback()
+    try:
+        import pickle
+    except Exception:
+        return fallback()
     name = arg1[0] + extension
     if os.path.exists(name) and os.path.getmtime(name) > os.path.getmtime(arg1[0]):
+        if _using_recommendations:
+            warnings.warn('pickled DataSetLists do currently NOT have recommendations,'
+                        '\n hence the file {} is not used'.format(name))
+            return fallback()
         try:
             with open(name, "rb") as f:
                 dsl = pickle.load(f)
-        except: pass
+        except Exception as e:
+            warnings.warn("failed to load pickle file {} with exception {}"
+                          .format(name, e))
         else:
             if isinstance(dsl, DataSetList):  # found valid pickle file
                 # to be compatible with DataSet.__init__:
                 if not testbedsettings.current_testbed:
                     testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
+                # genericsettings.verbosity > 0 and
                 print("  using pickled DataSetList", end=' ')  # remove when all went well for a while?
                 return dsl
+    if _using_recommendations:  # do not pickle recommendations for the time being
+        return fallback()
     dsl = fallback()
     try:
         with open(name, "wb") as f:
             pickle.dump(dsl, f)
     except Exception as e:
-        warnings.warn("could not write pickle file {}: {}".format(name, e))
+        warnings.warn("could not write pickle file {} getting exception {}"
+                    .format(name, e))
     return dsl
 
 class DataSetList(list):
@@ -2386,8 +2441,8 @@ class DataSetList(list):
         if hasattr(args[0], 'algId'):
             print('try calling DataSetList() with option ' +
                   '``check_data_type=False``')
-        fnames = []
-        alg_names = []
+        fnames = []  # data file names
+        alg_names = []  # may be the same algorithm name for (many) different fnames
         for name in args:
             if isinstance(name, string_types) and findfiles.is_recognized_repository_filetype(name):
                 # the found names may not at all reflect name anymore
@@ -2396,13 +2451,19 @@ class DataSetList(list):
                 fnames.append(name)
             alg_names.extend((len(fnames) - len(alg_names)) * [name])
         assert len(fnames) == len(alg_names)
-        for name, alg_name in zip(fnames, alg_names): 
+        for name, alg_name in zip(fnames, alg_names):
             if isinstance(name, DataSet):
                 self.append(name)
                 # we could check here whether name.algId and alg_name are similar or consistent
             elif name.endswith('.info'):
                 self.processIndexFile(name, alg_name)
             elif name.endswith('.pickle') or name.endswith('.pickle.gz'):
+                if _using_recommendations:
+                    warnings.warn(
+                        "ignoring an unexpected _using_recommendations={} setting,\n"
+                        "using the pickle file {} generally requires to set ``cocopp."
+                        "genericsettings.use_recommendations[{}] to `False`"
+                        .format(_using_recommendations, name, fnames.index(name)))
                 try:
                     # cocofy(name)
                     if name.endswith('.gz'):
@@ -2419,7 +2480,7 @@ class DataSetList(list):
                     try:
                         entry.instancenumbers = entry.itrials  # has been renamed
                         del entry.itrials
-                    except:
+                    except Exception:
                         pass
                     # if not hasattr(entry, 'detAverageEvals')
                     self.append(entry)
@@ -2492,6 +2553,7 @@ class DataSetList(list):
                         nbLine += 3
                         #TODO: check that something is not wrong with the 3 lines.
                         ds = DataSet(header, comment, data, indexFile)
+                        # data extension may have been modified to .mdat
                         if alg_name is not None:
                             ds.algId = alg_name
                         if len(ds.instancenumbers) > 0:                    
@@ -2640,7 +2702,7 @@ class DataSetList(list):
         return DataSetList(res) if type_ == 'DataSetList' else res
 
     def pickle(self, *args, **kwargs):
-        """Loop over self to pickle each element."""
+        """Loop over self to pickle each element, not in use (anymore)."""
         for i in self:
             i.pickle(*args, **kwargs)
 
@@ -3499,6 +3561,9 @@ def processInputArgs(args, process_background_algorithms=False):
     dictAlg = {}
     current_hash = None
     process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs)
+    global _block_using_recommendations
+    _set_using_recommendations(False)
+    _block_using_recommendations = True
     if process_background_algorithms:
         genericsettings.foreground_algorithm_list.extend(sortedAlgs)
         for value in genericsettings.background.values():
@@ -3511,18 +3576,20 @@ def processInputArgs(args, process_background_algorithms=False):
 
 
 def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
-    for alg in args:
+    for ialg, alg in enumerate(args):
         alg = alg.strip().rstrip(os.path.sep)  # lstrip would not be the same folder anymore
         if alg == '':  # might cure an lf+cr problem when using cywin under Windows
             continue
         if findfiles.is_recognized_repository_filetype(alg):
-            if 11 < 3:
-                filelist = findfiles.main(alg)  # this destroys name information
-                tmpDsList = DataSetList(filelist)  # DataSetList calls findfiles.main anyway
-                # Do here any sorting or filtering necessary.
-                # filelist = list(i for i in filelist if i.count('ppdata_f005'))
-            else:
-                tmpDsList = get_DataSetList(alg)
+            # if 11 < 3:
+            #     filelist = findfiles.main(alg)  # this destroys name information
+            #     tmpDsList = DataSetList(filelist)  # DataSetList calls findfiles.main anyway
+            #     # Do here any sorting or filtering necessary.
+            #     # filelist = list(i for i in filelist if i.count('ppdata_f005'))
+            # else:
+            _old = _set_using_recommendations(ialg)
+            tmpDsList = get_DataSetList(alg)
+            _set_using_recommendations(_old)
             for ds in tmpDsList:
                 ds._data_folder = alg
                 # to restore name information:

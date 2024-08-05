@@ -15,6 +15,9 @@ import numpy as np
 
 test = False  # debug/test flag, set to False for committing the final version
 interactive_mode = True  # open browser with results, grayscale setting (deprecated) deactivates interactive mode
+use_recommendations = [False]
+'''use only recommendations data (.mdat files) for the respective algorithm
+   where the last element is recycled for the remaining algorithms'''
 
 force_assertions = False  # another debug flag for time-consuming assertions
 in_a_hurry = 1000  # [0, 1000] lower resolution, no eps, saves 30% time

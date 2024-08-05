@@ -109,7 +109,9 @@ def main(args, outputdir):
                     )
 
     print("  loading data...")
+    pproc._block_using_recommendations = False
     dsList, sortedAlgs, dictAlg = processInputArgs(args, True)
+    pproc._block_using_recommendations = True
     # TODO: dictAlg not really needed here anymore as we filter
     #       dsList and then get dictAlg from there...
 

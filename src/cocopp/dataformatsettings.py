@@ -1,6 +1,6 @@
 from __future__ import absolute_import, division, print_function
-import numpy as np
 from . import genericsettings
+import warnings
 
 current_data_format = None  # used in readalign as global var
 
@@ -64,7 +64,11 @@ class BBOBNewDataFormat(DataFormat):
         dataset.evals_function, maxevals, finalfunvals = aligner(data,
                                                             self.evaluation_idx,
                                                             self.function_value_idx)
-        assert all(dataset.evals_function[0][1:] == 1)
+        # TODO: why do we even need the first evaluation?
+        if not all(dataset.evals_function[0][1:] == 1) and any(
+                '.mdat' not in n for n in dataset.dataFiles):
+            warnings.warn("First evaluation was not read/recorded for dataFiles={}"
+                          .format(dataset.dataFiles))
         dataset.evals_constraints, maxevals_cons, finalfunvals_cons = aligner(data,
                 self.evaluation_constraints_idx,
                 self.function_value_idx, rewind_reader=True)
