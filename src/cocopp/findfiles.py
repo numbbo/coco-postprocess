@@ -19,6 +19,7 @@ import sys
 import warnings
 import tarfile
 import zipfile
+import hashlib
 
 if sys.version_info[0] >= 3:
     from urllib.request import urlretrieve
@@ -133,8 +134,17 @@ def get_directory(directory, extract_files):
 
     return directory
 
+def hash(string, len_=None):
+    """return a hash of len `len_` or full length if ``len_ is None``"""
+    if len_ == 0:
+        return ''
+    h = hashlib.sha1(string.encode('utf-8')).hexdigest()
+    if len_:
+        h = h[:len_]
+    return h
 
-def get_output_directory_sub_folder(args):
+def get_output_directory_sub_folder(args, addhash=4):
+    """`addhash` indicates the number of chars to add to make the name unique"""
 
     directory = ''
     if not isinstance(args, (list, set, tuple)):
@@ -158,5 +168,6 @@ def get_output_directory_sub_folder(args):
     if len(directory) == 0:
         raise ValueError(args)
 
-    return directory
+    return directory + (
+        '_' + hash(''.join(args), addhash) if addhash else '')
 
