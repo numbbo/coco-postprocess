@@ -134,20 +134,20 @@ line_styles = [  # used by ppfigs and pprlmany, linewidth=1 can also be set here
     # {'color': '#ff7d0b', 'linestyle': '-', 'marker': 'd', 'markersize': 7, 'zorder': 2},
     {'color': '#fa7009', 'linestyle': '-', 'marker': 'd', 'markersize': 7, 'zorder': 2},
     {'color': '#22a022', 'linestyle': '-', 'marker': '*', 'markersize': 8.7, 'zorder': 2},
-    {'color': '#d61e1f', 'linestyle': '-', 'marker': 'P', 'markersize': 8, 'zorder': 2},
-    {'color': '#8a52bd', 'linestyle': '-', 'marker': 'p', 'markersize': 8, 'zorder': 2},
+    {'color': '#d61e1f', 'linestyle': '-', 'marker': 'P', 'markersize': 8, 'zorder': 2},# red
+    #{'color': '#8a52bd', 'linestyle': '-', 'marker': 'p', 'markersize': 8, 'zorder': 2},#purple
     {'color': '#8c493c', 'linestyle': '-', 'marker': 'v', 'markersize': 8, 'zorder': 2},
     {'color': '#e35fbb', 'linestyle': '-', 'marker': 'X', 'markersize': 8, 'zorder': 2},
     {'color': '#11bdcf', 'linestyle': '-', 'marker': '^', 'markersize': 8, 'zorder': 2},
-    {'color': '#7f7f7f', 'linestyle': '-', 'marker': 'D', 'markersize': 6, 'zorder': 2},
-    {'color': '#bcbd1a', 'linestyle': '-', 'marker': '<', 'markersize': 8, 'zorder': 2},
+    {'color': '#7f7f7f', 'linestyle': '-', 'marker': 'D', 'markersize': 6, 'zorder': 2},# gray
+    {'color': '#bcbd1a', 'linestyle': '-', 'marker': '<', 'markersize': 8, 'zorder': 2},# yellow
     {'color': '#440154', 'linestyle': '--', 'marker': '>', 'markersize': 8, 'zorder': 2.001},
-#    {'color': '#00ff5c', 'linestyle': '-', 'marker': 'h', 'markersize': 8, 'zorder': 1.999},  # shiny green
-    {'color': '#2500bb', 'linestyle': '--', 'marker': 'o', 'markersize': 7, 'zorder': 2.001},  # blue, ff->bb
+#    {'color': '#00ff5c', 'linestyle': '-', 'marker': 'h', 'markersize': 8, 'zorder': 1.999},# shiny green
+    {'color': '#2500bb', 'linestyle': '--', 'marker': 'p', 'markersize': 7, 'zorder': 2.001},# blue, ff->bb
     {'color': '#f800fd', 'linestyle': '--', 'marker': 'd', 'markersize': 7, 'zorder': 2.001},
     {'color': '#91b6e8', 'linestyle': '-', 'marker': '*', 'markersize': 8.5, 'zorder': 1.4},
     {'color': '#ffae5f', 'linestyle': '-', 'marker': 'P', 'markersize': 8, 'zorder': 1.4},
-    {'color': '#82df70', 'linestyle': '-', 'marker': 'p', 'markersize': 8, 'zorder': 1.4},
+    {'color': '#82df70', 'linestyle': '-', 'marker': 'o', 'markersize': 8, 'zorder': 1.4},
     {'color': '#ff7b79', 'linestyle': '-', 'marker': 'v', 'markersize': 8, 'zorder': 1.4},
     {'color': '#ba96d5', 'linestyle': '-', 'marker': 'X', 'markersize': 8, 'zorder': 1.4},
     {'color': '#f797c0', 'linestyle': '-', 'marker': '^', 'markersize': 8, 'zorder': 1.4},
