@@ -305,7 +305,7 @@ class RunlengthBasedTargetValues(TargetValues):
             from . import bestalg
             self.reference_data = bestalg.load_reference_algorithm(self.reference_algorithm, force=True)
             # TODO: remove targets smaller than 1e-8
-        elif type(self.reference_data) is str:  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work
+        elif isinstance(self.reference_data, string_types):  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work
             self._short_info = 'reference budgets from ' + self.reference_data
             # dsl = DataSetList(os.path.join(sys.modules[globals()['__name__']].__file__.split('cocopp')[0],
             #                                'cocopp', 'data', self.reference_data))
