@@ -752,7 +752,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                             return toolsstats.prctile(vals, [which])[0]
                         if 1 < 3:
                             if 'entry' in locals():  # entry was assigned under a try
-                                dictMaxEvals[keyValue].append(percentile(entry.budget_effective_estimates.values()))
+                                dictMaxEvals[keyValue].append(percentile(entry.budget_effective_estimates.values()) / divisor)
                         if 1 < 3:
                             maxmed = percentile(runlengthunsucc)
                             if len(runlengthsucc):
