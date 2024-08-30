@@ -1,5 +1,5 @@
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp" width="300">          
+<img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp" width="250">          
 </h1>
 <br>
 
