@@ -1,9 +1,12 @@
 <h1 align="center">
-<img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp" width="250">          
+    <table>
+  <td>COmparing Continuous Optimisers (COCO) Post-Processing 
+  </td>
+  <td><img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp">          
+</td>
+</table>
 </h1>
 <br>
-
-# COmparing Continuous Optimisers (COCO) post-processing
 
 The ([`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html)) package takes data generated with the [COCO framework](https://github.com/numbbo/coco) to compare continuous optimisers and produces output figures and tables in `html` format and for inclusion into LaTeX documents.
 
