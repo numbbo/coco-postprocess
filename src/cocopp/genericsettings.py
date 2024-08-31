@@ -239,14 +239,17 @@ isExpensive = False
 isRldOnSingleFcts = True
 isRLDistr = True
 
-# usage: background = {(color, linestyle): [alg1, alg2, ...], }
-# for example:
 # background = {('#d8d8d8', '-'): ['data/BFGS_ros_noiseless.tgz'], ('#f88017', ':'): ['data/NEWUOA_ros_noiseless.tgz', 'data/RANDOMSEARCH_auger_noiseless.tgz']}
-background = {}  # TODO: we should have a more instructive name here
+background = {}
+'''algorithms to shown for comparison "in the background".
+   Usage: `` background = {(color, linestyle): [path_to_data1, path_to_data2, ...], }``
+   Examples: ``background = {None: cocopp.archives.bbob.get_all('2009/')}`` for all algorithms benchmarked in 2009 on the bbob test suite show with default line style, or
+   ``background = {None: cocopp.archives.bbob_mixint.get_all('')}`` for all algorithms
+   benchmarked on the bbob-mixint test suite.'''
 background_default_style = (3 * (0.9,), '-')  # very light gray
 
 foreground_algorithm_list = []
-"""a list of data files/folders as those specified in cocopp.main"""
+'''a list of data files/folders as those specified in cocopp.main'''
 
 ##
 isLogLoss = True  # only affects rungeneric1
