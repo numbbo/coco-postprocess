@@ -409,7 +409,7 @@ def save_single_functions_html(filename,
                     for name in names:
                         f.write(add_image('%s_%02dD_%s.%s' % (name, dimension,
                                                               typeKey, extension), True))
-                    f.write('</div>')
+                    f.write('</div>\n')
 
             key = 'bbobpprldistrlegend' + testbedsettings.current_testbed.scenario
             f.write(caption_string_format % htmldesc.getValue('##' + key + '##'))
@@ -429,7 +429,7 @@ def save_single_functions_html(filename,
                         f.write(add_image('%s_%02dD_%s.%s'
                                           % (name, dimension, typeKey, extension),
                                           True))
-                    f.write('</div>')
+                    f.write('</div>\n')
 
             key = 'bbobpprldistrlegendtwo' + testbedsettings.current_testbed.scenario
             f.write(caption_string_format % htmldesc.getValue('##' + key + '##'))
@@ -448,7 +448,7 @@ def save_single_functions_html(filename,
                 f.write('<div>')
                 for dimension in dimensions:
                     f.write(add_image('pplogloss_%02dD_%s.%s' % (dimension, function_group, extension), True))
-                f.write('</div>')
+                f.write('</div>\n')
 
                 f.write("\n<!--tables-->\n")
                 scenario = testbedsettings.current_testbed.scenario
@@ -459,14 +459,15 @@ def save_single_functions_html(filename,
                     f.write('<div>')
                     for dimension in dimensions:
                         f.write(add_image('pplogloss_%02dD_%s.%s' % (dimension, typeKey, extension), True))
-                    f.write('</div>')
+                    f.write('</div>\n')
 
                 f.write(caption_string_format % htmldesc.getValue('##bbobloglossfigurecaption' + scenario + '##'))
 
         if caption:
             f.write(caption_string_format % caption)
 
-        f.write("\n<BR/><BR/><BR/><BR/><BR/>\n</BODY>\n</HTML>")
+        f.write("\n\n{0}</BODY>\n</HTML>".format(
+            22 * "   <BR/><BR/><BR/><BR/><BR/>\n"))  # solicit top alignment for last dimension tag
         
     toolsdivers.replace_in_file(filename + add_to_names + '.html', '??COCOVERSION??', '<br />Data produced with COCO %s' % (toolsdivers.get_version_label(None)))
 
@@ -475,7 +476,7 @@ def save_single_functions_html(filename,
 
 
 def write_dimension_links(dimension, dimensions, index):
-    links = '<p><A NAME="%d"></A>' % dimension
+    links = '\n<p><A NAME="%d"></A>' % dimension
     if index == 0:
         links += '<A HREF="#%d">Last dimension</A> | ' % dimensions[-1]
     else:
