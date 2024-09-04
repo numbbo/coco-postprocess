@@ -1,13 +1,13 @@
 <h1 align="center">
-    <table>
+    <table border="0">
   <td>COmparing Continuous Optimisers (COCO) Post-Processing 
   </td>
   <td><img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp">          
 </td>
 </table>
 </h1>
-<br>
 
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2594848.svg)][paper]  
 The ([`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html)) package takes data generated with the [COCO framework](https://github.com/numbbo/coco) to compare continuous optimisers and produces output figures and tables in `html` format and for inclusion into LaTeX documents.
 
 ## Installation
@@ -45,3 +45,6 @@ can be browsed at [https://numbbo.github.io/ppdata-archive/bbob/2009](https://nu
 where [`None`](http://docs.python.org/library/constants.html#None) invokes the default color (grey) and line style (solid) <tt class="rst-docutils literal">genericsettings.background_default_style</tt>. Now we could compare our own data with the first <tt class="rst-docutils literal">'bfgs'</tt>-matching archived algorithm where all other archived BFGS data are shown in the background with the command
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> cocopp.main(<span class="py-string">'exdata/my_output bfgs!'</span>)  <span class="py-comment"></span></pre>
+
+[paper]: https://doi.org/10.5281/zenodo.2594848
+
