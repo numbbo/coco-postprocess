@@ -8,11 +8,11 @@
 </h1>
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2594848.svg)][paper]  
-The ([`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html)) package takes data generated with the [COCO framework](https://github.com/numbbo/coco) to compare continuous optimisers and produces output figures and tables in `html` format and for inclusion into LaTeX documents.
+The ([`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html)) package uses data generated with the [COCO framework](https://numbbo.it) (comparing not only continuous optimisers) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents. The main documentation page can be found at [getting-started](https://numbbo.it/getting-started/postprocessing.html) and in the [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp), but see also [here](https://numbbo.github.io).
 
 ## Installation
 
-    pip install coco-postprocess
+    pip install cocopp
 
 ## Usage
 
