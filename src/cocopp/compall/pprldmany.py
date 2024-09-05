@@ -385,6 +385,11 @@ def plotLegend(handles, maxval):
                 if (not plt.getp(h, 'label').startswith('_line') and
                         (len(show_algorithms) == 0 or
                                  plt.getp(h, 'label') in show_algorithms)):
+                    is_recommendation = False
+                    if plt.getp(h, 'label') in genericsettings.foreground_algorithm_list:
+                        is_recommendation = genericsettings.use_recommendations[min((
+                            len(genericsettings.use_recommendations) - 1,
+                            genericsettings.foreground_algorithm_list.index(plt.getp(h, 'label'))))]
                     y = 0.02 + i * 0.96 / (lh - 1)
                     tmp = {}
                     for attr in ('lw', 'linestyle', 'marker',
@@ -400,6 +405,7 @@ def plotLegend(handles, maxval):
                                      toolsdivers.strip_pathname1(plt.getp(h, 'label'))[:numberOfCharacters]),
                                  horizontalalignment="left",
                                  verticalalignment="center",
+                                 color="darkviolet" if is_recommendation else "black",
                                  fontsize=fontsize))
                     reslabels.append(plt.getp(h, 'label'))
                     # set_trace()
