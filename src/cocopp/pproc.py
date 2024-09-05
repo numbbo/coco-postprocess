@@ -3566,6 +3566,12 @@ def processInputArgs(args, process_background_algorithms=False):
     _block_using_recommendations = True
     if process_background_algorithms:
         genericsettings.foreground_algorithm_list.extend(sortedAlgs)
+        # remove foreground algorithms from background list
+        for color in genericsettings.background:
+            algs = genericsettings.background[color]
+            for i in range(len(algs) - 1, -1, -1):
+                if algs[i] in genericsettings.foreground_algorithm_list:
+                    algs.pop(i)
         for value in genericsettings.background.values():
             assert isinstance(value, (list, tuple, set))
             process_arguments(value, current_hash, dictAlg, dsList, sortedAlgs)
