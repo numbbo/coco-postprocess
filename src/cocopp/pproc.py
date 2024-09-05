@@ -3195,9 +3195,9 @@ class DataSetList(list):
 
             funcs_processed.sort()
             funcs_solved.sort()
-            assert map(int, np.__version__.split('.')) > [1, 4, 0], \
-    """for older versions of numpy, replacing `nan` with `inf` might work
-    for sorting here"""
+            assert [int(n) for n in np.__version__.split('.')] > [1, 4, 0], (
+                "for older versions of numpy, replacing `nan` with `inf`"
+                " might work for sorting here")
             rld_data = np.hstack(rld_data)
             if reference_data_set_list is not None:
                 ref_scores = np.hstack(ref_scores)
