@@ -11,6 +11,7 @@ name = "coco-postprocess"
 authors = [
   {name="Umut Batu"},
   {name="Dimo Brockhoff"},
+  {name="Paul Dufossé"},
   {name="Nikolaus Hansen"},
   {name="Filip Matzner"},
   {name="Raymond Ros"},
