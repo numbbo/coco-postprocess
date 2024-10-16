@@ -9,10 +9,12 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "coco-postprocess"
 authors = [
-  {name="Dimo Brockhoff", email="dimo.brockhoff@inria.fr"},
-  {name="Nikolaus Hansen", email="nikolaus.hansen@inria.fr"},
+  {name="Umut Batu"},
+  {name="Dimo Brockhoff"},
+  {name="Nikolaus Hansen"},
+  {name="Filip Matzner"},
   {name="Raymond Ros"},
-  {name="Dejan Tusar"},
+  {name="Dejan Tušar"},
 ]
 description = "Benchmarking framework for all types of black-box optimization algorithms, postprocessing."
 readme = "README.md"
