@@ -45,8 +45,8 @@ dynamic = ["version"]
 
 [project.urls]
 Homepage = "https://numbbo.github.io"
-Issues = "https://github.com/numbbo/coco/issues"
-Repository = "https://github.com/numbbo/coco"
+Issues = "https://github.com/numbbo/coco-postprocess/issues"
+Repository = "https://github.com/numbbo/coco-postprocess"
 
 [tool.setuptools_scm]
 version_file = "src/cocopp/_version.py"
