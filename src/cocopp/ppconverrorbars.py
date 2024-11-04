@@ -6,11 +6,10 @@
 from __future__ import absolute_import
 
 import os
-import sys
 import numpy
 
 from . import toolsdivers
-from . import genericsettings, pproc, testbedsettings
+from . import pproc, testbedsettings
 from .ppfig import save_figure, save_single_functions_html, convergence_plots_header
 from .toolsstats import prctile
 

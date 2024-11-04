@@ -18,11 +18,10 @@ Help:
 from __future__ import absolute_import
 from __future__ import print_function
 
-import os, sys
-from pdb import set_trace
-import matplotlib
+import os
 
-import warnings, getopt, numpy as np
+import warnings
+import numpy as np
 
 from . import genericsettings, testbedsettings, config, ppfig, pptable, pprldistr, ppfigdim, ppfigcons1, pplogloss, findfiles
 from .pproc import DataSetList, store_reference_values, dictAlgByDim

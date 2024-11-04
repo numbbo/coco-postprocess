@@ -179,7 +179,7 @@ def get_short_names(file_name):
                 info_dict[int(key_val[0])] = key_val[1]
 
         return info_dict
-    except:
+    except:  # noqa: E722
         warnings.warn('benchmark infos not found')
         print(os.path.join(os.path.dirname(__file__), file_name))
 
@@ -370,7 +370,7 @@ class GECCOBBOBTestbed(Testbed):
             elif detected_suite == 'bbob-JOINED-bbob-largescale':
                 continue
             elif detected_suite == 'sbox-cost':
-                scenario_sboxcostfixed = True
+                pass
             else:
                 raise ValueError("Data from %s suite is not "
                                  "compatible with other data from "
@@ -411,7 +411,6 @@ class SBOXCOSTTestbed(GECCOBBOBTestbed):
         self.name = 'sbox-cost'
         self.reference_algorithm_filename = ''   # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_sboxcostfixed
 
         # self.instancesOfInterest = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
 
@@ -428,7 +427,6 @@ class SboxCostJOINEDTestbed(SBOXCOSTTestbed):
         self.instantiate_attributes(targetValues)
         self.reference_algorithm_filename = ''  # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_sboxcostfixed
 
 
 

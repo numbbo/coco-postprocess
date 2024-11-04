@@ -162,7 +162,7 @@ class BestAlgSet(DataSet):
         for i in res:
             # Find best algorithm
             curerts = i[1:]
-            assert len((np.isnan(curerts) == False)) > 0
+            assert len(~np.isnan(curerts)) > 0
             currentbestert = np.inf
             currentbestalg = ''
             for j, tmpert in enumerate(curerts):
@@ -372,7 +372,7 @@ class BestAlgSet(DataSet):
             successful_runs = success_ratios[0][0]
             all_runs = success_ratios[0][1]
         else:
-            successful_runs = np.sum(np.isnan(det_evaluations[0][0]) == False)  # count the nb of success
+            successful_runs = np.sum(~np.isnan(det_evaluations[0][0]))  # count the nb of success
             all_runs = len(det_evaluations[0][0])
 
         return successful_runs, all_runs
@@ -439,7 +439,7 @@ def load_reference_algorithm(best_algo_filename, force=False, relative_load=True
             if testbedsettings.current_testbed:            
                 if hasattr(testbedsettings.current_testbed, 'reference_algorithm_displayname'):
                     testbedsettings.current_testbed.reference_algorithm_displayname = pickleFilename
-        except:
+        except: # noqa: E722
             warnings.warn("failed to open file %s" % pickleFilename)
             # raise  # outcomment to diagnose
             bestAlgorithmEntries = None
@@ -706,7 +706,7 @@ def getAllContributingAlgorithmsToBest(algnamelist, target_lb=1e-8,
 
     selectedalgsperdimension = {}
     for (d, a) in sorted(countsperalgorithm):
-        if not d in selectedalgsperdimension:
+        if d not in selectedalgsperdimension:
             selectedalgsperdimension[d] = []
         selectedalgsperdimension[d].append((countsperalgorithm[(d, a)], a))
 
@@ -801,7 +801,7 @@ def extractBestAlgorithms(args=algs2009, f_factor=2,
 
     selectedalgsperdimension = {}
     for (d, a) in sorted(countsperalgorithm):
-        if not d in selectedalgsperdimension:
+        if d not in selectedalgsperdimension:
             selectedalgsperdimension[d] = []
         selectedalgsperdimension[d].append((countsperalgorithm[(d, a)], a))
 

@@ -4,8 +4,11 @@
 """Various tools. 
 
 """
-import os, time, warnings
-import tempfile, shutil
+import os
+import time
+import warnings
+import tempfile
+import shutil
 from collections import OrderedDict as _OrderedDict
 import re as _re
 import numpy as np
@@ -382,7 +385,7 @@ def num2str(val, significant_digits=2, force_rounding=False,
         return '0'
     assert significant_digits > 0
     is_negative = val < 0
-    original_value = val
+    # original_value = val # OME 2024-11-04: Unused?!?
     val = float(np.abs(val))
 
     order_of_magnitude = int(np.floor(np.log10(val)))
@@ -464,12 +467,12 @@ def number_to_html(number_as_string):
     return s
 
 def legend(*args, **kwargs):
-   kwargs.setdefault('framealpha', 0.2)
+   kwargs.setdefault("framealpha", 0.2)
    try:
       plt.legend(*args, **kwargs)
-   except:
+   except: # noqa: E722
       warnings.warn("framealpha not effective")
-      kwargs.pop('framealpha')
+      kwargs.pop("framealpha")
       plt.legend(*args, **kwargs)
       
 try:
@@ -509,7 +512,7 @@ def git(args):
         output = check_output(full_command, env=os.environ,
                               stderr=STDOUT, universal_newlines=True)
         output = output.rstrip()
-    except CalledProcessError as e:
+    except CalledProcessError:
         # print('Failed to execute "%s"' % str(full_command))
         raise
     return output
@@ -526,7 +529,7 @@ def get_version_label(algorithmID=None):
     from ._version import __version__ as coco_version
     reference_values = testbedsettings.get_reference_values(algorithmID)
     
-    if reference_values and type(reference_values) is set:        
+    if reference_values and isinstance(reference_values, set):
         label = "v%s, hv-hashes inconsistent:" % (coco_version)
         for r in reference_values:
             label = label + " %s and" % (r)

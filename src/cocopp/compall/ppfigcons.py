@@ -21,7 +21,7 @@ import matplotlib.pyplot as plt
 import numpy
 import warnings
 from pdb import set_trace
-from .. import toolsdivers, toolsstats, bestalg, pproc, genericsettings, htmldesc, ppfigparam, ppfig
+from .. import toolsdivers, toolsstats, bestalg, pproc, genericsettings, htmldesc, ppfigparam
 from .. import testbedsettings
 from .. import captions
 from ..ppfig import save_figure, get_plotting_styles, getFontSize

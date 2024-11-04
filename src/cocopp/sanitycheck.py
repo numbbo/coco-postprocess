@@ -76,7 +76,7 @@ def checkinfofile(filename, verbose=True):
                         print('Found data files %s.dat and %s.tdat' % (root, root))
                 datfiles.extend((dat, tdat))
             else:
-                if not ':' in elem:
+                if ':' not in elem:
                     warnings.warn('Caught an ill-finalized run in %s'
                                   % (filename))
                     trials.append(ast.literal_eval(elem))
@@ -99,7 +99,7 @@ def checkinfofile(filename, verbose=True):
             if tmp == 0.:
                 try:
                     info = dict(parseinfo(line))
-                except:
+                except:  # noqa: E722
                     msg = ('Cannot parse key=value pairs (check that string '
                            'values are in-between brackets)')
             elif tmp == 1.:
@@ -119,7 +119,7 @@ def checkinfofile(filename, verbose=True):
 
             # Checking by groups of 3 lines (1 index entry)
             if tmp == 2:
-                miss_attr = list(i for i in crit_attr if not i in info)
+                miss_attr = list(i for i in crit_attr if i not in info)
                 if miss_attr:
                     msg = ('File %s, entry l%d-%d is missing the following'
                            'keys: %s.' % (filename, i-2, i, ', '.join(miss_attr)))

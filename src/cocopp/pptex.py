@@ -3,13 +3,8 @@
 
 """Routines for writing TeX for tables."""
 from __future__ import absolute_import
-import os
-import sys
-import string
 import numpy
 
-from . import toolsstats
-from pdb import set_trace
 
 #GLOBAL VARIABLES DEFINITION
 alphabet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
@@ -287,7 +282,7 @@ def writeFEvalsMaxSymbols(fevals, maxsymbols, isscientific=False):
     #smallest representation of the decimal part
     #drop + and starting zeros of the exponent part
     repr1 = (('%.' + str(maxsymbols) + 'e') % fevals)
-    size1 = len(repr1)
+    # size1 = len(repr1) # OME 2024-11-04: Never used
     tmp = repr1.split('e', 1)
     tmp2 = tmp[-1].lstrip('+-0')
     if float(tmp[-1]) < 0:
@@ -360,7 +355,7 @@ def writeFEvalsMaxPrec(entry, SIG, maxfloatrepr=1e5):
         #smallest representation of the decimal part
         #drop + and starting zeros of the exponent part
         res = (('%.' + str(max([0, SIG - 1])) + 'e') % entry)
-        size1 = len(res)
+        # size1 = len(res)  # OME 2024-11-04: Never used
         tmp = res.split('e', 1)
         tmp2 = tmp[-1].lstrip('+-0')
         if float(tmp[-1]) < 0:

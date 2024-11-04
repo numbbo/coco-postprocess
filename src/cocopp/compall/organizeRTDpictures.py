@@ -7,7 +7,6 @@
 import os
 import sys
 import glob
-from pdb import set_trace
 
 def do(dirnames):
     """ moves images into different folders, only the overall RL distributions remain in the root folder"""

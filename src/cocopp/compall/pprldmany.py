@@ -215,10 +215,10 @@ def plotdata(data, maxval=None, maxevals=None, CrE=0., maxevals2=None, **kwargs)
     
     """
     # Expect data to be a ndarray.
-    x = data[np.isnan(data) == False]  # Take away the nans
+    x = data[np.isnan(data) == False]  # Take away the nans  # noqa: E712
     nn = len(x)
 
-    x = x[np.isinf(x) == False]  # Take away the infs
+    x = x[np.isinf(x) == False]  # Take away the infs  # noqa: E712
     n = len(x)
 
     x = np.exp(CrE) * x  # correction by crafting effort CrE
@@ -245,7 +245,7 @@ def plotdata(data, maxval=None, maxevals=None, CrE=0., maxevals2=None, **kwargs)
         try:  # plot the very last point outside of the "normal" plotting area
             c = kwargs['color']
             plt_plot(x_last, y_last, '.', color=c, markeredgecolor=c, markersize=4)
-        except:
+        except:  # noqa: E722
             pass
         x2 = np.hstack([np.repeat(x, 2), maxval])  # repeat x-values for each step in the cdf
         y2 = np.hstack([0.0, np.repeat(y / float(nn), 2)])
@@ -271,7 +271,7 @@ def plotdata(data, maxval=None, maxevals=None, CrE=0., maxevals2=None, **kwargs)
                         y3 = y2[x2 <= x3][-1]  # find right y-value for x3==median(maxevals)
                     except IndexError:  # median(maxevals) is smaller than any data, can only happen because of CrE?
                         y3 = y2[0]
-                h = plt.plot((x3,), (y3,),
+                plt.plot((x3,), (y3,),
                             marker=format[0],
                             markersize=format[1] * size_correction_from_n_foreground**0.85,
                             markeredgewidth=format[2],
@@ -455,7 +455,7 @@ def plot(dsList, targets=None, craftingeffort=0., **kwargs):
             x = [np.inf] * perfprofsamplesize
             runlengthunsucc = []
             evals = entry.detEvals([t])[0]
-            runlengthsucc = evals[np.isnan(evals) == False] / divisor
+            runlengthsucc = evals[np.isnan(evals) == False] / divisor  # noqa: E712
             if testbedsettings.current_testbed.has_constraints:
                 # maxevals is inconsistent in that case
                 maxevals_column = entry.maxfgevals
@@ -480,9 +480,9 @@ def plot(dsList, targets=None, craftingeffort=0., **kwargs):
 
     # Display data
     data = np.array(data)
-    data = data[np.isnan(data) == False]  # Take away the nans
+    data = data[np.isnan(data) == False]  # Take away the nans  # noqa: E712
     n = len(data)
-    data = data[np.isinf(data) == False]  # Take away the infs
+    data = data[np.isinf(data) == False]  # Take away the infs  # noqa: E712
     # data = data[data <= maxval] # Take away rightmost data
     data = np.exp(craftingeffort) * data  # correction by crafting effort CrE
     if len(data) == 0:  # data is empty.
@@ -570,7 +570,7 @@ def all_single_functions(dict_alg, is_single_algorithm, sorted_algs=None,
         dims = sorted(dictDim)
         for i, d in enumerate(dims):
             tempDictAlg = dictDim[d]
-            next_dim = dims[i+1] if i + 1 < len(dims) else dims[0]
+            dims[i+1] if i + 1 < len(dims) else dims[0]
             dictFG = pp.dictAlgByFuncGroup(tempDictAlg)
             for fg, entries in sorted(dictFG.items()):
                 main(entries,
@@ -682,7 +682,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             samplesize = max(run_numbers)
         else:
             try: lcm = np.lcm.reduce(run_numbers)  # lowest common multiplier
-            except: lcm = max(run_numbers)  # fallback for old numpy versions
+            except: lcm = max(run_numbers)  # fallback for old numpy versions  # noqa: E722
             # slight abuse of bootstrap_sample_size to avoid a huge number
             samplesize = min((int(genericsettings.simulated_runlength_bootstrap_sample_size), lcm))
         if testbedsettings.current_testbed.instances_are_uniform:
@@ -717,7 +717,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                         entry = dictAlgperFunc[alg][0]  # one element per fun and per dim.
                         evals = entry.detEvals([t])[0]
                         assert entry.dim == dim
-                        runlengthsucc = evals[np.isnan(evals) == False] / divisor
+                        runlengthsucc = evals[np.isnan(evals) == False] / divisor  # noqa: E712
                         if testbedsettings.current_testbed.has_constraints:
                             # maxevals is inconsistent in that case
                             maxevals_column = entry.maxfgevals
@@ -781,7 +781,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                             evals = refalgevals[0][j]
                             # set_trace()
                             assert dim == refalgentry.dim
-                            runlengthsucc = evals[np.isnan(evals) == False] / divisor
+                            runlengthsucc = evals[np.isnan(evals) == False] / divisor  # noqa: E712
                             runlengthunsucc = refalgentry.maxevals[refalgevals[1][j]][np.isnan(evals)] / divisor
                             x = toolsstats.drawSP(runlengthsucc, runlengthunsucc,
                                                   percentiles=[50],
@@ -816,14 +816,14 @@ def main(dictAlg, order=None, outputdir='.', info='default',
         for v in genericsettings.background.values():
             bg_algs.extend(v)
         n_foreground = len([a for a in dictData if a not in bg_algs])
-    except: n_foreground = len(dictData)
+    except: n_foreground = len(dictData)  # noqa: E722
     size_correction_from_n_foreground = 1.8 - 1 * min((1, (n_foreground - 1) / 30))
 
     styles = [s.copy() for s in genericsettings.line_styles]  # list of line/marker style dicts
     if styles[0]['color'] == '#000080':  # fix old styles marker size
         for s in styles:
             try: s['markersize'] /= 3.3  # apparently the appearance of sizes changed
-            except: pass
+            except: pass  # noqa: E722
     for plotting_style in plotting_style_list:
         for i, alg in enumerate(plotting_style.algorithm_list):
             try:

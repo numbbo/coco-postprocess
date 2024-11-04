@@ -6,13 +6,11 @@
 from __future__ import absolute_import
 
 import os
-import sys
 import warnings
 import numpy
 import matplotlib.pyplot as plt
 from .. import toolsstats, pproc, toolsdivers
 from ..ppfig import save_figure, consecutiveNumbers, plotUnifLogXMarkers
-from pdb import set_trace
 from six import advance_iterator
 
 #__all__ = []
@@ -39,7 +37,7 @@ def beautify(handles):
 
     axisHandle = plt.gca()
     axisHandle.set_xscale('log')
-    plt.axvline(1, ls='-', color='k');  # symmetry line for ERT1/ERT0 = 1
+    plt.axvline(1, ls='-', color='k')  # symmetry line for ERT1/ERT0 = 1
 
     xlim = plt.xlim()
     xlim = numpy.maximum(xlim[0], 1e-9), numpy.minimum(xlim[1], 1e9)
@@ -85,7 +83,7 @@ def beautify(handles):
 
 def computeERT(fevals, maxevals):
     data = fevals.copy()
-    success = (numpy.isnan(data)==False)
+    success = (numpy.isnan(data)==False)  # noqa: E712
     if any(numpy.isnan(data)):
         data[numpy.isnan(data)] = maxevals[numpy.isnan(data)]
     res = toolsstats.sp(data, issuccessful=success)
@@ -162,7 +160,7 @@ def plotLogAbs(dsList0, dsList1, dim, targetValuesToReach):
             label = '%s: %d/%d' % (targetValuesToReach.loglabel(j), succ1[j], succ0[j])
         if len(x) > 0:  # prevent warning/error
             x = numpy.hstack(x)
-            x = x[numpy.isnan(x)==False] # Is it correct?
+            x = x[numpy.isnan(x)==False] # Is it correct?  # noqa: E712
         n = len(x)
 
         if n == 0:

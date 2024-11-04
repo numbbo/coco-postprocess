@@ -19,14 +19,14 @@ the experimental data.
 
 from __future__ import absolute_import, print_function
 
-import os, sys
+import os
+import sys
 import numpy
 import warnings
 
 from . import genericsettings, testbedsettings, dataformatsettings
 
-from pdb import set_trace
-from six import string_types, advance_iterator
+from six import advance_iterator
 
 # CLASS DEFINITIONS
 class MultiReader(list):

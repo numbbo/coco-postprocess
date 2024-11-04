@@ -23,22 +23,23 @@ import sys
 import os
 import ast
 import re
-import pickle, gzip  # gzip is for future functionality: we probably never want to pickle without gzip anymore
+import pickle
+import gzip  # gzip is for future functionality: we probably never want to pickle without gzip anymore
 import warnings
 import json
 import hashlib
 import functools
 import collections
-from pdb import set_trace
 from six import string_types, advance_iterator
-import numpy, numpy as np
+import numpy
+import numpy as np
 import matplotlib.pyplot as plt
 from collections import OrderedDict
 from . import genericsettings, findfiles, toolsstats, toolsdivers
 from . import testbedsettings, dataformatsettings
 from .readalign import split, align_data, HMultiReader, VMultiReader, openfile
 from .readalign import HArrayMultiReader, VArrayMultiReader, alignArrayData
-from .ppfig import consecutiveNumbers, Usage
+from .ppfig import consecutiveNumbers
 from . import archiving
 
 do_assertion = genericsettings.force_assertions # expensive assertions
@@ -138,7 +139,7 @@ def asTargetValues(target_values):
     try:
         isinstance(target_values((1, 20)), list)
         return target_values
-    except:
+    except:  # noqa: E722
         raise NotImplementedError("""type %s not recognized""" %
                                   str(type(target_values)))
 class TargetValues(object):
@@ -801,8 +802,10 @@ class DataSet(object):
         # Extract information from the header line.
         self._extra_attr = []
         self.__parseHeader(header)
-        try: _algId = self.algId
-        except: _algId = None
+        try: 
+            _algId = self.algId
+        except: # noqa: E722
+            _algId = None
         # In biobjective case we have some header info in the data line.
         self.__parseHeader(data)
         if _algId and _algId != self.algId:
@@ -1135,7 +1138,7 @@ class DataSet(object):
                     s += sum(self.maxevals[np.logical_not(succ)])
                 self._ert.append(s / sum(succ))
             if np.random.rand() < 0.01:  # old code for cross checking, to be removed TODO
-                succ = (numpy.isnan(data)==False)
+                succ = (numpy.isnan(data)==False)  # noqa: E712
                 if any(numpy.isnan(data)):
                     data = data.copy()
                     data[numpy.isnan(data)] = self.maxevals[numpy.isnan(data)]
@@ -1198,8 +1201,10 @@ class DataSet(object):
         number of successes and supply the multipliers
         max(samplesizes) / samplesizes.
     """
-        try: targets = targets([self.funcId, self.dim])
-        except TypeError: pass
+        try:
+            targets = targets([self.funcId, self.dim])
+        except TypeError: 
+            pass
         if samplesize is None:  # default sampling is derandomized, hence no need for a huge number
             samplesize = 0
             while samplesize < 15:
@@ -1643,7 +1648,7 @@ class DataSet(object):
         evalsums = []
         for evalrow in self.detEvals(targets):
             idxnan = np.isnan(evalrow)
-            evalsums.append(sum(evalrow[idxnan==False]) + sum(self.maxevals[idxnan]))
+            evalsums.append(sum(evalrow[idxnan==False]) + sum(self.maxevals[idxnan]))  # noqa: E712
         
         averages = np.asarray(evalsums) / self.nbRuns()
             
@@ -2274,8 +2279,10 @@ class DataSet(object):
         in the leading columns of the `_evals` attribute.
         """
         def nanequal(a, b):
-            try: return np.array_equal(a, b, equal_nan=True)  # since 1.19 (2020)
-            except AttributeError: return np.all((a == b) | (np.isnan(a) & np.isnan(b)))
+            try:
+                return np.array_equal(a, b, equal_nan=True)  # since 1.19 (2020)
+            except AttributeError:
+                return np.all((a == b) | (np.isnan(a) & np.isnan(b)))
         targets = sorted(set.union(set(self._evals[:, 0]), set(ds._evals[:, 0])))
         if not targets:
             return []
@@ -3489,7 +3496,7 @@ def parseinfo(s):
             elem1 = ('\'' + re.sub(r'(?<!\\)(\')', r'\\\1', elem1[1:-1]) + '\'')
         try:
             elem1 = ast.literal_eval(elem1)
-        except:
+        except:  # noqa: E722
             if sys.version.startswith("2.6"):  # doesn't like trailing '\n'
                 elem1 = ast.literal_eval(elem1.strip())  # can be default anyway?
             else:
@@ -3678,7 +3685,8 @@ def dictAlgByDim(dictAlg):
                     if d in testbedsettings.current_testbed.dimensions_to_display[:-1]:
                         warning_txts += ['No data for algorithm %s in %d-D.'
                                          % (alg, d)]
-                except AttributeError: pass
+                except AttributeError: 
+                    pass
             # try:
             #     tmp = tmpdictAlg[alg][d]
             # except KeyError:

@@ -17,7 +17,6 @@ import sys
 import time
 import inspect
 import fnmatch
-import urllib
 import tempfile
 import shutil
 import subprocess

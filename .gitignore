@@ -11,6 +11,7 @@ __pycache__
 .vscode/*
 .version
 .idea/
+.ruff_cache/
 
 build/
 src/cocopp/_version.py

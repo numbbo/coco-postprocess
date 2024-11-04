@@ -240,8 +240,8 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                 data.append(toolsstats.sp(tmp, issuccessful=succ)[0])
                 # if not any(succ):
                 #   set_trace()
-                if any(succ):
-                    tmp2 = toolsstats.drawSP(tmp[succ], tmp[succ == False],
+                if any(succ): # noqa: E712
+                    tmp2 = toolsstats.drawSP(tmp[succ], tmp[succ == False],  # noqa: E712
                                              (10, 50, 90), entry.bootstrap_sample_size())[0]
                     dispersion.append((tmp2[-1] - tmp2[0]) / 2.)
                 else:
@@ -409,8 +409,8 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
             tmp = entry.evals[entry.evals[:, 0] <= targetf, 1:]
             try:
                 tmp = tmp[0]
-                curline.append('%d' % np.sum(np.isnan(tmp) == False))
-                curlineHtml.append('<td>%d' % np.sum(np.isnan(tmp) == False))
+                curline.append('%d' % np.sum(~np.isnan(tmp)))
+                curlineHtml.append('<td>%d' % np.sum(~np.isnan(tmp)))
             except IndexError:
                 curline.append('%d' % 0)
                 curlineHtml.append('<td>%d' % 0)

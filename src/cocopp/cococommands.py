@@ -298,7 +298,7 @@ def systeminfo():
     print('Matplotlib %s' % matplotlib.__version__)
     try:
         from . import __version__ as version
-    except:
+    except: # noqa: E722
         from cocopp import __version__ as version
     print('cocopp %s' % version)
 

@@ -12,7 +12,6 @@ reference (best) ERT value (or the inverse)
 from __future__ import absolute_import, print_function
 
 import os
-from pdb import set_trace
 import numpy as np
 from matplotlib import pyplot as plt
 try:
@@ -25,7 +24,6 @@ from six import advance_iterator
 from . import toolsstats, toolsdivers, bestalg, testbedsettings, genericsettings, captions
 from .pptex import writeFEvals2
 from .ppfig import save_figure, consecutiveNumbers
-from . import testbedsettings
 
 r"""
 ERT loss ratio of an algorithm A for comparison to a reference/best algorithm.
@@ -201,7 +199,7 @@ def generateData(dsList, evals, CrE_A):
         ERT_A = np.array(ERT_A)
         ERT_ref = np.array(ERT_ref)
         loss_A = np.exp(CrE_A) * ERT_A / ERT_ref
-        assert (np.isnan(loss_A) == False).all()
+        assert (np.isnan(loss_A) == False).all()  # noqa: E712
         #set_trace()
         #if np.isnan(loss_A).any() or np.isinf(loss_A).any() or (loss_A == 0.).any():
         #    txt = 'Problem with entry %s' % str(entry)
@@ -390,7 +388,7 @@ def plot(xdata, ydata):
     if max(len(i) for i in ydata) < 20: # TODO: subgroups of function, hopefully.
         for i, y in enumerate(ydata):
             # plot all single data points
-            if (np.isfinite(y) == False).any():
+            if (np.isfinite(y) == False).any():  # noqa: E712
                 assert not (np.isinf(y) * y > 0.).any()
                 assert not np.isnan(y).any()
 
@@ -425,7 +423,7 @@ def plot(xdata, ydata):
     else:
         for i, y in enumerate(ydata):
             # plot all single data points
-            if (np.isfinite(y) == False).any():
+            if (np.isfinite(y) == False).any():  # noqa: E712
                 assert not (np.isinf(y) * y > 0.).any()
                 assert not np.isnan(y).any()
 
@@ -763,7 +761,7 @@ def generateFigure(dsList, CrE=0., isStoringXRange=True, outputdir='.',
 
     # do not aggregate over dimensions
     for d, dsdim in sorted(dsList.dictByDim().items()):
-        maxevals = max(max(i.ert[np.isinf(i.ert) == False]) for i in dsdim)
+        maxevals = max(max(i.ert[np.isinf(i.ert) == False]) for i in dsdim)  # noqa: E712
         EVALS = [2.*d]
         EVALS.extend(10.**(np.arange(1, np.ceil(1e-9 + np.log10(maxevals * 1./d))))*d)
         if not evalf:

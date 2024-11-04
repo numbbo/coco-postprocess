@@ -44,10 +44,10 @@ from __future__ import absolute_import, print_function
 import os
 import sys
 import warnings # I don't know what I am doing here
-import pickle, gzip
+import pickle
+import gzip
 import matplotlib.pyplot as plt
 import numpy as np
-from pdb import set_trace
 from . import genericsettings, pproc, toolsdivers
 from . import testbedsettings
 from .ppfig import consecutiveNumbers, plotUnifLogXMarkers, save_figure, logxticks
@@ -116,7 +116,6 @@ def load_previous_data(filename=previous_data_filename, force=False):
         return pickle.load(f)
     except IOError as e:
         print("I/O error(%s): %s" % (e.errno, e.strerror))
-        previous_algorithm_data_found = False
         print('Could not find file: ', previous_data_filename)
     else:
         f.close()
@@ -271,7 +270,7 @@ def beautifyECDF():
     c = plt.gca().get_children()
     for i in c: # TODO: we only want to extend ECDF lines...
         try:
-            if i.get_drawstyle() == 'steps' and not i.get_linestyle() in ('', 'None'):
+            if i.get_drawstyle() == 'steps' and i.get_linestyle() not in ('', 'None'):
                 xdata = i.get_xdata()
                 ydata = i.get_ydata()
                 if len(xdata) > 0:
@@ -490,7 +489,7 @@ def plotRLDistr(dsList, target, label='', max_fun_evals=np.inf,
         funcs.add(ds.funcId)
         tmp = ds.detEvals((target((ds.funcId, ds.dim)),))[0] / ds.dim
         nn += len(tmp)
-        tmp = tmp[np.isnan(tmp) == False] # keep only success
+        tmp = tmp[np.isnan(tmp) == False] # keep only success  # noqa: E712
         if len(tmp) > 0 and sum(tmp <= max_fun_evals):
             fsolved.add(ds.funcId)
         x.extend(tmp)
@@ -737,7 +736,7 @@ def plot_previous_algorithms(dim, funcs):
                 tmp2 = tmp[f][dim][0][1:]
                 # [0], because the maximum #evals is also recorded
                 # [1:] because the target function value is recorded
-                x.append(tmp2[np.isnan(tmp2) == False])
+                x.append(tmp2[np.isnan(tmp2) == False])  # noqa: E712
                 nn += len(tmp2)
 
             if x:
@@ -769,7 +768,7 @@ def plotRLB_previous_algorithms(dim, funcs):
                 tmp2 = np.array(tmp[f][dim][0][1:][0])
                 # [0], because the maximum #evals is also recorded
                 # [1:] because the target function value is recorded
-                x.append(tmp2[np.isnan(tmp2) == False])
+                x.append(tmp2[np.isnan(tmp2) == False])  # noqa: E712
                 nn += len(tmp2)
 
             if x:
@@ -855,7 +854,7 @@ def main(dsList, isStoringXMax=False, outputdir='',
         try: # was never tested, so let's make it safe
             if len(funcs) == 1:
                 plt.title(testbed.info(funcs[0])[:27])
-        except:
+        except:  # noqa: E722
             warnings.warn('could not print title')
 
 

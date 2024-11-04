@@ -7,8 +7,6 @@ This module creates a tex file with all the descriptions of the images and table
 
 """
 
-import os
-import sys
 import warnings
 
 from . import genericsettings, pplogloss, ppfigdim, ppfigcons1, pptable, pprldistr, config

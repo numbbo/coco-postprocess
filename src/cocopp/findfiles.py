@@ -22,10 +22,9 @@ import zipfile
 import hashlib
 
 if sys.version_info[0] >= 3:
-    from urllib.request import urlretrieve
+    pass
 else:
-    from urllib import urlretrieve
-from .toolsdivers import StringList  # def StringList(list_): return list_
+    pass
 from . import genericsettings
 
 # Initialization
@@ -121,8 +120,10 @@ def get_directory(directory, extract_files):
                         raise IOError(2, 'Some of the files cannot be extracted ' +
                                       'from "%s". The path is too long.' % directory)
 
-                    try: tar_file.extractall(dir_name, filter='data')
-                    except TypeError: tar_file.extractall(dir_name)  # Windows
+                    try: 
+                        tar_file.extractall(dir_name, filter="data")
+                    except TypeError:
+                        tar_file.extractall(dir_name)  # Windows
                     # TarFile.open handles tar.gz/tgz
                     print('    archive extracted to folder', dir_name, '...')
             directory = dir_name

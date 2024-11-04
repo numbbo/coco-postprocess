@@ -154,7 +154,7 @@ def plot(dsList, dsref, targets=defaulttargets, istoolsstats=False, **kwargs):
                 x = [np.inf] * perfprofsamplesize
                 runlengthunsucc = []
                 evals = entry.detEvals([t])[0]
-                runlengthsucc = evals[np.isnan(evals) == False]
+                runlengthsucc = evals[np.isnan(evals) == False]  # noqa: E712
                 runlengthunsucc = entry.maxevals[np.isnan(evals)]
                 if len(runlengthsucc) > 0:
                     x = toolsstats.drawSP(runlengthsucc, runlengthunsucc,
@@ -169,9 +169,9 @@ def plot(dsList, dsref, targets=defaulttargets, istoolsstats=False, **kwargs):
 
     # Display data
     data = np.array(data)
-    data = data[np.isnan(data)==False] # Take away the nans
+    data = data[np.isnan(data)==False] # Take away the nans  # noqa: E712
     n = len(data)
-    data = data[np.isinf(data)==False] # Take away the infs
+    data = data[np.isinf(data)==False] # Take away the infs  # noqa: E712
     # data = data[data <= maxval] # Take away rightmost data
     #data = np.exp(craftingeffort) * data  # correction by crafting effort CrE
     #set_trace()

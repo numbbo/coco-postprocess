@@ -6,12 +6,11 @@ from __future__ import absolute_import, print_function
 
 import os
 import sys
-import warnings
 import numpy
 
 from .. import genericsettings, bestalg, toolsstats, pproc, ppfigparam, testbedsettings, captions, ppfig
 from ..pptex import writeFEvals2, writeFEvalsMaxPrec, tableXLaTeX, numtotext
-from ..toolsstats import significancetest, significance_all_best_vs_other, best_alg_indices
+from ..toolsstats import significance_all_best_vs_other, best_alg_indices
 from ..toolsdivers import str_to_latex, strip_pathname1, strip_pathname3, replace_in_file, get_version_label, prepend_to_file
 
 
@@ -343,13 +342,13 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
             tmpdisp = []
             tmpert = []
             for i, e in enumerate(evals):
-                succ = (numpy.isnan(e) == False)
+                succ = (numpy.isnan(e) == False)  # noqa: E712
                 ec = e.copy()  # note: here was the previous bug (changes made in e also appeared in evals !)
-                ec[succ == False] = entry.maxevals[succ == False]
+                ec[succ == False] = entry.maxevals[succ == False]  # noqa: E712
                 ert = toolsstats.sp(ec, issuccessful=succ)[0]
                 # tmpdata.append(ert/refalgert[i])
                 if succ.any():
-                    tmp = toolsstats.drawSP(ec[succ], entry.maxevals[succ == False],
+                    tmp = toolsstats.drawSP(ec[succ], entry.maxevals[succ == False],  # noqa: E712
                                             [10, 50, 90], samplesize=entry.bootstrap_sample_size(samplesize))[0]
                     tmpdisp.append((tmp[-1] - tmp[0]) / 2.)
                 else:
@@ -382,7 +381,7 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
 
             # determine success probability for Df = 1e-8
             e = entry.detEvals((targetf,))[0]
-            algnbsucc.append(numpy.sum(numpy.isnan(e) == False))
+            algnbsucc.append(numpy.sum(numpy.isnan(e) == False))  # noqa: E712
             algnbruns.append(len(e))
 
         # Process over all data

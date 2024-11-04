@@ -256,7 +256,7 @@ def _get_remote(url, target_folder=None, redownload=False):
         _makedirs(target_folder)
         _download_definitions(url, target_folder)
         _url_add(target_folder, url)
-        if not official_archives.url(key) and not url in official_archives.urls.values():
+        if not official_archives.url(key) and url not in official_archives.urls.values():
             ArchivesKnown.register(url)
         else:  # TODO: check that ArchivesOfficial is in order?
             pass
@@ -384,11 +384,11 @@ def create(local_path):
             fnlower = filename.lower()
             if ('.extracted' not in dirpath
                 and not fnlower.startswith('.')
-                and not default_definition_filename in filename
+                and default_definition_filename not in filename
                 and not fnlower == 'readme'
                 and not fnlower.endswith(('.git', '.dat', '.mdat', '.rdat', '.tdat', '.info',
                                           '.txt', '.md', '.py', '.ipynb', '.pdf'))
-                and not '.txt' in fnlower
+                and '.txt' not in fnlower
                 ):
                 if filename[-1] not in ('2', 'z') and filename[-2:] not in ('ar', ) and '.zip' not in filename:
                     warnings.warn('Trying to archive unusual file "%s".'
@@ -682,8 +682,10 @@ class COCODataArchive(_td.StrList):
                     self.check_hash(full_name)
                 else:
                     raise
-            try: self._redownload_if_changed.remove(names[0])
-            except ValueError: pass
+            try: 
+                self._redownload_if_changed.remove(names[0])
+            except ValueError: 
+                pass
             return full_name
         if not remote:
             return ''  # like this string operations don't bail out
@@ -1087,7 +1089,7 @@ class ListOfArchives(_td.StrList):
     def lists():
         lists = [ListOfArchives._name(n) for n in os.listdir(cocopp_home_archives)
                  if n.startswith(listing_file_start) and
-                    not listing_file_extension + "_2" in n]  # backups add the date like "...txt_2019-04-29_17h23m45s"
+                    listing_file_extension + "_2" not in n]  # backups add the date like "...txt_2019-04-29_17h23m45s"
         d = {}
         for name in lists:
             with open(ListOfArchives._fullfile(name), 'rt') as f:
@@ -1135,9 +1137,9 @@ class ListOfArchives(_td.StrList):
 
     def _remove_double_entries(self):
         """keep the first of duplicated entries"""
-        l = []
-        l.extend(v for v in self if v not in l)  # depends on l changing in generator
-        self[:] = l
+        things = []
+        things.extend(v for v in self if v not in things)  # depends on things changing in generator
+        self[:] = things
 
     def _walk(self, folder=None):
         """recursive search for COCO data archives in `folder` on disk.
@@ -1415,7 +1417,7 @@ class OfficialArchives(object):
 
         the very first import.
         """
-        for url in [l[0] for l in self._list]:
+        for url in [item[0] for item in self._list]:
             path = _url_to_folder_name(url)
             if path.endswith('/test'):
                 continue
@@ -1441,8 +1443,8 @@ for url in coco_urls[-1::-1]:  # loop over possible URLs until successful
         # connection was successful at least once (before or now)
         official_archives.set_as_attributes_in()  # set "official" archives as attributes by suite name
         break
-    except:  # (HTTPError, TimeoutError, URLError)
-        warnings.warn("failed to connect to " + url)
+    except:  # noqa: E722 (HTTPError, TimeoutError, URLError)
+        warnings.warn(f"Failed to connect to '{url}'.")
 else:
     warnings.warn("Failed fo find workable URL or local folder for official archives."
                   "\n After the www connection is restored, you may need to call"

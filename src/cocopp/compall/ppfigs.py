@@ -424,7 +424,7 @@ def generateData(dataSet, target):
     res = []
 
     data = dataSet.detEvals([target])[0]
-    succ = (numpy.isnan(data) == False)
+    succ = (numpy.isnan(data) == False)  # noqa: E712
     data[numpy.isnan(data)] = dataSet.maxevals[numpy.isnan(data)]
     res.extend(toolsstats.sp(data, issuccessful=succ, allowinf=False))
     res.append(numpy.mean(data))

@@ -7,11 +7,12 @@ from __future__ import absolute_import, print_function
 import warnings
 import numpy as np
 from . import genericsettings
-from pdb import set_trace
 
 def _has_len(thing):
-    try: len(thing)
-    except TypeError: return False
+    try: 
+        len(thing)
+    except TypeError: 
+        return False
     return True
 
 def fix_data_number(data, ndata=15,
@@ -711,7 +712,7 @@ def significancetest(entry0, entry1, targets):
     # one of the entry is an instance of BestAlgDataSet
     for entry in (entry0, entry1):
         tmp = entry.detEvals(targets)
-        if not 'funvals' in entry.__dict__ and not 'indicator' in entry.__dict__:  # this looks like a terrible hack
+        if 'funvals' not in entry.__dict__ and 'indicator' not in entry.__dict__:  # this looks like a terrible hack
             isRefAlg = True
             # for i, j in enumerate(tmp[0]):
                 # if np.isnan(j).all():
@@ -800,16 +801,18 @@ def significancetest(entry0, entry1, targets):
         # 2. 3. 4. Collect data for the significance test:
         curdata = []  # current data 
         
-        try: fvalues
-        except NameError: pass
+        try: 
+            fvalues
+        except NameError: 
+            pass
         else:
             f_offset = 1.01 * min((0, min(fvalues[0]), min(fvalues[1])))  # fix for negative fvalues (which are Df-values)
         for j, entry in enumerate((entry0, entry1)):
             tmp = evals[j][i].copy()
             idx = np.isnan(tmp)
-            idx[idx == False] += tmp[idx == False] > FE_umin
+            idx[idx == False] += tmp[idx == False] > FE_umin  # noqa: E712
             # was not a bool before: idx = np.isnan(tmp) + (tmp > FE_umin)
-            tmp[idx == False] = np.power(tmp[idx == False], -1.)
+            tmp[idx == False] = np.power(tmp[idx == False], -1.)  # noqa: E712
             if idx.any():
                 tmp[idx] = -fvalues[j][idx] + f_offset  # larger data is better
                 assert all(tmp[idx] <= 0), (

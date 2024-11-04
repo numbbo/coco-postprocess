@@ -33,8 +33,6 @@ import os
 import numpy
 import numpy as np
 import warnings
-from pdb import set_trace
-import matplotlib
 from matplotlib import pyplot as plt
 try:
     from matplotlib.transforms import blended_transform_factory as blend
@@ -43,7 +41,6 @@ except ImportError:
     from matplotlib.transforms import blend_xy_sep_transform as blend
 from .. import genericsettings, htmldesc, ppfigparam, testbedsettings
 from ..ppfig import save_figure, getFontSize
-from .. import toolsdivers
 from .. import pproc
 from .. import captions
 
@@ -92,7 +89,6 @@ def prepare_figure_caption():
 
 def figure_caption(for_html = False):
 
-    targets = testbedsettings.current_testbed.ppscatter_target_values
     if for_html:
         caption = htmldesc.getValue('##bbobppscatterlegend' +
                                     testbedsettings.current_testbed.scenario + '##')
@@ -233,8 +229,8 @@ def main(dsList0, dsList1, outputdir, settings):
                 #    set_trace()
 
             # plot beyond maxevals but finite data
-            idx = ((numpy.isinf(xdata) == False) *
-                   (numpy.isinf(ydata) == False) *
+            idx = ((numpy.isinf(xdata) == False) *  # noqa: E712
+                   (numpy.isinf(ydata) == False) *  # noqa: E712
                    np.logical_or(xdata >= entry0.mMaxEvals(),
                                  ydata >= entry1.mMaxEvals()))
             if idx.any():
@@ -255,7 +251,7 @@ def main(dsList0, dsList1, outputdir, settings):
             warnings.filterwarnings('default')  # , category=matplotlib.MatplotlibDeprecationWarning)
 
             # plot data on the right edge
-            idx = numpy.isinf(xdata) * (numpy.isinf(ydata) == False)
+            idx = numpy.isinf(xdata) * (numpy.isinf(ydata) == False)  # noqa: E712
             if idx.any():
                 # This (seems to) transform inf to the figure limits!?
                 trans = blend(ax.transAxes, ax.transData)
@@ -277,7 +273,7 @@ def main(dsList0, dsList1, outputdir, settings):
                 #set_trace()
 
             # plot data on the left edge
-            idx = (numpy.isinf(xdata)==False) * numpy.isinf(ydata)
+            idx = (numpy.isinf(xdata)==False) * numpy.isinf(ydata)  # noqa: E712
             if idx.any():
                 # This (seems to) transform inf to the figure limits!?
                 trans = blend(ax.transData, ax.transAxes)

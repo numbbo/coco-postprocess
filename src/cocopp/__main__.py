@@ -10,7 +10,7 @@ try:
     from . import rungeneric
     from . import genericsettings
     is_module = True
-except:
+except:  # noqa: E722
     is_module = False
 import matplotlib  # just to make sure the following is actually done first
 

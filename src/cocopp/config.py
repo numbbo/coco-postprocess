@@ -22,10 +22,8 @@ import numpy as np
 from . import ppfigdim
 from . import genericsettings as settings, pproc, pprldistr
 from . import testbedsettings as tbs
-from . import dataformatsettings
 from .comp2 import ppfig2, ppscatter
 from .compall import pprldmany
-from . import __path__  # import path for default genericsettings
 
 if settings.test:
     np.seterr(all='raise')

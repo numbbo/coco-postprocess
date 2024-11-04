@@ -46,7 +46,6 @@ functions.
 from __future__ import absolute_import, print_function
 
 import sys
-from pdb import set_trace
 import warnings
 import numpy as np
 

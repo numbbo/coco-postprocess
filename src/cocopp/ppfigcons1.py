@@ -202,7 +202,7 @@ def generateData(dataSet, targetFuncValue):
             break
 
     data = prev[1:].copy()  # keep only the number of function evaluations.
-    succ = (np.isnan(data) == False)
+    succ = (np.isnan(data) == False)  # noqa: E712
     if succ.any():
         med = toolsstats.prctile(data[succ], 50)[0]
         # Line above was modified at rev 3050 to make sure that we consider only
@@ -302,7 +302,7 @@ def plot(dsList, valuesOfInterest=None, styles=styles):
     res = []
     mediandata = {}
     displaynumber = {}
-    no_target_reached = 1;
+    no_target_reached = 1
     for i_target in range(len(valuesOfInterest)):
         succ = []
         unsucc = []
@@ -510,7 +510,7 @@ def main(dsList, _valuesOfInterest, outputdir):
     ppfig.copy_js_files(outputdir)
 
     funInfos = ppfigparam.read_fun_infos()
-    fontSize = ppfig.getFontSize(funInfos.values())
+    ppfig.getFontSize(funInfos.values())
 
     for ifunc, func in enumerate(dictFuncCons):
         dd = dictFuncCons[func].dictByDim()

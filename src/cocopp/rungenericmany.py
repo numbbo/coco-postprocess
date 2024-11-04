@@ -11,18 +11,15 @@ from __future__ import print_function
 
 import os
 import sys
-import getopt
 import warnings
 
 from . import genericsettings, config, ppfig, testbedsettings, findfiles
 from . import pproc, pptex, pprldistr
 from .pproc import DataSetList, processInputArgs
-from .ppfig import Usage
 from .toolsdivers import prepend_to_file, strip_pathname1, str_to_latex, replace_in_file
 from .compall import pprldmany, pptables, ppfigs, ppfigcons
 from .comp2 import pprldistr2, ppscatter
 
-import matplotlib.pyplot as plt
 from .toolsdivers import print_done, get_version_label
 
 __all__ = ['main']
@@ -84,7 +81,7 @@ def main(args, outputdir):
 
     """
 
-    print("\nPost-processing (2+)");
+    print("\nPost-processing (2+)")
     if not os.path.exists(outputdir):
         os.makedirs(outputdir)
         if genericsettings.verbose:
@@ -157,8 +154,10 @@ def main(args, outputdir):
             for instance_set_of_interest in genericsettings.instancesOfInterest:
                 if curr_instances == instance_set_of_interest:
                     correct = True
-            try: last_incorrect_instances
-            except: last_incorrect_instances = None
+            try: 
+                last_incorrect_instances
+            except:   # noqa: E722
+                last_incorrect_instances = None
             if not correct and curr_instances != last_incorrect_instances:
                 warnings.warn('The data of %s ' % i +
                             '(and possibly further data) do not ' +
