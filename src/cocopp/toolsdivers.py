@@ -526,7 +526,7 @@ def get_version_label(algorithmID=None):
     from ._version import __version__ as coco_version
     reference_values = testbedsettings.get_reference_values(algorithmID)
     
-    if reference_values and type(reference_values) is set:        
+    if reference_values and isinstance(reference_values, set):
         label = "v%s, hv-hashes inconsistent:" % (coco_version)
         for r in reference_values:
             label = label + " %s and" % (r)
@@ -537,10 +537,18 @@ def get_version_label(algorithmID=None):
 
 
 def path_in_package(sub_path=""):
-    from importlib import resources as res
     """return the absolute path prepended to `subpath` in this module.
     """
-    
-    package_root_directory = res.files("cocopp")
+    try:
+        import importlib_resources as res
+    except ImportError:
+        import importlib.resources as res
+
+    try:
+        package_root_directory = res.files("cocopp")
+    except AttributeError:
+        print("pip install importlib_resources or (ideally) upgrade Python to >=3.9")
+        raise
+
     path = package_root_directory / sub_path
     return str(path)
