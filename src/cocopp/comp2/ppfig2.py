@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Creates ERT-ratio comparison figures (ECDF) and convergence figures for the comparison of 2 algorithms.
 
@@ -7,7 +6,6 @@ Scale up figures for two algorithms can be done with compall/ppfigs.py
 
 """
 
-from __future__ import absolute_import
 
 import os
 import matplotlib.pyplot as plt

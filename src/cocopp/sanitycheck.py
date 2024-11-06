@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Module for checking data sets.
 
@@ -11,9 +10,6 @@ Help:
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import with_statement # This isn't required in Python 2.6
 
 import os
 import sys
@@ -70,10 +66,10 @@ def checkinfofile(filename, verbose=True):
                 dat = os.path.join(root + '.dat')
                 tdat = os.path.join(root + '.tdat')
                 if not (os.path.exists(dat) and os.path.exists(tdat)):
-                    raise IOError
+                    raise OSError
                 else:
                     if verbose:
-                        print('Found data files %s.dat and %s.tdat' % (root, root))
+                        print(f'Found data files {root}.dat and {root}.tdat')
                 datfiles.extend((dat, tdat))
             else:
                 if ':' not in elem:

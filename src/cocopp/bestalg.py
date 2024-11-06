@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """ Best algorithm dataset module
 
@@ -17,8 +16,6 @@
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 import os
 import sys
@@ -244,7 +241,7 @@ class BestAlgSet(DataSet):
                     'MCS_huyer' in missed[0][2] and missed[0][0] == 40):
                 warnings.warn(
                     'Missing data for the following (dimension, funcId, algorithm)'
-                    ' list\n{0}'.format(missed))
+                    f' list\n{missed}')
 
     def __eq__(self, other):
         return (self.__class__ is other.__class__ and
@@ -293,8 +290,8 @@ class BestAlgSet(DataSet):
                 f.close()
                 if genericsettings.verbose:
                     print('Saved pickle in %s.' % self.pickleFile)
-            except IOError as e:
-                print("I/O error(%s): %s" % (e.errno, e.strerror))
+            except OSError as e:
+                print(f"I/O error({e.errno}): {e.strerror}")
             except pickle.PicklingError:
                 print("Could not pickle %s" % self)
                 # else: #What?
@@ -610,8 +607,8 @@ def create_data_files(output_dir, result, suite):
             if suite is not None:
                 header += ", suite = '%s'" % suite
             info_lines.append(header)
-            info_lines.append("%% %s; instance_numbers: %s" % (value.comment, instances_list))
-            info_lines.append("%s, %s" % (filename_template % (key[1], key[0], 'dat'), instance_data))
+            info_lines.append(f"% {value.comment}; instance_numbers: {instances_list}")
+            info_lines.append("{}, {}".format(filename_template % (key[1], key[0], 'dat'), instance_data))
 
         filename = os.path.join(output_dir, filename_template % (key[1], key[0], 'dat'))
         write_to_file(filename, lines)
@@ -638,7 +635,7 @@ def create_data_files(output_dir, result, suite):
             comment = value.comment
         comment += '; coco_version: ' + coco_version
 
-        info_lines.insert(1, "%% %s; instance_numbers: %s" % (comment, instances_list))
+        info_lines.insert(1, f"% {comment}; instance_numbers: {instances_list}")
 
     filename = os.path.join(output_dir, '%s.info' % info_filename)
     write_to_file(filename, info_lines)

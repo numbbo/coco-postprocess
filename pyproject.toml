@@ -64,10 +64,26 @@ indent-width = 4
 target-version = "py39"
 
 [tool.ruff.lint]
-# select = []
-ignore = [
-  "E402", # Module level import not at top of file
+select = [
+  "B", 
+  "C4", # flake8-comprehensions
+  "E",
+  "F",
+  # "NPY",
+  "PERF",
+  "PLC",  
+  # "PTH",
+  # "ARG",
+  "RET", # flake8-return
+  "SIM", 
+  "TRY", # Tryceratops exception handling anti-patterns
 ]
+ignore = [  
+  "B028", # No explicit `stacklevel` keyword argument found
+  "E402", # Module level import not at top of file
+  "E501", # Line too long
+]
+
 fixable = ["ALL"]
 unfixable = []
 dummy-variable-rgx = "^(_+|(_+[a-zA-Z0-9_]*[a-zA-Z0-9]+?))$"

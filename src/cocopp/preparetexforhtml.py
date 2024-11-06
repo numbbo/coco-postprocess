@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Prepares the descriptions of images and tables which will be converted to html.
 
@@ -182,10 +181,10 @@ def prepare_item(name, command_name='', param=''):
     if not command_name:
         command_name = name
 
-    return '\#\#%s\#\#\n\\%s{%s}\n' % (name, command_name, param)
+    return f'\#\#{name}\#\#\n\\{command_name}{{{param}}}\n'
 
 def prepare_item_two(name, command_name='', paramOne='', paramTwo=''):
     if not command_name:
         command_name = name
 
-    return '\#\#%s\#\#\n\\%s{%s}{%s}\n' % (name, command_name, paramOne, paramTwo)
+    return f'\#\#{name}\#\#\n\\{command_name}{{{paramOne}}}{{{paramTwo}}}\n'

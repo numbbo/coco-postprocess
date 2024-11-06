@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Algorithm portfolio data set module.
 
@@ -43,7 +42,6 @@ functions.
 
 # TODO: generalize behaviour for data sets that have different instances...
 
-from __future__ import absolute_import, print_function
 
 import sys
 import warnings

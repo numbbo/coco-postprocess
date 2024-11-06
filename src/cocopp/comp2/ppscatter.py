@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 """Scatter Plots.
 
 For two algorithms, this generates the scatter plot of log(ERT1(df)) vs.
@@ -18,7 +17,6 @@ Boxes correspond to the maximum numbers of function evaluations for
 each algorithm in each dimension.
 
 """
-from __future__ import absolute_import
 
 """For two algorithms, ERTs(given target function value) can also be
 plotted in a scatter plot (log(ERT0) vs. log(ERT1)), which results in a
@@ -342,7 +340,7 @@ def main(dsList0, dsList1, outputdir, settings):
         #     warnings.warn('Inconsistent numbers of instances over dimensions found for ALG1:\n\
         #                    found instances %s' % str(num_of_instances_alg1))
         if len(set(num_of_instances_alg0)) == 1 and len(set(num_of_instances_alg1)) == 1:
-            text += '%s and %s instances' % (num_of_instances_alg0[0], num_of_instances_alg1[0])
+            text += f'{num_of_instances_alg0[0]} and {num_of_instances_alg1[0]} instances'
         else:
             for n in num_of_instances_alg0:
                 text += '%d, ' % n

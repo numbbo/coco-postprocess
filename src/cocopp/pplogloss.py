@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Module for computing ERT loss ratio
 
@@ -9,7 +8,6 @@ reference (best) ERT value (or the inverse)
 
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import numpy as np
@@ -683,7 +681,7 @@ def generateSingleTableHtml(dsList, funcs, mFE, d, prcOfInterest, EVALS, data,
         else:
             tmp = writeFEvals2(EVALS[i]/d, 1)
 
-        tmp = ["<th sorttable_customkey=\"%f\">%s</th>\n" % ((EVALS[i]/d), tmp)]
+        tmp = [f"<th sorttable_customkey=\"{EVALS[i]/d:f}\">{tmp}</th>\n"]
 
         for j in tmpdata:
             # tmp.append(writeFEvals(j, '.2'))
@@ -700,7 +698,7 @@ def generateSingleTableHtml(dsList, funcs, mFE, d, prcOfInterest, EVALS, data,
                 ar = ("%1.1e" % j).split('e')
                 tmp1 = ar[0] + 'e' + str(int(ar[1]))
 
-            tmp.append("<td sorttable_customkey=\"%f\">%s</td>\n" % (j, tmp1))
+            tmp.append(f"<td sorttable_customkey=\"{j:f}\">{tmp1}</td>\n")
 
         res.append("".join(tmp))
         res.append("</tr>\n")

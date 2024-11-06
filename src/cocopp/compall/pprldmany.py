@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Generates figure of the bootstrap distribution of (function) evaluations.
     
@@ -28,7 +27,6 @@ function evaluations of unsuccessful runs divided by dimension.
 
 """
 
-from __future__ import absolute_import, print_function
 
 import os
 import warnings
@@ -689,8 +687,8 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             samplesize = max((int(genericsettings.simulated_runlength_bootstrap_sample_size),
                               samplesize))  # maybe more bootstrapping with unsuccessful trials
         if samplesize > 1e4:
-            warntxt = ("Sample size equals {} which may take very long. "
-                       "This is likely to be unintended, hence a bug.".format(samplesize))
+            warntxt = (f"Sample size equals {samplesize} which may take very long. "
+                       "This is likely to be unintended, hence a bug.")
             warnings.warn(warntxt)
         if not isinstance(samplesize, int):
             warntxt = ("samplesize={} was of type {}. This must be considered a bug."
@@ -864,11 +862,11 @@ def main(dictAlg, order=None, outputdir='.', info='default',
 
     if 11 < 3:
         import time
-        plt.text(1e5, 0, ' {}'.format(time.asctime()), fontsize=5)
+        plt.text(1e5, 0, f' {time.asctime()}', fontsize=5)
     labels, handles = plotLegend(lines, x_limit)
     if True:  # isLateXLeg:
         if info:
-            file_name = os.path.join(outputdir, '%s_%s.tex' % (genericsettings.pprldmany_file_name, info))
+            file_name = os.path.join(outputdir, f'{genericsettings.pprldmany_file_name}_{info}.tex')
         else:
             file_name = os.path.join(outputdir, '%s.tex' % genericsettings.pprldmany_file_name)
         with open(file_name, 'w') as file_obj:
@@ -876,14 +874,13 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             algtocommand = {}  # latex commands
             for i, alg in enumerate(order):
                 tmp = r'\alg%sperfprof' % pptex.numtotext(i)
-                file_obj.write(r'\providecommand{%s}{\StrLeft{%s}{\nperfprof}}' %
-                        (tmp, toolsdivers.str_to_latex(
+                file_obj.write(r'\providecommand{{{}}}{{\StrLeft{{{}}}{{\nperfprof}}}}'.format(tmp, toolsdivers.str_to_latex(
                             toolsdivers.strip_pathname2(algname_to_label(alg)))))
                 algtocommand[algname_to_label(alg)] = tmp
             if displaybest:
                 tmp = r'\algzeroperfprof'
                 refalgname = testbedsettings.current_testbed.reference_algorithm_displayname
-                file_obj.write(r'\providecommand{%s}{%s}' % (tmp, refalgname))
+                file_obj.write(rf'\providecommand{{{tmp}}}{{{refalgname}}}')
                 algtocommand[algname_to_label(refalgname)] = tmp
 
             commandnames = []
@@ -892,12 +889,10 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             # file_obj.write(headleg)
             if len(
                     order) > 28:  # latex sidepanel won't work well for more than 25 algorithms, but original labels are also clipped
-                file_obj.write(r'\providecommand{\perfprofsidepanel}{\mbox{%s}\vfill\mbox{%s}}'
-                        % (commandnames[0], commandnames[-1]))
+                file_obj.write(rf'\providecommand{{\perfprofsidepanel}}{{\mbox{{{commandnames[0]}}}\vfill\mbox{{{commandnames[-1]}}}}}')
             else:
                 fontsize_command = r'\tiny{}' if len(order) > 19 else ''
-                file_obj.write(r'\providecommand{\perfprofsidepanel}{{%s\mbox{%s}' %
-                        (fontsize_command, commandnames[0]))  # TODO: check len(labels) > 0
+                file_obj.write(rf'\providecommand{{\perfprofsidepanel}}{{{{{fontsize_command}\mbox{{{commandnames[0]}}}')  # TODO: check len(labels) > 0
                 for i in range(1, len(labels)):
                     file_obj.write('\n' + r'\vfill \mbox{%s}' % commandnames[i])
                 file_obj.write('}}\n')
@@ -906,7 +901,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                 print('Wrote right-hand legend in %s' % file_name)
 
     if info:
-        figureName = os.path.join(outputdir, '%s_%s' % (genericsettings.pprldmany_file_name, info))
+        figureName = os.path.join(outputdir, f'{genericsettings.pprldmany_file_name}_{info}')
     else:
         figureName = os.path.join(outputdir, '%s' % genericsettings.pprldmany_file_name)
     # beautify(figureName, funcsolved, x_limit*x_annote_factor, False, fileFormat=figformat)
@@ -931,7 +926,7 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                                  groupName,
                                  dimList[0])
     else:
-        text = '%s %s' % (testbedsettings.current_testbed.name,
+        text = '{} {}'.format(testbedsettings.current_testbed.name,
                             ppfig.consecutiveNumbers(sorted(dictFunc.keys()), 'f'))
         if not (plotType == PlotType.DIM):
             text += ', %d-D' % dimList[0]

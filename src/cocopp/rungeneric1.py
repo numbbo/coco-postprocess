@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Module for post-processing the data of one algorithm.
 
@@ -15,8 +14,6 @@ Help:
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 import os
 
@@ -136,8 +133,7 @@ def main(alg, outputdir, argv=None):
         algorithm_string = " for Algorithm %s" % dictFunc[list(dictFunc.keys())[0]][0].algId
     else:
         algorithm_string = ""
-    page_title = 'Results%s on the <TT>%s</TT> Benchmark Suite' % \
-                 (algorithm_string, dictFunc[list(dictFunc.keys())[0]][0].suite_name)
+    page_title = f'Results{algorithm_string} on the <TT>{dictFunc[list(dictFunc.keys())[0]][0].suite_name}</TT> Benchmark Suite'
     ppfig.save_single_functions_html(os.path.join(algoutputdir, genericsettings.single_algorithm_file_name),
                                      page_title,
                                      htmlPage=ppfig.HtmlPage.ONE,

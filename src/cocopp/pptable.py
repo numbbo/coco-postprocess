@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Module for generating tables used by rungeneric1.py.
 
@@ -20,7 +19,6 @@ down arrow (computed in the rank-sum test with Bonferroni
 correction by the number of functions).
 
 """
-from __future__ import absolute_import, print_function
 
 import os
 import warnings
@@ -182,17 +180,13 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                         temp = "%.1e" % targetsOfInterest((f, d))[i]
                         if temp[-2] == "0":
                             temp = temp[:-2] + temp[-1]
-                        curline.append(r'\multicolumn{2}{@{}c@{}}{\textit{%s}:%s \quad}'
-                                       % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
-                        curlineHtml.append('<td><i>%s</i>:%s</td>\n'
-                                           % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
+                        curline.append(rf'\multicolumn{{2}}{{@{{}}c@{{}}}}{{\textit{{{temp}}}:{writeFEvalsMaxPrec(refalgdata[i], 2)} \quad}}')
+                        curlineHtml.append(f'<td><i>{temp}</i>:{writeFEvalsMaxPrec(refalgdata[i], 2)}</td>\n')
                     temp = "%.1e" % targetsOfInterest((f, d))[-1]
                     if temp[-2] == "0":
                         temp = temp[:-2] + temp[-1]
-                    curline.append(r'\multicolumn{2}{@{}c|@{}}{\textit{%s}:%s \quad}'
-                                   % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
-                    curlineHtml.append('<td><i>%s</i>:%s</td>\n'
-                                       % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
+                    curline.append(rf'\multicolumn{{2}}{{@{{}}c|@{{}}}}{{\textit{{{temp}}}:{writeFEvalsMaxPrec(refalgdata[i], 2)} \quad}}')
+                    curlineHtml.append(f'<td><i>{temp}</i>:{writeFEvalsMaxPrec(refalgdata[i], 2)}</td>\n')
                     # success
                     targetf = targetsOfInterest((f, d))[-1]
 
@@ -296,8 +290,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                             tmpHtml = '<b>%s</b>' % tmpHtml
                     else:
                         tmpHtml = tmp
-                    tableentry = (r'\multicolumn{2}{@{}%s@{}}{%s}'
-                                  % (alignment, tmp))
+                    tableentry = (rf'\multicolumn{{2}}{{@{{}}{alignment}@{{}}}}{{{tmp}}}')
                     tableentryHtml = ('%s' % tmpHtml)
                 else:
                     # Formatting
@@ -319,8 +312,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                         elif 11 < 3:  # and significance0vs1 < 0:
                             tableentry = r'\textit{%s}' % tableentry
                             tableentryHtml = '<i>%s</i>' % tableentryHtml
-                        tableentry = (r'\multicolumn{2}{@{}%s@{}}{%s}'
-                                      % (alignment, tableentry))
+                        tableentry = (rf'\multicolumn{{2}}{{@{{}}{alignment}@{{}}}}{{{tableentry}}}')
                     elif tableentry.find('e') > -1 or (np.isinf(tmp) and i != len(data) - 1):
                         if is_bold:
                             tableentry = r'\textbf{%s}' % tableentry
@@ -328,8 +320,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                         elif 11 < 3:  # and significance0vs1 < 0:
                             tableentry = r'\textit{%s}' % tableentry
                             tableentryHtml = '<i>%s</i>' % tableentryHtml
-                        tableentry = (r'\multicolumn{2}{@{}%s@{}}{%s}'
-                                      % (alignment, tableentry))
+                        tableentry = (rf'\multicolumn{{2}}{{@{{}}{alignment}@{{}}}}{{{tableentry}}}')
                     else:
                         tmp = tableentry.split('.', 1)
                         tmpHtml = tableentryHtml.split('.', 1)

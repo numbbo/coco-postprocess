@@ -1,11 +1,10 @@
-from __future__ import absolute_import, division, print_function
 from . import genericsettings
 import warnings
 
 current_data_format = None  # used in readalign as global var
 
 
-class DataFormat(object):
+class DataFormat:
     """serves to define and manage the interfacing between written logger
     data and the contents of `DataSet`.
 
@@ -67,8 +66,7 @@ class BBOBNewDataFormat(DataFormat):
         # TODO: why do we even need the first evaluation?
         if not all(dataset.evals_function[0][1:] == 1) and any(
                 '.mdat' not in n for n in dataset.dataFiles):
-            warnings.warn("First evaluation was not read/recorded for dataFiles={}"
-                          .format(dataset.dataFiles))
+            warnings.warn(f"First evaluation was not read/recorded for dataFiles={dataset.dataFiles}")
         dataset.evals_constraints, maxevals_cons, finalfunvals_cons = aligner(data,
                 self.evaluation_constraints_idx,
                 self.function_value_idx, rewind_reader=True)

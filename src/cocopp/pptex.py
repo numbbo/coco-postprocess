@@ -1,8 +1,6 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Routines for writing TeX for tables."""
-from __future__ import absolute_import
 import numpy
 
 
@@ -111,8 +109,7 @@ class WrongInputSizeError(Error):
         self.reqSize = reqSize
 
     def __str__(self):
-        message = 'The size of %s is %s. One dimension must be of length %s!' %\
-                  (self.arrName,str(self.arrSize), str(self.reqSize))
+        message = f'The size of {self.arrName} is {str(self.arrSize)}. One dimension must be of length {str(self.reqSize)}!'
         return repr(message)
 
 
@@ -464,7 +461,7 @@ def tableLaTeXStar(table, width, spec, extraeol=()):
 
     # TODO: check that spec and extraeol have the right format?
 
-    res = [r'\begin{tabular*}{%s}{%s}' % (width, spec)]
+    res = [rf'\begin{{tabular*}}{{{width}}}{{{spec}}}']
     for i, line in enumerate(table[:-1]):
         curline = ' & '.join(line) + r'\\' + extraeol[i]
         res.append(curline)

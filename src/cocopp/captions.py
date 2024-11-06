@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """ Provides basic functionality for creating figure and table captions.
 
@@ -191,8 +190,8 @@ replace_dict = {
 }
 
 replace_dict_html = {
-    '\\Df': lambda: str(r"""&Delta;f"""),
-    '\\DI': lambda: str(r"""&Delta;I""")
+    '\\Df': lambda: r"""&Delta;f""",
+    '\\DI': lambda: r"""&Delta;I"""
 }
 
 tohtml = False

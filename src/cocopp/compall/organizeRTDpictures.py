@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Routine to organize the output folder in which runcompall puts all the output.
 """
@@ -32,7 +31,7 @@ def do(dirnames):
                         os.rename(f, dst)
                     except OSError:
                         # Either dst is a folder or the OS is Windows and dst exists
-                        print("%s cannot be moved to %s.\n" % (f, dst))
+                        print(f"{f} cannot be moved to {dst}.\n")
 
 if 1 < 3 and __name__ == "__main__":
     # Input: folders where to apply above method do

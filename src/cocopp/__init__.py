@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """COmparing Continuous Optimisers (COCO) post-processing package
 
@@ -90,7 +89,6 @@ background with
 
 """
 
-from __future__ import absolute_import
 import sys as _sys
 
 import matplotlib  # just to make sure the following is actually done first
@@ -147,12 +145,3 @@ class Interface:
     genericsettings = genericsettings
     load = load
     main = main
-
-# clean up namespace
-del absolute_import
-# del bestalg, captions, comp2, compall, htmldesc, pickle, ppconverrorbars
-# del ppfig, ppfigdim, ppfigparam, pplogloss, pprldistr, pproc, pptable
-# del pptex, readalign, rungeneric1, rungenericmany, toolsdivers, toolsstats
-
-# cococommands, config, data_archive, dataformatsettings, findfiles,
-# genericsettings, info, load, main, rungeneric, set_seed, systeminfo, testbedsettings,

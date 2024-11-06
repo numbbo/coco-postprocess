@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Various tools. 
 
@@ -17,7 +16,7 @@ from subprocess import CalledProcessError, STDOUT
 
 from . import genericsettings, testbedsettings
 
-class Infolder(object):
+class Infolder:
     """Contextmanager to do some work in a folder of choice and change dir
     back in the end.
 
@@ -110,8 +109,7 @@ class InfolderGoneWithTheWind:
         if self.target_dir == self._target_dir:
             shutil.rmtree(self.target_dir)
         else:
-            raise ValueError("inconsistent temporary folder name %s vs %s"
-                             % (self._target_dir, self.target_dir))
+            raise ValueError(f"inconsistent temporary folder name {self._target_dir} vs {self.target_dir}")
 
 
 class StrList(list):
@@ -240,9 +238,8 @@ class AlgorithmList(list):
         Keys that are not in self are sorted using `sorted`.
         """
         if set(algorithms_dict) != set(self):
-            warnings.warn("keys in algorithm dict: \n%s\n"
-                          "do not agree with original algorithm list: \n%s\n"
-                                 % (str(algorithms_dict.keys()), str(self)))
+            warnings.warn(f"keys in algorithm dict: \n{str(algorithms_dict.keys())}\n"
+                          f"do not agree with original algorithm list: \n{str(self)}\n")
         res = _OrderedDict()
         for name in self:
             if name in algorithms_dict:
@@ -294,9 +291,9 @@ def diff_attr(m1, m2, exclude=('_', )):
 def prepend_to_file(filename, lines, maxlines=1000, warn_message=None):
     """"prepend lines the tex-command filename """
     try:
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             lines_to_append = list(f)
-    except IOError:
+    except OSError:
         lines_to_append = []
     with open(filename, 'w') as f:
         for line in lines:
@@ -312,9 +309,9 @@ def replace_in_file(filename, old_text, new_text):
 
     lines = []    
     try:
-        with open(filename, 'r') as f:
+        with open(filename) as f:
             lines = list(f)
-    except IOError:
+    except OSError:
         print('File %s does not exist.' % filename)
     
     if lines:    
@@ -325,7 +322,7 @@ def replace_in_file(filename, old_text, new_text):
 def truncate_latex_command_file(filename, keeplines=200):
     """truncate file but keep in good latex shape"""
     open(filename, 'a').close()
-    with open(filename, 'r') as f:
+    with open(filename) as f:
         lines = list(f)
     with open(filename, 'w') as f:
         for i, line in enumerate(lines):
@@ -535,7 +532,7 @@ def get_version_label(algorithmID=None):
             label = label + " %s and" % (r)
         label = label[:-3] + "found!"
     else:
-        label = "v%s" % (coco_version) if reference_values is None else "v%s, hv-hash=%s" % (coco_version, reference_values)      
+        label = "v%s" % (coco_version) if reference_values is None else f"v{coco_version}, hv-hash={reference_values}"      
     return label
 
 

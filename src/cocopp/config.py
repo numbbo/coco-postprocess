@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """This module is an attempt for a global configuration file for various
 parameters.

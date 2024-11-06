@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Routines for the generation of TeX tables."""
-from __future__ import absolute_import, print_function
 
 import os
 import sys
@@ -60,9 +58,8 @@ def get_table_caption():
         rank-sum tests with the other algorithms either obeys $0.01 < p \le 0.05$
         or $10^{-k-1} < p \le 10^{-k}$ when the star is followed by the number $k$,
         with Bonferroni correction by the number of functions (!!TOTAL-NUM-OF-FUNCTIONS!!). """ +
-                (r"""A ${}$ signifies the number of trials that were worse than the ERT of !!THE-REF-ALG!! """
+                (rf"""A ${significance_vs_ref_symbol}$ signifies the number of trials that were worse than the ERT of !!THE-REF-ALG!! """
                  r"""shown only when less than 10 percent were worse and the ERT was better."""
-                 .format(significance_vs_ref_symbol)
                     if not (testbedsettings.current_testbed.reference_algorithm_filename == '' or
                             testbedsettings.current_testbed.reference_algorithm_filename is None)
                  else "") + r""" Best results are printed in bold.
@@ -490,18 +487,16 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                     temp = "%.1e" % targets_of_interest((df[1], df[0]))[i]
                     if temp[-2] == "0":
                         temp = temp[:-2] + temp[-1]
-                    curline.append(r'\multicolumn{2}{@{}c@{}}{\textit{%s}:%s \quad}'
-                                   % (temp, writeFEvalsMaxPrec(refalgert[i], 2)))
-                    replaceValue = '<i>%s</i>:%s' % (temp, writeFEvalsMaxPrec(refalgert[i], 2))
+                    curline.append(rf'\multicolumn{{2}}{{@{{}}c@{{}}}}{{\textit{{{temp}}}:{writeFEvalsMaxPrec(refalgert[i], 2)} \quad}}')
+                    replaceValue = f'<i>{temp}</i>:{writeFEvalsMaxPrec(refalgert[i], 2)}'
                     curlineHtml = [item.replace('REPLACE%d' % counter, replaceValue) for item in curlineHtml]
                     counter += 1
 
                 temp = "%.1e" % targets_of_interest((df[1], df[0]))[-1]
                 if temp[-2] == "0":
                     temp = temp[:-2] + temp[-1]
-                curline.append(r'\multicolumn{2}{@{}c@{}|}{\textit{%s}:%s }'
-                               % (temp, writeFEvalsMaxPrec(refalgert[-1], 2)))
-                replaceValue = '<i>%s</i>:%s' % (temp, writeFEvalsMaxPrec(refalgert[-1], 2))
+                curline.append(rf'\multicolumn{{2}}{{@{{}}c@{{}}|}}{{\textit{{{temp}}}:{writeFEvalsMaxPrec(refalgert[-1], 2)} }}')
+                replaceValue = f'<i>{temp}</i>:{writeFEvalsMaxPrec(refalgert[-1], 2)}'
                 curlineHtml = [item.replace('REPLACE%d' % counter, replaceValue) for item in curlineHtml]
             else:
                 # write #fevals of the reference alg
@@ -545,8 +540,7 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
             command_name = r'\alg%stables' % numtotext(i)
             #            header += r'\providecommand{%s}{{%s}{}}' % (command_name, str_to_latex(strip_pathname(alg)))
             if df[0] == testbedsettings.current_testbed.tabDimsOfInterest[0]:
-                additional_commands.append('\\providecommand{%s}{\\StrLeft{%s}{\\ntables}}' %
-                                           (command_name, str_to_latex(strip_pathname1(alg))))
+                additional_commands.append(f'\\providecommand{{{command_name}}}{{\\StrLeft{{{str_to_latex(strip_pathname1(alg))}}}{{\\ntables}}}}')
             curline = [command_name + r'\hspace*{\fill}']  # each list element becomes a &-separated table entry?
             curlineHtml = ['<th style="width:%dpx">%s</th>\n' % (
                 table_first_column_width, str_to_latex(strip_pathname3(alg)))]
@@ -571,9 +565,9 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                             i == best_alg_idx[j] and nbtests * significance_versus_others[j][1] < 0.05):
                     logp = -numpy.ceil(numpy.log10(nbtests * significance_versus_others[j][1]))
                     logp = numpy.min((9, logp))  # not messing up the format and handling inf
-                    str_significance_subsup = r"^{%s%s}" % (
+                    str_significance_subsup = r"^{{{}{}}}".format(
                     significance_vs_others_symbol, str(int(logp)) if logp > 1 else '')
-                    str_significance_subsup_html = '<sup>%s%s</sup>' % (
+                    str_significance_subsup_html = '<sup>{}{}</sup>'.format(
                     significance_vs_others_symbol_html, str(int(logp)) if logp > 1 else '')
 
                 # create subscript arrow for significance against reference
@@ -581,8 +575,8 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                     if testres is not None:
                         # tmp2[-1] += r'$^{%s}$' % superscript
                         nb = str(int(testres + 1/2))  # rounded number of runs that were worse
-                        str_significance_subsup += r'_{%s%s}' % (significance_vs_ref_symbol, nb)
-                        str_significance_subsup_html += '<sub>%s%s</sub>' % (significance_vs_ref_symbol_html, nb)
+                        str_significance_subsup += rf'_{{{significance_vs_ref_symbol}{nb}}}'
+                        str_significance_subsup_html += f'<sub>{significance_vs_ref_symbol_html}{nb}</sub>'
 
                 if str_significance_subsup:
                     str_significance_subsup = '$%s$' % str_significance_subsup
@@ -599,10 +593,8 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                     if dispersion and numpy.isfinite(dispersion):
                         tableentry += r'\mbox{\tiny (%s)}' % writeFEvalsMaxPrec(dispersion, precdispersion)
                         tableentryHtml += ' (%s)' % writeFEvalsMaxPrec(dispersion, precdispersion)
-                    curline.append(r'\multicolumn{2}{%s}{%s}%s' % (
-                        alignment, tableentry, str_significance_subsup))
-                    curlineHtml.append('<td sorttable_customkey=\"%f\">%s%s</td>\n' % (
-                        algerts[i][j], tableentryHtml, str_significance_subsup_html))
+                    curline.append(rf'\multicolumn{{2}}{{{alignment}}}{{{tableentry}}}{str_significance_subsup}')
+                    curlineHtml.append(f'<td sorttable_customkey=\"{algerts[i][j]:f}\">{tableentryHtml}{str_significance_subsup_html}</td>\n')
                     continue
 
                 denom = 1
@@ -635,11 +627,10 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                             tmpdisp = writeFEvalsMaxPrec(tmpdisp, precdispersion, maxfloatrepr=maxfloatrepr)
                         tmp += r'\mbox{\tiny (%s)}' % tmpdisp
                         tmpHtml += ' (%s)' % tmpdisp
-                    curline.append(r'\multicolumn{2}{%s}{%s%s}' % (alignment, tmp, str_significance_subsup))
+                    curline.append(rf'\multicolumn{{2}}{{{alignment}}}{{{tmp}{str_significance_subsup}}}')
                     if (numpy.isinf(sortKey)):
                         sortKey = sys.maxsize
-                    curlineHtml.append('<td sorttable_customkey=\"%f\">%s%s</td>' % (
-                    sortKey, tmpHtml, str_significance_subsup_html))
+                    curlineHtml.append(f'<td sorttable_customkey=\"{sortKey:f}\">{tmpHtml}{str_significance_subsup_html}</td>')
                 else:
                     tmp2 = tmp.split('.', 1)
                     if len(tmp2) < 2:
@@ -669,7 +660,7 @@ def main(dict_alg, sorted_algs, output_dir='.', function_targets_line=True, late
                     tmp2html[-1] += str_significance_subsup_html
                     curline.extend(tmp2)
                     tmp2html = ("").join(str(item) for item in tmp2html)
-                    curlineHtml.append('<td sorttable_customkey=\"%f\">%s</td>' % (data, tmp2html))
+                    curlineHtml.append(f'<td sorttable_customkey=\"{data:f}\">{tmp2html}</td>')
 
             curline.append('%d' % algnbsucc[i])
             curline.append('/%d' % algnbruns[i])

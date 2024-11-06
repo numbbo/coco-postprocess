@@ -11,7 +11,6 @@ runs only the doctests (which is quick).
 runs also the most extensive tests.
 """
 
-from __future__ import absolute_import, division, print_function, unicode_literals
 import os
 import sys
 import time
@@ -69,8 +68,7 @@ class InfolderGoneWithTheWind:
         if self.target_dir == self._target_dir:
             shutil.rmtree(self.target_dir)
         else:
-            raise ValueError("inconsistent temporary folder name %s vs %s"
-                             % (self._target_dir, self.target_dir))
+            raise ValueError(f"inconsistent temporary folder name {self._target_dir} vs {self.target_dir}")
 
 def depreciated_data_archive_get(substrs):
     """CAVEAT: this won't work anymore as the get_first method changed to
@@ -140,7 +138,7 @@ def run_latex_template(filename, all_tests):
         DEVNULL = open(os.devnull, 'wb')
         output_file = open("bibtex.log", "w")
         result = subprocess.call(arguments, stdin=DEVNULL, stdout=output_file, stderr=DEVNULL)
-        assert not result, 'Test failed: error while running bibtex on %s resuling in %s' % (os.path.splitext(filename)[0], str(result))
+        assert not result, f'Test failed: error while running bibtex on {os.path.splitext(filename)[0]} resuling in {str(result)}'
 
 
 def retrieve_algorithm(data_path, folder_name, algorithm_name, file_name=None):
@@ -148,7 +146,7 @@ def retrieve_algorithm(data_path, folder_name, algorithm_name, file_name=None):
     replaced by `cocopp.archiving.get` or `cocopp.archiving.official_archives` or `cocopp.archives.all`)"""
     algorithm_file = join_path(data_path, file_name if file_name else algorithm_name)
     if not os.path.exists(algorithm_file):
-        data_url = 'https://numbbo.github.io/data-archive/data-archive/%s/%s' % (folder_name, algorithm_name)
+        data_url = f'https://numbbo.github.io/data-archive/data-archive/{folder_name}/{algorithm_name}'
         urlretrieve(data_url, algorithm_file)
 
 
@@ -278,7 +276,7 @@ def main(arguments):
     #copy_latex_templates()
     #print('LaTeX templates copied.')
 
-    print('*** testing module cocopp {0} ***'
+    print('*** testing module cocopp {} ***'
           .format('(all ~ 30 minutes)' if run_all_tests else '(~ 5 minutes)'))
     t0 = time.time()
     data_path = data_archive_get('BFGS_ros_noiseless')
@@ -478,7 +476,7 @@ def do_doctest():
                 if current_failure_count:
                     print('doctest file "%s" failed' % os.path.join(root, filename))
                 else:
-                    print('doctest {0}/{1} tests succeeded'.format(test_count - failure_count, test_count), end='\r')
+                    print(f'doctest {test_count - failure_count}/{test_count} tests succeeded', end='\r')
         os.chdir(current_path)
         print()
     else:

@@ -1,13 +1,10 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Process data to be included in a generic template.
 
 Only called from rungeneric.py.
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
 
 import os
 import sys
@@ -224,7 +221,7 @@ def main(args, outputdir):
             algorithm_name0 = str_to_latex(strip_pathname1(sortedAlgs[0]))
             algorithm_name1 = str_to_latex(strip_pathname1(sortedAlgs[1]))
 
-            algorithm_name = "%s vs %s" % (algorithm_name1, algorithm_name0)
+            algorithm_name = f"{algorithm_name1} vs {algorithm_name0}"
             ppfig.save_single_functions_html(
                 os.path.join(many_algorithms_output, genericsettings.pprldistr2_file_name),
                 algname=algorithm_name,
@@ -400,7 +397,7 @@ def main(args, outputdir):
         ds_list1 = dictAlg[sortedAlgs[1]]
         algorithm_name1 = str_to_latex(strip_pathname1(sortedAlgs[1]))
 
-        algorithm_name = "%s vs %s" % (algorithm_name1, algorithm_name0)
+        algorithm_name = f"{algorithm_name1} vs {algorithm_name0}"
         ppfig.save_single_functions_html(
             os.path.join(many_algorithms_output, genericsettings.ppscatter_file_name),
             algname=algorithm_name,

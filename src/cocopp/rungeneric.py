@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """
 Process data to be included in a latex template. Called via
@@ -12,9 +11,6 @@ python -m cocopp
 
 """
 
-from __future__ import absolute_import
-from __future__ import print_function
-from __future__ import unicode_literals
 
 import os
 import sys
@@ -437,7 +433,7 @@ def main(argv=None):
         def as_str(s, clip=25):
             """return ``str(s)``, only surround by '"' if `s` is a string
             """
-            put_quotes = True if s is str(s) else False
+            put_quotes = s is str(s)
             s = str(s)
             if len(s) > clip:
                 s = s[:clip-3] + '...'
@@ -445,8 +441,7 @@ def main(argv=None):
         mess = ''
         for key, v1, v2 in diff_attr(genericsettings.default_settings,
                                      genericsettings):
-            mess = mess + '    %s: from %s to %s\n' % (
-                key, as_str(v1), as_str(v2))
+            mess = mess + f'    {key}: from {as_str(v1)} to {as_str(v2)}\n'
         if mess:
             print('Setting changes in `cocopp.genericsettings` compared to default:')
             print(mess, end='')

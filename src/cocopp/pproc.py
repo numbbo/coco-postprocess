@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Raw post-processing routines.
 
@@ -17,7 +16,6 @@ for comparisons.
 # TODO: dictAlg should become the class DictALg that is a dictionary of DataSetLists with
 # usecase DictAlg(algdict).by_dim() etc  
 
-from __future__ import absolute_import, print_function
 
 import sys
 import os
@@ -134,15 +132,18 @@ def cocofy(filename):
 def asTargetValues(target_values):
     if isinstance(target_values, TargetValues):
         return target_values
-    if isinstance(target_values, list):
+    elif isinstance(target_values, list):
         return TargetValues(target_values)
-    try:
-        isinstance(target_values((1, 20)), list)
-        return target_values
-    except:  # noqa: E722
-        raise NotImplementedError("""type %s not recognized""" %
-                                  str(type(target_values)))
-class TargetValues(object):
+    else:
+        try:
+            isinstance(target_values((1, 20)), list)
+        except:  # noqa: E722
+            raise NotImplementedError("""type %s not recognized""" %
+                                      str(type(target_values))) from None
+    return target_values
+
+
+class TargetValues:
     """store and retrieve a list of target function values:
 
         >>> import numpy as np
@@ -162,8 +163,6 @@ class TargetValues(object):
     def __init__(self, target_values, discretize=None):
         if 11 < 3 and isinstance(target_values, TargetValues):  # type cast passing behavior
             return self  # caveat: one might think a copy should be made
-            self.__dict__ = target_values.__dict__  # this is not a copy
-            return
         self.target_values = sorted(target_values, reverse=True)
         if discretize:
             self.target_values = self._discretize(self.target_values)
@@ -538,7 +537,7 @@ class RunlengthBasedTargetValues(TargetValues):
         raise NotImplementedError
               
 
-class DataSet(object):
+class DataSet:
     """Unit element for the COCO post-processing.
 
     An instance of this class is created from one unit element of
@@ -809,7 +808,7 @@ class DataSet(object):
         # In biobjective case we have some header info in the data line.
         self.__parseHeader(data)
         if _algId and _algId != self.algId:
-            warnings.warn("data overwrote header algId %s --> %s" % (_algId, self.algId))
+            warnings.warn(f"data overwrote header algId {_algId} --> {self.algId}")
         # Read in second line of entry (comment line). The information
         # is only stored if the line starts with "%", else it is ignored.
         if comment.startswith('%'):
@@ -886,9 +885,7 @@ class DataSet(object):
                     # For now we leave it in.
                     idx_of_instances_to_load.append(True)
                     self.isFinalized.append(False)
-                    warnings.warn('Caught an ill-finalized run in %s for %s'
-                                  % (indexfile,
-                                     os.path.join(filepath, self.dataFiles[-1])))
+                    warnings.warn(f'Caught an ill-finalized run in {indexfile} for {os.path.join(filepath, self.dataFiles[-1])}')
                     self.readmaxevals.append(0)
                     self.readfinalFminusFtarget.append(numpy.inf)
                 else:
@@ -1016,9 +1013,8 @@ class DataSet(object):
             else:
                 tmp = not all(tmp)
             if tmp or len(self._maxevals) != len(self.readmaxevals):
-                warnings.warn('The maxevals from {} and {} disagree:'
-                              '\n  {}\n  {}'.format(
-                                  indexfile, dataFiles, self.readmaxevals, self._maxevals))
+                warnings.warn(f'The maxevals from {indexfile} and {dataFiles} disagree:'
+                              f'\n  {self.readmaxevals}\n  {self._maxevals}')
             self._cut_data()
         if len(self._evals):
             self._target = self._evals[:,0]  # needed for biobj best alg computation
@@ -1111,10 +1107,9 @@ class DataSet(object):
                 not hasattr(self, 'used_algorithms') and self.algId != 'bestCustomAlg'):
             is_consistent = False
             warnings.warn('  instance numbers not among the ones specified'
-                          ' by cocopp.genericsettings.instancesOfInterest={0}'
-                          .format(genericsettings.instancesOfInterest))
+                          f' by cocopp.genericsettings.instancesOfInterest={genericsettings.instancesOfInterest}')
         if not is_consistent:
-            warnings.warn('Some DataSet of {0} was not consistent'.format(self.algId))  # should rather be in the previous messages
+            warnings.warn(f'Some DataSet of {self.algId} was not consistent')  # should rather be in the previous messages
         assert self._evals.shape[1] - 1 == len(self.instancenumbers), self
         assert self.evals.shape[1] - 1 == len(self.maxevals), self
         return is_consistent
@@ -1287,7 +1282,7 @@ class DataSet(object):
         res = ('DataSet(%s on f%s %d-D'
                % (self.algId, str(self.funcId), self.dim))
         for i in getattr(self, '_extra_attr', ()):
-            res += ', %s = %s' % (i, getattr(self, i))
+            res += f', {i} = {getattr(self, i)}'
         res += ')'
         return res
 
@@ -1494,8 +1489,7 @@ class DataSet(object):
         
         """
         if _using_recommendations:
-            warnings.warn('no pickle file is created because cocopp.pproc._using_recommendations={}'
-                          .format(_using_recommendations))
+            warnings.warn(f'no pickle file is created because cocopp.pproc._using_recommendations={_using_recommendations}')
             return
         # the associated pickle file does not exist
         if outputdir is not None and getattr(self, 'pickleFile', False):
@@ -1528,8 +1522,8 @@ class DataSet(object):
                 f.close()
                 if genericsettings.verbose:
                     print('Saved pickle in %s.' %(self.pickleFile))
-            except IOError as e:
-                print("I/O error(%s): %s" % (e.errno, e.strerror))
+            except OSError as e:
+                print(f"I/O error({e.errno}): {e.strerror}")
             except pickle.PicklingError:
                 print("Could not pickle %s" %(self))
                 
@@ -1759,7 +1753,7 @@ class DataSet(object):
             assert evals[idata, 0] <= target and (idata == 0 or evals[idata - 1, 0] > target)
             evalsrows[target] = evals[idata, 1:].copy() if copy else evals[idata, 1:]
         if do_assertion:
-            assert all([all((np.isnan(evalsrows[target]) + (evalsrows[target] == self._detEvals2(targets)[i])))
+            assert all([all(np.isnan(evalsrows[target]) + (evalsrows[target] == self._detEvals2(targets)[i]))
                         for i, target in enumerate(targets)])
         if bootstrap:
             return [np.asarray(evalsrows[t])[np.random.randint(0,
@@ -1793,7 +1787,7 @@ class DataSet(object):
             return [self._number_of_better_runs(t, ref_eval) for t in target]
         if not np.isfinite(ref_eval):
             if np.isnan(ref_eval):
-                warnings.warn("ref_eval was nan when calling {}".format(self))
+                warnings.warn(f"ref_eval was nan when calling {self}")
             ref_eval = np.inf  # replace nan with inf
         evals = self.detEvals([target])[0]
         evals = evals[np.isfinite(evals)]
@@ -1810,8 +1804,7 @@ class DataSet(object):
         ref_evals = refalg_dataset.detEvals([target])[0][0]  # first return value is the evals
         evals = self.detEvals([target])[0]
         if len(ref_evals) > 1:
-            warnings.warn('found {} evals data in reference algorithm {}, detEvals([{}])={}'
-                        .format(len(ref_evals), refalg_dataset.algId, target, ref_evals))
+            warnings.warn(f'found {len(ref_evals)} evals data in reference algorithm {refalg_dataset.algId}, detEvals([{target}])={ref_evals}')
         ref_evals[~np.isfinite(ref_evals)] = np.inf  # replace nan with inf
         m, a = np.min(ref_evals), np.asarray(evals[np.isfinite(evals)])
         return sum(a < m) + sum(a == m) / 2
@@ -2310,8 +2303,7 @@ class DataSet(object):
         `plot_function` (for convenience).
         """
         if smallest_target > self.evals[0, 0]:
-            raise ValueError("smallest_target=%f argument is larger than the largest recorded target %f"
-                % (smallest_target, self.evals[0, 0]))
+            raise ValueError(f"smallest_target={smallest_target:f} argument is larger than the largest recorded target {self.evals[0, 0]:f}")
         plot_kwargs = kwargs
         kwargs.update(plot_formats)
         median_kwargs = dict(median_formats)
@@ -2375,14 +2367,13 @@ def get_DataSetList(*args, **kwargs):
     if os.path.exists(name) and os.path.getmtime(name) > os.path.getmtime(arg1[0]):
         if _using_recommendations:
             warnings.warn('pickled DataSetLists do currently NOT have recommendations,'
-                        '\n hence the file {} is not used'.format(name))
+                        f'\n hence the file {name} is not used')
             return fallback()
         try:
             with open(name, "rb") as f:
                 dsl = pickle.load(f)
         except Exception as e:
-            warnings.warn("failed to load pickle file {} with exception {}"
-                          .format(name, e))
+            warnings.warn(f"failed to load pickle file {name} with exception {e}")
         else:
             if isinstance(dsl, DataSetList):  # found valid pickle file
                 # to be compatible with DataSet.__init__:
@@ -2398,8 +2389,7 @@ def get_DataSetList(*args, **kwargs):
         with open(name, "wb") as f:
             pickle.dump(dsl, f)
     except Exception as e:
-        warnings.warn("could not write pickle file {} getting exception {}"
-                    .format(name, e))
+        warnings.warn(f"could not write pickle file {name} getting exception {e}")
     return dsl
 
 class DataSetList(list):
@@ -2430,7 +2420,7 @@ class DataSetList(list):
 
 
         if not args:
-            super(DataSetList, self).__init__()
+            super().__init__()
             return
 
         if isinstance(args, string_types):
@@ -2467,16 +2457,15 @@ class DataSetList(list):
             elif name.endswith('.pickle') or name.endswith('.pickle.gz'):
                 if _using_recommendations:
                     warnings.warn(
-                        "ignoring an unexpected _using_recommendations={} setting,\n"
-                        "using the pickle file {} generally requires to set ``cocopp."
-                        "genericsettings.use_recommendations[{}] to `False`"
-                        .format(_using_recommendations, name, fnames.index(name)))
+                        f"ignoring an unexpected _using_recommendations={_using_recommendations} setting,\n"
+                        f"using the pickle file {name} generally requires to set ``cocopp."
+                        f"genericsettings.use_recommendations[{fnames.index(name)}] to `False`")
                 try:
                     # cocofy(name)
                     if name.endswith('.gz'):
                         f = gzip.open(name)
                     else:
-                        f = open(name,'r')
+                        f = open(name)
                     try:
                         entry = pickle.load(f)
                     except pickle.UnpicklingError:
@@ -2492,8 +2481,8 @@ class DataSetList(list):
                     # if not hasattr(entry, 'detAverageEvals')
                     self.append(entry)
                     #set_trace()
-                except IOError as e:
-                    print("I/O error(%s): %s" % (e.errno, e.strerror))
+                except OSError as e:
+                    print(f"I/O error({e.errno}): {e.strerror}")
             else:
                 s = ('File or folder ' + name + ' not found. ' +
                               'Expecting as input argument either .info ' +
@@ -2576,15 +2565,15 @@ class DataSetList(list):
                         warnings.warn("    data file " + data_file_names[i])
                 warnings.warn("  This is likely to produce spurious results.")
 
-        except IOError as e:
+        except OSError as e:
             print('Could not load "%s".' % indexFile)
-            print('I/O error(%s): %s' % (e.errno, e.strerror))
+            print(f'I/O error({e.errno}): {e.strerror}')
 
     def append(self, o, check_data_type='warn'):
         """Redefines the append method to check for unicity."""
 
         if check_data_type and not isinstance(o, DataSet):
-            warnings.warn('appending a non-DataSet {} to a DataSetList'.format(o))
+            warnings.warn(f'appending a non-DataSet {o} to a DataSetList')
             if check_data_type != 'warn':
                 raise ValueError('Expect DataSet instance.')
         isFound = False
@@ -2672,7 +2661,7 @@ class DataSetList(list):
             if not condition(self[i]):
                 removed += [self.pop(i)]
         if verbose in [1, 3]:
-            print('  {0} DataSets removed'.format(len(removed)))
+            print(f'  {len(removed)} DataSets removed')
         if verbose in [2, 3]:
             return removed
     def remove_if(self, condition):
@@ -3036,7 +3025,7 @@ class DataSetList(list):
                             tmp2.append('%8f' % k)
                         else:
                             tmp2.append('%8d' % k)
-                    print('%2.1e |%s' % (j, ' '.join(tmp2)))
+                    print('{:2.1e} |{}'.format(j, ' '.join(tmp2)))
 
             # display distributions of final values
         else:
@@ -3050,7 +3039,8 @@ class DataSetList(list):
                 return 1 if getattr(a, key2) > getattr(b, key2) else -1                
             else:
                 return 1 if getattr(a, key1) > getattr(b, key1) else -1
-        sorted_self = list(sorted(self, key=functools.cmp_to_key(cmp_fun)))
+        sorted_self = sorted(self, key=functools.cmp_to_key(cmp_fun))
+        
         for i, ds in enumerate(sorted_self):
             self[i] = ds
         return self
@@ -3238,7 +3228,7 @@ class DataSetList(list):
             if reference_data_set_list is not None:
                 rld_dict[alg].append(ref_scores)
 
-        for k, v in rld_dict.items():
+        for v in rld_dict.values():
             if v[2] != funcs_processed:
                 print('TODO: HERE AN ASSERTION FAILED')
             # assert v[2] == funcs_processed  # the must all agree to the last
@@ -3370,8 +3360,7 @@ class DataSetList(list):
                 best_scores[i] = current_scores[i]
 
         if any(line is None for line in best_lines):
-            warnings.warn('best data lines for f%s in %s-D could not be determined'
-                          % (str(fct), str(dim)))
+            warnings.warn(f'best data lines for f{str(fct)} in {str(dim)}-D could not be determined')
         return best_lines, best_scores
 
     def get_sorted_algorithms(self, dimension, target_values,
@@ -3506,7 +3495,7 @@ def parseinfo(s):
 
 
 def align_list(list_to_process, evals):
-    for i, item in enumerate(evals):
+    for i, _ in enumerate(evals):
         if i + 1 < len(evals) and evals[i] == evals[i + 1]:
             list_to_process.insert(i, list_to_process[i])
 
@@ -3563,8 +3552,8 @@ def processInputArgs(args, process_background_algorithms=False):
         name to a DataSetList
 
     """
-    dsList = list()
-    sortedAlgs = list()
+    dsList = []
+    sortedAlgs = []
     dictAlg = {}
     current_hash = None
     process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs)
@@ -3706,8 +3695,7 @@ def dictAlgByDim(dictAlg):
             #res.setdefault(i.dim, {}).setdefault(alg, DataSetList()).append(i)
 
     if warning_txts and genericsettings.verbose:
-        warnings.warn('The following warnings appeared at least once: {}\n'
-                      .format(collections.Counter(warning_txts)))
+        warnings.warn(f'The following warnings appeared at least once: {collections.Counter(warning_txts)}\n')
     return res
 
 def dictAlgByDim2(dictAlg, remove_empty=False):
@@ -3732,12 +3720,6 @@ def dictAlgByDim2(dictAlg, remove_empty=False):
 
     if remove_empty:
         raise NotImplementedError
-        for dim, ds_dict in res.items():
-            for alg, ds_dict2 in ds_dict.items():
-                if not len(ds_dict2):
-                    pass
-            if not len(ds_dict):
-                pass
 
     return res
 
@@ -3814,13 +3796,11 @@ def dictAlgByNoi(dictAlg):
             try:
                 tmp = tmpdictAlg[alg][n]
             except KeyError:
-                txt = ('No data for algorithm %s on %s function.'
-                       % (alg, stmp))
+                txt = (f'No data for algorithm {alg} on {stmp} function.')
                 warnings.warn(txt)
 
             if alg in res.setdefault(n, {}):
-                txt = ('Duplicate data for algorithm %s on %s functions.'
-                       % (alg, stmp))
+                txt = (f'Duplicate data for algorithm {alg} on {stmp} functions.')
                 warnings.warn(txt)
 
             res.setdefault(n, OrderedDict()).setdefault(alg, tmp)
@@ -3852,13 +3832,11 @@ def dictAlgByFuncGroup(dictAlg):
             try:
                 tmp = tmpdictAlg[alg][g]
             except KeyError:
-                txt = ('No data for algorithm %s on %s functions.'
-                       % (alg, g))
+                txt = (f'No data for algorithm {alg} on {g} functions.')
                 warnings.warn(txt)
 
             if alg in res.setdefault(g, {}):
-                txt = ('Duplicate data for algorithm %s on %s functions.'
-                       % (alg, g))
+                txt = (f'Duplicate data for algorithm {alg} on {g} functions.')
                 warnings.warn(txt)
 
             res.setdefault(g, OrderedDict()).setdefault(alg, tmp)

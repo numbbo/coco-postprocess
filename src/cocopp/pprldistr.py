@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """For generating empirical cumulative distribution function figures.
 
@@ -40,7 +39,6 @@ CAVEAT: the naming conventions in this module mix up ERT (an estimate
 of the expected running length) and run lengths.
 
 """
-from __future__ import absolute_import, print_function
 import os
 import sys
 import warnings # I don't know what I am doing here
@@ -111,11 +109,10 @@ def load_previous_data(filename=previous_data_filename, force=False):
     try:
         # cocofy(previous_data_filename)
         f = gzip.open(previous_data_filename, 'r')
-        if sys.version_info > (3, 0):
-            return pickle.load(f, encoding='latin1')
+        return pickle.load(f, encoding='latin1')
         return pickle.load(f)
-    except IOError as e:
-        print("I/O error(%s): %s" % (e.errno, e.strerror))
+    except OSError as e:
+        print(f"I/O error({e.errno}): {e.strerror}")
         print('Could not find file: ', previous_data_filename)
     else:
         f.close()
@@ -126,11 +123,10 @@ def load_previous_RLBdata(filename=previous_RLBdata_filename):
         return previous_RLBdata_dict
     try:
         f = gzip.open(previous_RLBdata_filename, 'r')
-        if sys.version_info > (3, 0):
-            return pickle.load(f, encoding='latin1')
+        return pickle.load(f, encoding='latin1')
         return pickle.load(f)
-    except IOError as e:
-        print("I/O error(%s): %s" % (e.errno, e.strerror))
+    except OSError as e:
+        print(f"I/O error({e.errno}): {e.strerror}")
         print('Could not find file: ', previous_RLBdata_filename)
     else:
         f.close()
@@ -190,9 +186,9 @@ def caption_two():
         + r"""/D)
         """)
 
-    symbAlgorithmA = r'{%s%s}' % (color_to_latex('k'),
+    symbAlgorithmA = r'{{{}{}}}'.format(color_to_latex('k'),
                                   marker_to_latex(styles[0]['marker']))
-    symbAlgorithmB = r'{%s%s}' % (color_to_latex('k'),
+    symbAlgorithmB = r'{{{}{}}}'.format(color_to_latex('k'),
                                   marker_to_latex(styles[1]['marker']))
     caption_two_fixed_targets_part1 = r"""%
         to reach a target value $!!FOPT!!+!!DF!!$ with $!!DF!!=10^{k}$, where

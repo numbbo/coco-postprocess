@@ -1,4 +1,3 @@
-# -*- coding: utf-8 -*-
 """Online and offline archiving of COCO data.
 
 `create` and `get` are the main functions to create and retrieve online and
@@ -66,8 +65,6 @@ path/filename, a sha256 hash and optionally their approximate size. Datasets
 are (tar-)zipped files containing a full experiment from a single algorithm.
 
 """
-from __future__ import absolute_import, division, print_function, unicode_literals
-del absolute_import, division, print_function, unicode_literals
 
 __author__ = 'Nikolaus Hansen'
 
@@ -113,7 +110,7 @@ def _abs_path(path, *args):
 def _makedirs(path, error_ok=True):
     try:
         os.makedirs(path)
-    except os.error:  # python 2&3 compatible
+    except OSError:  # python 2&3 compatible
         if not error_ok:
             raise
 
@@ -175,9 +172,9 @@ def _definition_file_to_write(local_path_or_filename,
                                             default_definition_filename)
         elif f != default_definition_filename:
             warnings.warn(
-                'Interpreted "%s" as definition filename. This\n'
+                f'Interpreted "{f}" as definition filename. This\n'
                 'will fail in the further processing which expects the default\n'
-                'filename %s.' % (f, default_definition_filename))
+                f'filename {default_definition_filename}.')
     fullname = _abs_path(local_path_or_filename)
     _make_backup(fullname)
     return fullname
@@ -202,13 +199,13 @@ def _old_move_official_local_data():
     if os.path.exists(src):
         if not os.path.exists(os.path.join(dest, 'data-archive')):  # obsolete
             _makedirs(dest)
-            print("moving %s to %s" % (src, dest))
+            print(f"moving {src} to {dest}")
             _shutil.move(src, dest)
         else:
             warnings.warn("could not move the official archive location "
-                          "\n%s\n because \n%s\n already exists."
+                          f"\n{src}\n because \n{dest}\n already exists."
                           "\nTo prevent this message in future, remove either one or"
-                        " the other folder (preferably the smaller one)" % (src, dest))
+                        " the other folder (preferably the smaller one)")
 
 def _repr_definitions(list_):
     return repr(sorted(list_, key=lambda t: (t[0].split('/')[0], t))).replace('(', '\n(')
@@ -220,7 +217,7 @@ def _url_add(folder, url):
     """
     defs = read_definition_file(folder)
     if ('_url_', url) not in defs:
-        with open(_definition_file_to_write(folder), 'wt') as f:
+        with open(_definition_file_to_write(folder), "w") as f:
             f.write(_repr_definitions([('_url_', url)] + defs))
 
 def _download_definitions(url, target_folder):
@@ -230,11 +227,10 @@ def _download_definitions(url, target_folder):
     try:
         read_definition_file(_definition_file_to_read(target_folder))
     except:
-        warnings.warn('Downloaded definition file\n  %s\n  -> %s \n'
+        warnings.warn('Downloaded definition file\n  {}\n  -> {} \n'
                       'seems not to have the proper format.\n'
                       'Make sure that the above URL is a valid definition file and\n'
-                      'that the machine is connected to the www, and try again.'
-                      % (url + '/' + default_definition_filename,
+                      'that the machine is connected to the www, and try again.'.format(url + '/' + default_definition_filename,
                          _definition_file_to_read(target_folder)))
         raise
 
@@ -266,13 +262,12 @@ def _get_remote(url, target_folder=None, redownload=False):
         arch.name = key + ' (official)' # should stay?
     if arch.remote_data_path is None:
         _url_add(target_folder, url)
-        warnings.warn("No URL found in %s.\n"
-            "'_url_' = '%s' added.\n"
+        warnings.warn(f"No URL found in {_definition_file_to_read(target_folder)}.\n"
+            f"'_url_' = '{url}' added.\n"
             "This typically happens if the definition file was newly created locally\n"
             "and could mean that remote and local definition files are out of sync.\n"
             "You may want to upload the above local definition file to the above URL\n"
-            "or use the `update` method to re-download the remote definition file."
-            % (_definition_file_to_read(target_folder), url))
+            "or use the `update` method to re-download the remote definition file.")
         arch.remote_data_path = url
     assert arch.remote_data_path.replace('https', 'http') == url.replace('https', 'http')  # check that url was in the definition file
     return arch
@@ -310,12 +305,9 @@ def get(url_or_folder=None):
     """
     if url_or_folder in (None, 'help'):
         raise ValueError(
-                  '"Officially" available archives are\n    %s\n'
-                  "Otherwise available (known) archives are\n    %s\n"
-                  "Local archives are \n    %s"
-                  % (str(official_archives.names),
-                     str(ArchivesKnown()),
-                     str(ArchivesLocal())))
+                  f'"Officially" available archives are\n    {str(official_archives.names)}\n'
+                  f"Otherwise available (known) archives are\n    {str(ArchivesKnown())}\n"
+                  f"Local archives are \n    {str(ArchivesLocal())}")
     if (url_or_folder.lower().startswith("http")
         or url_or_folder in official_archives.names):
         return _get_remote(url_or_folder)
@@ -324,7 +316,7 @@ def get(url_or_folder=None):
 def read_definition_file(local_path_or_definition_file):
     """return definition triple `list`"""
     filename = _definition_file_to_read(local_path_or_definition_file)
-    with open(filename, 'rt') as file_:
+    with open(filename) as file_:
         try:
             return ast.literal_eval(file_.read())
         except:
@@ -391,10 +383,9 @@ def create(local_path):
                 and '.txt' not in fnlower
                 ):
                 if filename[-1] not in ('2', 'z') and filename[-2:] not in ('ar', ) and '.zip' not in filename:
-                    warnings.warn('Trying to archive unusual file "%s".'
-                        'Remove the file from %s and call `create` again '
-                        'if the file was not meant to be in the archive.'
-                        % (filename, dirpath))
+                    warnings.warn(f'Trying to archive unusual file "{filename}".'
+                        f'Remove the file from {dirpath} and call `create` again '
+                        'if the file was not meant to be in the archive.')
                 name = dirpath[len(full_local_path) + 1:].replace(os.path.sep, '/')
                 # print(dirpath, local_path, name, filename)
                 name = '/'.join([name, filename]) if name else filename
@@ -403,14 +394,13 @@ def create(local_path):
                          _hash(path),
                          int(os.path.getsize(path) // 1000))] # or os.stat(path).st_size
                 if 'L)' in name:
-                    raise ValueError("Name '%s' at %s contains 'L)' which"
+                    raise ValueError(f"Name '{name}' at {path} contains 'L)' which"
                                      " is not allowed."
-                                     "\nPlease change the filename."
-                                     % (name, path))
+                                     "\nPlease change the filename.")
     if not len(res):
         warnings.warn('cocopp.archiving.create: no data found in %s' % local_path)
         return
-    with open(definition_file, 'wt') as file_:
+    with open(definition_file, "w") as file_:
         file_.write(_repr_definitions(res).replace('L)', ')'))
     ArchivesLocal.register(full_local_path)  # to find splattered local archives easily
     return COCODataArchive(full_local_path)
@@ -542,13 +532,12 @@ class COCODataArchive(_td.StrList):
             local_path, fn = os.path.split(local_path)
             if fn:
                 warnings.warn("COCODataArchive.__init__: filename"
-                              " %s in %s ignored" % (fn, local_path))
+                              f" {fn} in {local_path} ignored")
         if not COCODataArchive.is_archive(local_path):
-            raise ValueError('The folder "%s" seems not to "be" a COCO data'
-                            " archive as it does not contain a %s file)."
+            raise ValueError(f'The folder "{local_path}" seems not to "be" a COCO data'
+                            f" archive as it does not contain a {default_definition_filename} file)."
                             "\nUse `create(folder)` or `get(URL)` of"
-                            " `cocopp.archiving` to create/get this file."
-                            % (local_path, default_definition_filename))
+                            " `cocopp.archiving` to create/get this file.")
         self.local_data_path = local_path
         self._names_found = []  # names recently found
         self._redownload_if_changed = []
@@ -568,8 +557,7 @@ class COCODataArchive(_td.StrList):
                           str([v for v in self._all if keys.count(v[0]) > 1]))
         if self.remote_data_path and self._all_dict.setdefault("_url_",
                                        (self.remote_data_path, )) != (self.remote_data_path, ):
-            warnings.warn("found different remote paths \n    %s\n vs %s"
-                          % (self.remote_data_path, self._all_dict["_url_"]))
+            warnings.warn("found different remote paths \n    {}\n vs {}".format(self.remote_data_path, self._all_dict["_url_"]))
         _td.StrList.__init__(self, (kv[0] for kv in self._all if kv[0] != '_url_'))
         self.consistency_check_read()
         if 11 < 3:  # this takes too long on importing cocopp
@@ -662,11 +650,10 @@ class COCODataArchive(_td.StrList):
             names = [substr]
         elif len(names) > 1:
             raise ValueError(
-                "'%s' has multiple matches in the data archive:\n   %s\n"
+                "'{}' has multiple matches in the data archive:\n   {}\n"
                 "Either pick a single match, or use the `get_all` or\n"
                 "`get_first` method, or use the ! (first) or * (all)\n"
-                "marker and try again."
-                % (substr, '\n   '.join(names)))
+                "marker and try again.".format(substr, '\n   '.join(names)))
         # create full path
         full_name = self.full_path(names[0])
         if os.path.exists(full_name):
@@ -676,7 +663,7 @@ class COCODataArchive(_td.StrList):
                 if names[0] in self._redownload_if_changed:
                     self._download(names[0])
                     self.check_hash(full_name)
-                elif 11 < 3 and not input("\n\n  ** wrong hash, download {} again? [n=no, return=yes] **".format(names[0])).lower().startswith('n'):
+                elif 11 < 3 and not input(f"\n\n  ** wrong hash, download {names[0]} again? [n=no, return=yes] **").lower().startswith('n'):
                     # seems to break tests?
                     self._download(names[0])
                     self.check_hash(full_name)
@@ -697,7 +684,7 @@ class COCODataArchive(_td.StrList):
         url = '/'.join((self.remote_data_path, name))
         full_name = self.full_path(name)
         _makedirs(os.path.split(full_name)[0])  # create path if necessary
-        self._print("  downloading %s to %s" % (url, full_name))
+        self._print(f"  downloading {url} to {full_name}")
         try:
             _urlretrieve(url, full_name)
         except BaseException:  # KeyboardInterrupt is a BaseException
@@ -752,9 +739,8 @@ class COCODataArchive(_td.StrList):
                 if not remote or try_ > 0:
                     raise ValueError('"%s" seems not to be an existing file or match any archived data'
                                      % name)
-                warnings.warn('COCODataArchive failed to locate "%s".\n'
-                              'Will try again after updating from %s'
-                              % (name, self.remote_data_path))
+                warnings.warn(f'COCODataArchive failed to locate "{name}".\n'
+                              f'Will try again after updating from {self.remote_data_path}')
                 try:
                     self.update()
                 except Exception as e:
@@ -838,26 +824,25 @@ class COCODataArchive(_td.StrList):
         known_hash = self._known_hash(name)
         if known_hash is None:
             raise RuntimeError(
-                'COCODataArchive has no hash checksum for\n  %s\n'
-                'The computed checksum was \n  %s\n'
+                f'COCODataArchive has no hash checksum for\n  {name}\n'
+                f'The computed checksum was \n  {self._hash(name)}\n'
                 'To remove this warning, consider to manually insert this hash in `COCODataArchive._all_coco_remote`\n'
                 'Or, if this happens for many different data, consider using `create` to\n'
                 'compute all hashes of local data and then manually insert the hash in _all.\n'
                 'Or consider filing a bug report (issue) at https://github.com/numbbo/coco/issues'
-                '' % (name, self._hash(name)))
+                '')
         elif self._hash(name) != known_hash:
             raise ValueError(
-                'wrong checksum for\n\n   %s\n\n in archive\n\n   %s\n   %s\n\n'
+                f'wrong checksum for\n\n   {name}\n\n in archive\n\n   {self.local_data_path}\n   {str(self.remote_data_path)}\n\n'
                 'Consider to (re)move file\n'
-                '   %s\n'
+                f'   {self.full_path(name)}\n'
                 'as it may be a partial or unsuccessful download.\n'
                 'A missing file will be downloaded again by `get`.\n'
                 'Alternatively, call `cocopp.archives.this-archive.update()`\n'
                 'of the respective data archive to update definitions\n'
                 'and checksums and allow for automatic re-downloads.\n'
                 'If this is not a remote archive consider to re-`create` it.'
-                '' % (name, self.local_data_path, str(self.remote_data_path),
-                self.full_path(name)))
+                '')
 
     def _hash(self, name, hash_function=hashlib.sha256):
         """compute hash of `name` or path"""
@@ -1059,12 +1044,11 @@ class ListOfArchives(_td.StrList):
             _makedirs(os.path.split(self.listing_file)[0])
             if 11 < 3:  # TODO-decide: do we want this?
                 print("cocopp.archiving: initializing once and for all "
-                      "%s for %s, this may take a while"
-                        % (str(self.listing_file), str(type(self))))
+                      f"{str(self.listing_file)} for {str(type(self))}, this may take a while")
                 self._walk()
                 self._save_walk()
         else:  # file is not generated if it does not exist
-            with open(self.listing_file, 'rt') as f:
+            with open(self.listing_file) as f:
                 list.__init__(self, ast.literal_eval(f.read()))
 
     @property
@@ -1092,7 +1076,7 @@ class ListOfArchives(_td.StrList):
                     listing_file_extension + "_2" not in n]  # backups add the date like "...txt_2019-04-29_17h23m45s"
         d = {}
         for name in lists:
-            with open(ListOfArchives._fullfile(name), 'rt') as f:
+            with open(ListOfArchives._fullfile(name)) as f:
                 d[name] = ast.literal_eval(f.read())  # read list of archive paths
         return d
 
@@ -1122,7 +1106,7 @@ class ListOfArchives(_td.StrList):
         self._makepathsabsolute()
         self._remove_double_entries()  # can have gotten here from append or extend
         _make_backup(self.listing_file)
-        with open(self.listing_file, 'wt') as f:
+        with open(self.listing_file, "w") as f:
             f.write(_repr_definitions(self))
 
     def remote_update(self, name=None):
@@ -1169,10 +1153,10 @@ class ListOfArchives(_td.StrList):
 
     def update(self):
         """update self from the listing file that may have changed"""
-        with open(self.listing_file, 'rt') as f:
+        with open(self.listing_file) as f:
             self[:] = ast.literal_eval(f.read())  # or list.__init__(self, ...)
 
-class OfficialArchives(object):
+class OfficialArchives:
     """overdesigned class to connect URLs, names, and classes of "official" archives.
 
     The `all` archive name gets special treatment. The 'all'-archive is
@@ -1428,10 +1412,10 @@ class OfficialArchives(object):
             df = _definition_file_to_read(path)
             if os.path.exists(df):
                 warnings.warn('_make_folder_skeleton(): '
-                              'file "{}" exists'.format(df))
+                              f'file "{df}" exists')
             else:
                 with open(df, 'w') as f:
-                    f.write("[('_url_', '{}')]\n".format(url))
+                    f.write(f"[('_url_', '{url}')]\n")
 
 # official_archives = OfficialArchives()
 for url in coco_urls[-1::-1]:  # loop over possible URLs until successful
@@ -1501,13 +1485,13 @@ class RemoteListOfArchives(_td.StrList):
     location += '/data-archives/'  # + 'list_known_archives.txt'
 
     def __init__(self, name='known_archives'):
-        super(RemoteListOfArchives, self).__init__(self._download(name))
+        super().__init__(self._download(name))
 
     def _download(self, name):
         fname = ListOfArchives._file(name)
         destname = os.path.join(cocopp_home_archives, '_remote_' + fname)  # not meant to stay
         _urlretrieve(self.location + fname, destname)
-        with open(destname, 'rt') as f:
+        with open(destname) as f:
             return ast.literal_eval(f.read())
     
     def save(self):

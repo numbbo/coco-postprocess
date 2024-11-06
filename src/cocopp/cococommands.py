@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """A collection of commands for using COCO from Jupyter or IPython.
 
@@ -57,7 +56,6 @@ Examples:
 
 """
 
-from __future__ import absolute_import
 
 import collections as _collections
 import warnings as _warnings
@@ -74,8 +72,7 @@ from . import testbedsettings as _testbedsettings
 def true_number_of_trials(ds):
     """return number of actually conducted trials for `DataSet` `ds`"""
     if len(ds.instancenumbers) != len(ds._evals[0]) - 1:
-        _warnings.warn("DataSet {0}: instancenumbers = {1} != {2} = len(_evals[0]) - 1"
-                       .format(ds.algId, ds.instancenumbers, len(ds._evals[0]) - 1))
+        _warnings.warn(f"DataSet {ds.algId}: instancenumbers = {ds.instancenumbers} != {len(ds._evals[0]) - 1} = len(_evals[0]) - 1")
     return len(ds.instancenumbers)
 class DataWithFewSuccesses:
     """The `all` property is an `OrderedDict` with all ``(dimension, funcId)``-
@@ -170,8 +167,7 @@ class DataWithFewSuccesses:
                 self.dsl = load(folder_name)
             _genericsettings.balance_instances = _bi
             if not self.dsl:
-                _warnings.warn("Sorry, could not find any coco data in {}"
-                               .format(folder_name))
+                _warnings.warn(f"Sorry, could not find any coco data in {folder_name}")
         self.trials = [true_number_of_trials(ds) for ds in self.dsl]
         """number of trials in each data set, for the record only"""
         self.successes = self.compute_successes().successes  # declarative assignment
@@ -207,7 +203,7 @@ class DataWithFewSuccesses:
         return self.evaluations
     def print(self):
         """return a `str` with the number of data sets with too few successes"""
-        return 'DataWithFewSuccesses: {}/{}'.format(len(self.result), len(self.dsl))
+        return f'DataWithFewSuccesses: {len(self.result)}/{len(self.dsl)}'
     def __len__(self):
         return len(self.result)
 

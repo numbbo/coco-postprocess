@@ -1,9 +1,7 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Bootstrapping and statistics routines."""
 
-from __future__ import absolute_import, print_function
 import warnings
 import numpy as np
 from . import genericsettings
@@ -816,13 +814,11 @@ def significancetest(entry0, entry1, targets):
             if idx.any():
                 tmp[idx] = -fvalues[j][idx] + f_offset  # larger data is better
                 assert all(tmp[idx] <= 0), (
-                    "negative Df value(s) found ({}, offset={}) in DataSet {} in significance test line {}"
-                    " for target[{}] = {}. This is a bug and may lead to a wrong significance result."
-                    .format(-tmp[idx], f_offset, entry.info_str(targets), tmp, i, targets[i]))
+                    f"negative Df value(s) found ({-tmp[idx]}, offset={f_offset}) in DataSet {entry.info_str(targets)} in significance test line {tmp}"
+                    f" for target[{i}] = {targets[i]}. This is a bug and may lead to a wrong significance result.")
             curdata.append(tmp)
             if np.isnan(tmp).any():
-                warnings.warn("{} contains nan values in significance test line {} for target[{}] = {}"
-                              .format(entry.info_str(targets), tmp, i, targets[i]))
+                warnings.warn(f"{entry.info_str(targets)} contains nan values in significance test line {tmp} for target[{i}] = {targets[i]}")
 
         z_and_p = ranksumtest(curdata[0], curdata[1])
         if isRefAlg:
@@ -993,7 +989,7 @@ def in_approximately(a, list_, abs=1e-11, rel=1e-11):
     return False
 
 
-class Evals(object):
+class Evals:
     def __init__(self, evals, counts):
         self.evals = evals
         self.counts = counts

@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Generate ERT vs param. figures.
 
@@ -12,7 +11,6 @@ overall conducted function evaluations in case the smallest target
 function value (1e-8) was not reached.
 
 """
-from __future__ import absolute_import
 import os
 import matplotlib.pyplot as plt
 import numpy as np

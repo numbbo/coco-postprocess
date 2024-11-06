@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """For generating performance profiles. This module is not in use (anymore or not yet?).
 
@@ -35,7 +34,6 @@
    # cocopp.compall.ppperfprof.plotmultiple(dsets, dsref=cocopp.bestalg.bestAlgorithmEntries)
 
 """
-from __future__ import absolute_import
 
 import os
 import numpy as np

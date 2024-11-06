@@ -1,5 +1,4 @@
 #! /usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Generate performance scaling figures wrt constraints.
 See also:
@@ -10,7 +9,6 @@ TODOs:
     - add legend: on first figure ?
     - review the caption and html caption
 """
-from __future__ import absolute_import
 
 import os
 import warnings
@@ -517,10 +515,10 @@ def main(dsList, _valuesOfInterest, outputdir):
         for idim, dim in enumerate(dd.keys()):
             plot(dd[dim], _valuesOfInterest, styles=styles)  # styles might have changed via config
             beautify(dim)
-            plt.title("%s, %s-D" % (func, dim))
+            plt.title(f"{func}, {dim}-D")
             # display number of instances in data and used targets type:
             if all(set(d.instancenumbers) == set(dd[dim][0].instancenumbers) for d in dd[dim]):
-                display_text = '%d instances\n' % len(((dd[dim][0]).instancenumbers))
+                display_text = '%d instances\n' % len((dd[dim][0]).instancenumbers)
             else:
                 display_text = 'instances %s' % [d.instancenumbers for d in dd[dim]]
             display_text += _valuesOfInterest.short_info

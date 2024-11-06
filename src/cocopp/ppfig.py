@@ -1,8 +1,6 @@
 #!/usr/bin/env python
-# -*- coding: utf-8 -*-
 
 """Generic routines for figure generation."""
-from __future__ import absolute_import
 # from __future__ import unicode_literals  # enum construction fails
 
 import os
@@ -92,9 +90,8 @@ def save_figure(filename,
                 plt.tight_layout(pad=0.15, rect=layout_rect)
             except Exception as e:
                 warnings.warn(
-                    'Figure tightening failed (matplotlib version %s)'
-                    ' with Exception: "%s"' %
-                    (plt.matplotlib.__version__, str(e)))
+                    f'Figure tightening failed (matplotlib version {plt.matplotlib.__version__})'
+                    f' with Exception: "{str(e)}"')
         try:
             if plt.rcParams['figure.figsize'] != genericsettings.figsize:
                 # prevent saved figure to be different under Jupyter notebooks
@@ -113,7 +110,7 @@ def save_figure(filename,
                         )
             if genericsettings.verbose:
                 print('Wrote figure in %s.' % (filename + '.' + format))
-        except IOError:
+        except OSError:
             warnings.warn('%s is not writeable.' % (filename + '.' + format))
 
 pprldmany_per_func_dim_header = 'Runtime distributions (ECDFs) per function'
@@ -153,7 +150,7 @@ def add_link(current_dir, folder, file_name, label,
              dimension=None):
     if folder:
         path = os.path.join(os.path.realpath(current_dir), folder, file_name)
-        href = '%s/%s' % (folder, file_name)
+        href = f'{folder}/{file_name}'
     else:
         path = os.path.join(os.path.realpath(current_dir), file_name)
         href = file_name
@@ -214,7 +211,7 @@ def save_folder_index_file(filename, image_file_extension):
 
     image_file_name = 'pprldmany-single-functions/pprldmany.%s' % image_file_extension
     if os.path.isfile(os.path.join(current_dir, image_file_name)):
-        links += "<H2> %s </H2>\n" % ' Runtime distributions (ECDFs) over all targets'
+        links += "<H2> {} </H2>\n".format(' Runtime distributions (ECDFs) over all targets')
         links += add_image(image_file_name, True, 380)
 
     links += add_link(current_dir, None, genericsettings.ppfigs_file_name + '.html', 'Scaling with dimension')
@@ -228,7 +225,7 @@ def save_folder_index_file(filename, image_file_extension):
     # add the ECDFs aggregated over all functions in all dimensions at the end:
     if os.path.isfile(os.path.join(current_dir,
                                    testbedsettings.current_testbed.plots_on_main_html_page[0])):
-        links += "<H2> %s </H2>\n" % ' Runtime distributions (ECDFs) over all targets'
+        links += "<H2> {} </H2>\n".format(' Runtime distributions (ECDFs) over all targets')
         i = 1 # counter to only put three plots per line
         for plotname in testbedsettings.current_testbed.plots_on_main_html_page:
             if os.path.isfile(os.path.join(current_dir, plotname)):
@@ -284,8 +281,7 @@ def get_rld_link(current_dir):
 
 def get_parent_link(html_page, parent_file_name):
     if parent_file_name and html_page not in (HtmlPage.ONE, HtmlPage.MANY):
-        return format_link_list_entry_in_html('<a href="{}.html">Overview page</a>'
-                                              .format(parent_file_name))
+        return format_link_list_entry_in_html(f'<a href="{parent_file_name}.html">Overview page</a>')
     return ''
 
 
@@ -342,7 +338,7 @@ def save_single_functions_html(filename,
             f.write("\n<H2> %s </H2>\n" % current_header)
             for function_name in testbedsettings.current_testbed.func_cons_groups.keys():
                 for dimension in dimensions if dimensions is not None else [2, 3, 5, 10, 20, 40]:
-                    f.write(add_image('ppfigcons_%s_d%s%s.%s' % (function_name, dimension, add_to_names, extension), True))
+                    f.write(add_image(f'ppfigcons_{function_name}_d{dimension}{add_to_names}.{extension}', True))
             f.write(caption_string_format % '##bbobppfigconslegend##')
 
         elif htmlPage is HtmlPage.PPFIGCONS1:
@@ -350,7 +346,7 @@ def save_single_functions_html(filename,
             f.write("\n<H2> %s </H2>\n" % current_header)
             for function_name in testbedsettings.current_testbed.func_cons_groups.keys():
                 for dimension in dimensions if dimensions is not None else [2, 3, 5, 10, 20, 40]:
-                    f.write(add_image('ppfigcons1_%s_d%s%s.%s' % (function_name, dimension, add_to_names, extension), True))
+                    f.write(add_image(f'ppfigcons1_{function_name}_d{dimension}{add_to_names}.{extension}', True))
             # caption given by caption in this case
 
         elif htmlPage is HtmlPage.NON_SPECIFIED:
@@ -444,7 +440,7 @@ def save_single_functions_html(filename,
                 index = dimension_list.rfind(",")
                 dimension_list = dimension_list[:index] + ' and' + dimension_list[index + 1:]
 
-                f.write('<p><b>%s in %s</b></p>' % ('All functions', dimension_list))
+                f.write('<p><b>{} in {}</b></p>'.format('All functions', dimension_list))
                 f.write('<div>')
                 for dimension in dimensions:
                     f.write(add_image('pplogloss_%02dD_%s.%s' % (dimension, function_group, extension), True))
@@ -455,7 +451,7 @@ def save_single_functions_html(filename,
                 f.write(caption_string_format % htmldesc.getValue('##bbobloglosstablecaption' + scenario + '##'))
 
                 for typeKey, typeValue in function_groups.items():
-                    f.write('<p><b>%s in %s</b></p>' % (typeValue, dimension_list))
+                    f.write(f'<p><b>{typeValue} in {dimension_list}</b></p>')
                     f.write('<div>')
                     for dimension in dimensions:
                         f.write(add_image('pplogloss_%02dD_%s.%s' % (dimension, typeKey, extension), True))
@@ -466,7 +462,7 @@ def save_single_functions_html(filename,
         if caption:
             f.write(caption_string_format % caption)
 
-        f.write("\n\n{0}</BODY>\n</HTML>".format(
+        f.write("\n\n{}</BODY>\n</HTML>".format(
             22 * "   <BR/><BR/><BR/><BR/><BR/>\n"))  # solicit top alignment for last dimension tag
         
     toolsdivers.replace_in_file(filename + add_to_names + '.html', '??COCOVERSION??', '<br />Data produced with COCO %s' % (toolsdivers.get_version_label(None)))
@@ -549,7 +545,7 @@ def marker_positions(xdata, ydata, nbperdecade, maxnb,
         ax_limits = plt.axis()
     tfy = y_transformation
     if tfy is None:
-        def identity(x): x
+        def identity(x): return x
         tfy = identity
 
     xdatarange = np.log10(max([max(xdata), ax_limits[0], ax_limits[1]]) + 0.501) - \
@@ -762,7 +758,7 @@ def plot(dsList, _valuesOfInterest=(10, 1, 1e-1, 1e-2, 1e-3, 1e-5, 1e-8),
     def transform(dsList):
         """Create dictionary of instances."""
 
-        class StrippedUpDS():
+        class StrippedUpDS:
             """Data Set stripped up of everything."""
 
             pass
@@ -868,7 +864,7 @@ def get_sorted_html_files(current_dir, prefix):
     return pair_list
 
 
-class PlottingStyle(object):
+class PlottingStyle:
 
     def __init__(self, pprldmany_styles, ppfigs_styles, algorithm_list, in_background):
         self.pprldmany_styles = pprldmany_styles
