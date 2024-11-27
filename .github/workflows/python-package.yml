@@ -23,3 +23,11 @@ jobs:
         python -m pip install ruff
     # - name: Lint with ruff
     #   run: ruff check src/
+    - name: Install package
+      run: pip install .
+    - name: Run doctests
+      run: python -m cocopp.test doctest
+    - name: Run tests
+      run: python -m cocopp.test
+    # - name: Run all tests
+    #   run: python -m cocopp.test all
