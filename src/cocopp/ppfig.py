@@ -209,12 +209,12 @@ def save_folder_index_file(filename, image_file_extension):
 
     links += add_link(current_dir, None, 'pptable.html', 'Tables for selected targets')
     links += add_link(current_dir, None, 'pprldistr.html',
-                      'Runtime distribution for selected targets and f-distributions')
+                      'Runtime profiles for selected targets and f-distributions')
     links += add_link(current_dir, None, 'pplogloss.html', 'Runtime loss ratios')
 
     image_file_name = 'pprldmany-single-functions/pprldmany.%s' % image_file_extension
     if os.path.isfile(os.path.join(current_dir, image_file_name)):
-        links += "<H2> %s </H2>\n" % ' Runtime distributions (ECDFs) over all targets'
+        links += "<H2> %s </H2>\n" % ' Runtime profiles over all targets'
         links += add_image(image_file_name, True, 380)
 
     links += add_link(current_dir, None, genericsettings.ppfigs_file_name + '.html', 'Scaling with dimension')
@@ -223,12 +223,12 @@ def save_folder_index_file(filename, image_file_extension):
                       'Tables for selected targets')
     links += add_link(current_dir, None, genericsettings.ppscatter_file_name + '.html', 'Scatter plots')
     links += add_link(current_dir, None, genericsettings.pprldistr2_file_name + '.html',
-                      'Runtime distribution for selected targets and f-distributions')
+                      'Runtime profiles for selected targets and f-distributions')
 
     # add the ECDFs aggregated over all functions in all dimensions at the end:
     if os.path.isfile(os.path.join(current_dir,
                                    testbedsettings.current_testbed.plots_on_main_html_page[0])):
-        links += "<H2> %s </H2>\n" % ' Runtime distributions (ECDFs) over all targets'
+        links += "<H2> %s </H2>\n" % ' Runtime profiles over all targets'
         i = 1 # counter to only put three plots per line
         for plotname in testbedsettings.current_testbed.plots_on_main_html_page:
             if os.path.isfile(os.path.join(current_dir, plotname)):
