@@ -1114,9 +1114,12 @@ class ListOfArchives(_td.StrList):
 
     def save(self):
         """save current list making changes permanent"""
-        for foldername in self:
+        for foldername in list(self):
             if not COCODataArchive.is_archive(foldername):
-                raise ValueError('"%s" is not an archive, save aborted' % foldername)
+                warnings.warn('"{0}" is not an archive and is hence removed from the '
+                              'list of {1} archives at {2}'
+                              .format(foldername, type(self), self.listing_file))
+                self.pop(foldername)
         self._makepathsabsolute()
         self._remove_double_entries()  # can have gotten here from append or extend
         _make_backup(self.listing_file)
