@@ -193,7 +193,6 @@ def save_index_html_file(filename):
 
 
 def save_folder_index_file(filename, image_file_extension):
-
     if not filename:
         return
 
@@ -202,6 +201,7 @@ def save_folder_index_file(filename, image_file_extension):
     links = get_home_link()
     links += get_convergence_link(current_dir)
     links += get_rld_link(current_dir)
+    links += get_rld_flex_link(current_dir)
     links += add_link(current_dir, None, genericsettings.ppfigdim_file_name + '.html',
                       'Scaling with dimension for selected targets')
     links += add_link(current_dir, None, genericsettings.ppfigcons1_file_name + '.html',
@@ -280,6 +280,22 @@ def get_rld_link(current_dir):
                       pprldmany_per_group_dim_header, dimension=testbedsettings.current_testbed.goto_dimension)
 
     return links
+
+def get_rld_flex_link(current_dir):
+	if testbedsettings.current_testbed.name != "bbob":
+		# not implemented yet
+		return ''
+
+	# write the config file
+	srcfile = os.path.join(toolsdivers.path_in_package(), 'bbob-benchmarkinfos.json')
+	dstfile = os.path.join(current_dir, 'pprldflex-config.js')
+	with open(srcfile, 'r') as file:
+		j = file.read()
+		with open(dstfile, 'w') as configfile:
+			configfile.write("\nconst config = " + j + "\n")
+
+	# return the link
+	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime distribution (ECDF) comparison')
 
 
 def get_parent_link(html_page, parent_file_name):
@@ -504,13 +520,12 @@ def write_tables(f, caption_string_format, best_alg_exists, html_key, legend_key
     f.write(caption_string_format % htmldesc.getValue('##' + key + '##'))
 
 
-def copy_js_files(output_dir):
-    """Copies js files to output directory."""
+def copy_static_files(output_dir):
+    """Copies static files to output directory."""
 
-    js_folder = os.path.join(toolsdivers.path_in_package(), 'js')
-    for file_in_folder in os.listdir(js_folder):
-        if file_in_folder.endswith(".js"):
-            shutil.copy(os.path.join(js_folder, file_in_folder), output_dir)
+    folder = os.path.join(toolsdivers.path_in_package(), 'static')
+    for file_in_folder in os.listdir(folder):
+        shutil.copy(os.path.join(folder, file_in_folder), output_dir)
 
 
 def discretize_limits(limits, smaller_steps_limit=3.1):

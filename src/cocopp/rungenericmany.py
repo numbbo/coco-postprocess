@@ -166,7 +166,7 @@ def main(args, outputdir):
                             'of function F%d.' % i.funcId)
                 last_incorrect_instances = curr_instances
 
-    ppfig.copy_js_files(many_algorithms_output)
+    ppfig.copy_static_files(many_algorithms_output)
 
     ppfig.save_single_functions_html(
         os.path.join(many_algorithms_output, genericsettings.many_algorithm_file_name),

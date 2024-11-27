@@ -1,0 +1,44 @@
+<!doctype html>
+<html>
+<head>
+	<meta charset="UTF-8"/>
+	<meta name="viewport" content="width=device-width" />
+	<title>Runtime Profiles</title>
+	<script src="pprldflex-config.js"></script>
+	<script src="pprldflex.js"></script>
+	<link rel="stylesheet" href="pprldflex.css">
+</head>
+<body>
+<div id="header">
+	<h2>Runtime profiles (ECDFs)</h2>
+	<div id="controls">
+		<select id="type">
+			<option name="dimension">per dimension</option>
+			<option name="function" >per function</option>
+			<option name="single"   >single plot</option>
+		</select>
+		<div id="dim">
+			<button id="dec_dim">&ndash;</button>
+			<select id="cur_dim"></select>
+			<button id="inc_dim">+</button>
+		</div>
+		<div id="func">
+			<button id="dec_func">&ndash;</button>
+			<select id="cur_func"></select>
+			<button id="inc_func">+</button>
+		</div>
+		<select id="columns">
+			<option name="2">2 columns</option>
+			<option name="3">3 columns</option>
+			<option name="4">4 columns</option>
+			<option name="5">5 columns</option>
+			<option name="6" selected>6 columns</option>
+			<option name="8">8 columns</option>
+			<option name="10">10 columns</option>
+		</select>
+	</div>
+	<a href="../index.html">Overview page</a>
+</div>
+<div id="content"></div>
+</body>
+</html>

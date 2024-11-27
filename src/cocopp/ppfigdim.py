@@ -559,7 +559,7 @@ def main(dsList, _valuesOfInterest, outputdir):
             function_groups= dsList.getFuncGroups(),
             parentFileName=genericsettings.single_algorithm_file_name)
 
-    ppfig.copy_js_files(outputdir)
+    ppfig.copy_static_files(outputdir)
 
     funInfos = ppfigparam.read_fun_infos()
     fontSize = ppfig.getFontSize(funInfos.values())
