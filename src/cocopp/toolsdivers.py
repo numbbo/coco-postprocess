@@ -382,7 +382,7 @@ def num2str(val, significant_digits=2, force_rounding=False,
         return '0'
     assert significant_digits > 0
     is_negative = val < 0
-    original_value = val
+    # original_value = val
     val = float(np.abs(val))
 
     order_of_magnitude = int(np.floor(np.log10(val)))
@@ -510,7 +510,7 @@ def git(args):
                               stderr=STDOUT, universal_newlines=True)
         output = output.rstrip()
     except CalledProcessError as e:
-        # print('Failed to execute "%s"' % str(full_command))
+        print('Failed to execute "{0}" with exception {1}'.format(full_command, e))
         raise
     return output
 

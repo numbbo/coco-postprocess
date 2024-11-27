@@ -287,7 +287,7 @@ def writeFEvalsMaxSymbols(fevals, maxsymbols, isscientific=False):
     #smallest representation of the decimal part
     #drop + and starting zeros of the exponent part
     repr1 = (('%.' + str(maxsymbols) + 'e') % fevals)
-    size1 = len(repr1)
+    size1 = len(repr1)  # noqa: F841
     tmp = repr1.split('e', 1)
     tmp2 = tmp[-1].lstrip('+-0')
     if float(tmp[-1]) < 0:
@@ -360,7 +360,7 @@ def writeFEvalsMaxPrec(entry, SIG, maxfloatrepr=1e5):
         #smallest representation of the decimal part
         #drop + and starting zeros of the exponent part
         res = (('%.' + str(max([0, SIG - 1])) + 'e') % entry)
-        size1 = len(res)
+        size1 = len(res)  # noqa: F841
         tmp = res.split('e', 1)
         tmp2 = tmp[-1].lstrip('+-0')
         if float(tmp[-1]) < 0:

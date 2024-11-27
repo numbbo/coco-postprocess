@@ -22,7 +22,7 @@ except ImportError:
     from matplotlib.transforms import blend_xy_sep_transform as blend
 from six import advance_iterator
 
-from . import toolsstats, toolsdivers, bestalg, testbedsettings, genericsettings, captions
+from . import toolsstats, toolsdivers, bestalg, genericsettings, captions
 from .pptex import writeFEvals2
 from .ppfig import save_figure, consecutiveNumbers
 from . import testbedsettings

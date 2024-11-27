@@ -7,7 +7,6 @@ from __future__ import absolute_import, print_function
 import warnings
 import numpy as np
 from . import genericsettings
-from pdb import set_trace
 
 def _has_len(thing):
     try: len(thing)

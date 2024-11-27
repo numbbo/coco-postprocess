@@ -90,7 +90,7 @@ def plot2(dataset, **kwargs):
 
     finalpoints = np.vstack((dataset.maxevals, dataset.finalfunvals)).T
     sortedfpoints = np.vstack(sorted(finalpoints,
-                                     cmp=lambda x, y: cmp(list(x), list(y))))
+                                     cmp=lambda x, y: cmp(list(x), list(y))))  # noqa: F821
     # sort final points like a list of 2-element sequences
     res.extend(plt.plot(sortedfpoints[:, 0], sortedfpoints[:, 1], **props))
     plt.setp(res[-1], marker='+', markeredgewidth=props['linewidth'],
@@ -118,6 +118,6 @@ def generatefig(dsList):
 def main(dsList, outputdir):
     """Generate output image files of function values vs. function evaluations."""
 
-    generatefigure(dsList)
+    generatefigure(dsList)  # noqa: F821
     # TODO: save, close
 

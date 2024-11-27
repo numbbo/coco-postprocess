@@ -1138,9 +1138,9 @@ class ListOfArchives(_td.StrList):
 
     def _remove_double_entries(self):
         """keep the first of duplicated entries"""
-        l = []
-        l.extend(v for v in self if v not in l)  # depends on l changing in generator
-        self[:] = l
+        _l = []
+        _l.extend(v for v in self if v not in _l)  # depends on l changing in generator
+        self[:] = _l
 
     def _walk(self, folder=None):
         """recursive search for COCO data archives in `folder` on disk.
@@ -1418,7 +1418,7 @@ class OfficialArchives(object):
 
         the very first import.
         """
-        for url in [l[0] for l in self._list]:
+        for url in [_l[0] for _l in self._list]:
             path = _url_to_folder_name(url)
             if path.endswith('/test'):
                 continue

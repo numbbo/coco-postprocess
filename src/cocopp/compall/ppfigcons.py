@@ -575,6 +575,7 @@ def main(dictAlg, html_file_prefix, sorted_algorithms=None, output_dir='ppdata',
 
             refalgentries = bestalg.load_reference_algorithm(testbedsettings.current_testbed.reference_algorithm_filename)
 
+            f = fname  # fix ruff error
             if refalgentries:        
                 refalgdata = []
                 dimrefalg = list(df[0] for df in refalgentries if df[1] == f)

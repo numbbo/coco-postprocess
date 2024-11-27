@@ -564,7 +564,9 @@ def marker_positions(xdata, ydata, nbperdecade, maxnb,
         ax_limits = plt.axis()
     tfy = y_transformation
     if tfy is None:
-        tfy = lambda x: x  # identity
+        def _id(x):
+            return x
+        tfy = _id  # identity
 
     xdatarange = np.log10(max([max(xdata), ax_limits[0], ax_limits[1]]) + 0.501) - \
                  np.log10(max([0,  # addresses ax_limits[0] < 0, assumes above max >= 0

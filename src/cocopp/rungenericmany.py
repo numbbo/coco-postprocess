@@ -157,7 +157,7 @@ def main(args, outputdir):
             for instance_set_of_interest in genericsettings.instancesOfInterest:
                 if curr_instances == instance_set_of_interest:
                     correct = True
-            try: last_incorrect_instances
+            try: last_incorrect_instances  # noqa: F821
             except: last_incorrect_instances = None
             if not correct and curr_instances != last_incorrect_instances:
                 warnings.warn('The data of %s ' % i +

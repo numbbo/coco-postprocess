@@ -510,7 +510,7 @@ def main(dsList, _valuesOfInterest, outputdir):
     ppfig.copy_static_files(outputdir)
 
     funInfos = ppfigparam.read_fun_infos()
-    fontSize = ppfig.getFontSize(funInfos.values())
+    fontSize = ppfig.getFontSize(funInfos.values())  # noqa: F841
 
     for ifunc, func in enumerate(dictFuncCons):
         dd = dictFuncCons[func].dictByDim()

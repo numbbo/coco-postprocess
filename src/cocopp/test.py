@@ -17,7 +17,7 @@ import sys
 import time
 import inspect
 import fnmatch
-import urllib
+import urllib  # noqa: F401
 import tempfile
 import shutil
 import subprocess

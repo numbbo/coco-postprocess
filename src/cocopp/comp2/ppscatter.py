@@ -92,7 +92,7 @@ def prepare_figure_caption():
 
 def figure_caption(for_html = False):
 
-    targets = testbedsettings.current_testbed.ppscatter_target_values
+    targets = testbedsettings.current_testbed.ppscatter_target_values  # noqa: F841
     if for_html:
         caption = htmldesc.getValue('##bbobppscatterlegend' +
                                     testbedsettings.current_testbed.scenario + '##')

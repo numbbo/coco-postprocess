@@ -271,7 +271,7 @@ def plotdata(data, maxval=None, maxevals=None, CrE=0., maxevals2=None, **kwargs)
                         y3 = y2[x2 <= x3][-1]  # find right y-value for x3==median(maxevals)
                     except IndexError:  # median(maxevals) is smaller than any data, can only happen because of CrE?
                         y3 = y2[0]
-                h = plt.plot((x3,), (y3,),
+                _h = plt.plot((x3,), (y3,),
                             marker=format[0],
                             markersize=format[1] * size_correction_from_n_foreground**0.85,
                             markeredgewidth=format[2],
@@ -570,7 +570,7 @@ def all_single_functions(dict_alg, is_single_algorithm, sorted_algs=None,
         dims = sorted(dictDim)
         for i, d in enumerate(dims):
             tempDictAlg = dictDim[d]
-            next_dim = dims[i+1] if i + 1 < len(dims) else dims[0]
+            next_dim = dims[i+1] if i + 1 < len(dims) else dims[0]  # noqa: F841
             dictFG = pp.dictAlgByFuncGroup(tempDictAlg)
             for fg, entries in sorted(dictFG.items()):
                 main(entries,

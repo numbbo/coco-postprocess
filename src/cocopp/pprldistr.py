@@ -116,7 +116,7 @@ def load_previous_data(filename=previous_data_filename, force=False):
         return pickle.load(f)
     except IOError as e:
         print("I/O error(%s): %s" % (e.errno, e.strerror))
-        previous_algorithm_data_found = False
+        previous_algorithm_data_found = False  # noqa: F841
         print('Could not find file: ', previous_data_filename)
     else:
         f.close()
