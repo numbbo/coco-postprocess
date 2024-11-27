@@ -21,8 +21,8 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install ruff
-    # - name: Lint with ruff
-    #   run: ruff check src/
+    - name: Lint with ruff
+      run: ruff check --ignore E701 --ignore E712 --ignore E713 --ignore E722 --ignore E401 --ignore E703 --ignore F401 --ignore E402 --ignore F403 --ignore F405 src/
     - name: Install package
       run: pip install .
     - name: Run doctests
