@@ -23,6 +23,8 @@ jobs:
         python -m pip install ruff
     # - name: Lint with ruff
     #   run: ruff check src/
+    - name: Install package
+      run: pip install .
     - name: Run doctests
       run: python -m cocopp.test doctest  # takes about 5 seconds
     - name: Run tests
