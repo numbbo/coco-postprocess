@@ -116,8 +116,8 @@ def save_figure(filename,
         except IOError:
             warnings.warn('%s is not writeable.' % (filename + '.' + format))
 
-pprldmany_per_func_dim_header = 'Runtime distributions (ECDFs) per function'
-pprldmany_per_group_dim_header = 'Runtime distributions (ECDFs) summary and function groups'
+pprldmany_per_func_dim_header = 'Runtime profiles per function'
+pprldmany_per_group_dim_header = 'Runtime profiles summary and function groups'
 convergence_plots_header = 'Convergence plots'
 
 links_placeholder = '<!--links-->'
@@ -295,7 +295,7 @@ def get_rld_flex_link(current_dir):
 			configfile.write("\nconst config = " + j + "\n")
 
 	# return the link
-	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime distribution (ECDF) comparison')
+	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime profiles comparison')
 
 
 def get_parent_link(html_page, parent_file_name):
@@ -416,7 +416,7 @@ def save_single_functions_html(filename,
             names = ['pprldistr', 'ppfvdistr']
             dimensions = testbedsettings.current_testbed.rldDimsOfInterest
 
-            header_ecdf = ' Empirical cumulative distribution functions (ECDF)'
+            header_ecdf = 'Empirical cumulative runtime profiles'
             f.write("<H2> %s </H2>\n" % header_ecdf)
             for dimension in dimensions:
                 for typeKey, typeValue in function_groups.items():
@@ -434,8 +434,8 @@ def save_single_functions_html(filename,
             names = ['pprldistr', 'pplogabs']
             dimensions = testbedsettings.current_testbed.rldDimsOfInterest
 
-            header_ecdf = 'Empirical cumulative distribution functions ' \
-                         '(ECDFs) per function group'
+            header_ecdf = ('Empirical cumulative runtime profiles'
+                           ' per function group')
             f.write("\n<H2> %s </H2>\n" % header_ecdf)
             for dimension in dimensions:
                 for typeKey, typeValue in function_groups.items():
