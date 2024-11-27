@@ -2,6 +2,7 @@
 
 const dom = {};       // shortcut access to HTML elements
 const history = [];   // very short state history
+const columns_selected = {dim: 4, func: 1};   // number of columns per display type
 
 // fill the dimension into a filename template
 function filename(template, dimension)
@@ -95,10 +96,13 @@ function buildContent(event)
 		while (history.length > 2) history.shift();
 	}
 
-	let cols = [2,3,4,5,6,8,10][dom.columns.selectedIndex];
-	let colwidth = (99 / cols) + "vw";
+	let old = [];
+	for (let e of dom.content.children)
+	{
+		if (e.nodeName === "TABLE" || e.nodeName === "IMG") old.push(e);
+		else e.remove();
+	}
 
-	dom.content.innerHTML = "";
 	if (dom.type.selectedIndex === 0)
 	{
 		// per dimension
@@ -108,6 +112,11 @@ function buildContent(event)
 		dom.cur_func.disabled = true;
 		dom.inc_func.disabled = true;
 		dom.dec_func.disabled = true;
+		dom.columns.disabled = false;
+		dom.columns.selectedIndex = columns_selected.dim;
+
+		let cols = [2,3,4,5,6,8,10][columns_selected.dim];
+		let colwidth = (99 / cols) + "vw";
 
 		let table = createElement({type: "table", parent: dom.content, classname: "per_dimension"});
 		let j = 0;
@@ -135,6 +144,11 @@ function buildContent(event)
 		dom.cur_func.disabled = false;
 		dom.inc_func.disabled = false;
 		dom.dec_func.disabled = false;
+		dom.columns.disabled = false;
+		dom.columns.selectedIndex = columns_selected.func;
+
+		let cols = [2,3,4,5,6,8,10][columns_selected.func];
+		let colwidth = (99 / cols) + "vw";
 
 		let table = createElement({type: "table", parent: dom.content, classname: "per_function"});
 		let j = 0;
@@ -162,15 +176,19 @@ function buildContent(event)
 		dom.cur_func.disabled = false;
 		dom.inc_func.disabled = false;
 		dom.dec_func.disabled = false;
+		dom.columns.disabled = true;
 
 		let src = filename(config.functions[func_index].filename, config.dimensions[dim_index]);
 		let img = createElement({type: "img", parent: dom.content, classname: "single_plot", properties: {src: src}});
 	}
 	else throw new Error("unknown type");
 
-	createElement({type: "p", parent: dom.content, html: "Bootstrapped empirical cumulative distribution of the number of f-evaluations divided by dimension (FEvals/DIM) for 51 targets with target precision in <i>10<sup>-8..2</sup></i> for all functions and subgroups in different dimensions. As reference algorithm, the best algorithm from BBOB 2009 is shown as light thick line with diamond markers."});
+//	createElement({type: "p", parent: dom.content, html: "Bootstrapped empirical cumulative distribution of the number of f-evaluations divided by dimension (FEvals/DIM) for 51 targets with target precision in <i>10<sup>-8..2</sup></i> for all functions and subgroups in different dimensions. As reference algorithm, the best algorithm from BBOB 2009 is shown as light thick line with diamond markers."});
 
 	window.setTimeout(() => dom.content.focus(), 10);
+
+	console.log("old", old);
+	window.setTimeout(() => { for (let e of old) e.remove(); }, 250);
 }
 
 // entry point
@@ -195,23 +213,35 @@ window.addEventListener("load", function(event)
 	// handle events
 	function prevDim(event)
 	{
+		let s = dom.content.scrollTop;
 		dom.cur_dim.selectedIndex = (dom.cur_dim.selectedIndex + config.dimensions.length - 1) % config.dimensions.length;
 		buildContent();
+		dom.content.scrollTop = s;
+		window.setTimeout(() => dom.content.scrollTop = s, 1);
 	}
 	function nextDim(event)
 	{
+		let s = dom.content.scrollTop;
 		dom.cur_dim.selectedIndex = (dom.cur_dim.selectedIndex + 1) % config.dimensions.length;
 		buildContent();
+		dom.content.scrollTop = s;
+		window.setTimeout(() => dom.content.scrollTop = s, 1);
 	}
 	function prevFunc(event)
 	{
+		let s = dom.content.scrollTop;
 		dom.cur_func.selectedIndex = (dom.cur_func.selectedIndex + config.functions.length - 1) % config.functions.length;
 		buildContent();
+		dom.content.scrollTop = s;
+		window.setTimeout(() => dom.content.scrollTop = s, 1);
 	}
 	function nextFunc(event)
 	{
+		let s = dom.content.scrollTop;
 		dom.cur_func.selectedIndex = (dom.cur_func.selectedIndex + 1) % config.functions.length;
 		buildContent();
+		dom.content.scrollTop = s;
+		window.setTimeout(() => dom.content.scrollTop = s, 1);
 	}
 
 	dom.type.addEventListener("change", buildContent);
@@ -221,7 +251,13 @@ window.addEventListener("load", function(event)
 	dom.cur_func.addEventListener("change", buildContent);
 	dom.dec_func.addEventListener("click", prevFunc);
 	dom.inc_func.addEventListener("click", nextFunc);
-	dom.columns.addEventListener("change", buildContent);
+
+	dom.columns.addEventListener("change", function(event)
+	{
+		if (dom.type.selectedIndex === 0) columns_selected.dim = dom.columns.selectedIndex;
+		else if (dom.type.selectedIndex === 1) columns_selected.func = dom.columns.selectedIndex;
+		buildContent();
+	});
 
 	window.addEventListener("keydown", function(event)
 	{

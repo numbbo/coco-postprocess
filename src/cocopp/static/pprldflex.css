@@ -9,6 +9,7 @@ div#header div#controls { display: flex; justify-content: space-between; align-i
 div#header div#controls select { padding: 0.25em 0.5em; }
 div#header div#controls span { padding: 0.25em 0.5em; border: 1px solid #ccc; border-radius: 0.25em; }
 div#header div#controls div { display: flex; gap: 0.25em; }
-div#content { width: 100%; height: calc(100vh - 3em); overflow-x: hidden; overflow-y: scroll; margin: auto; }
+div#content { position: relative; width: 100%; height: calc(100vh - 3em); overflow-x: hidden; overflow-y: scroll; margin: auto; }
+div#content table { position: absolute; top: 0; left: 0; }
 div#content img.single_plot { width: 100%; max-width: 100vw; max-height: calc(100vh - 5em); }
 .clickable { cursor: pointer; }
