@@ -23,3 +23,9 @@ jobs:
         python -m pip install ruff
     # - name: Lint with ruff
     #   run: ruff check src/
+    - name: Run doctests
+      run: python -m cocopp.test doctest  # takes about 5 seconds
+    - name: Run tests
+      run: python -m cocopp.test  # takes about 5 minutes
+    # - name: Run all tests
+    #   run: python -m cocopp.test all  # takes about 30 minutes    
