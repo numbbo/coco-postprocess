@@ -35,7 +35,7 @@ suite_name_cons = 'bbob-constrained'
 suite_name_ls = 'bbob-largescale'
 suite_name_mixint = 'bbob-mixint'
 suite_name_bi_mixint = 'bbob-biobj-mixint'
-suite_name_sboxcost = 'sbox-cost'
+suite_name_sboxcost = 'bbob-boxed'
 
 default_suite_single = 'bbob'
 default_suite_single_noisy = 'bbob-noisy'
@@ -66,8 +66,8 @@ suite_to_testbed = {
     'bbob-mixint': default_testbed_mixint,
     'bbob-biobj-mixint': 'GECCOBBOBBiObjMixintTestbed',
     'bbob-JOINED-bbob-largescale': 'BBOBLargeScaleJOINEDTestbed',
-    'sbox-cost': 'SBOXCOSTTestbed',
-    'bbob-JOINED-sbox-cost': 'SboxCostJOINEDTestbed'
+    'bbob-boxed': 'SBOXCOSTTestbed',
+    'bbob-JOINED-bbob-boxed': 'SboxCostJOINEDTestbed'
 }
 
 
@@ -369,7 +369,7 @@ class GECCOBBOBTestbed(Testbed):
                 bbob_largescale_detected = True
             elif detected_suite == 'bbob-JOINED-bbob-largescale':
                 continue
-            elif detected_suite == 'sbox-cost':
+            elif detected_suite == 'bbob-boxed':
                 scenario_sboxcostfixed = True  # noqa: F841
             else:
                 raise ValueError("Data from %s suite is not "
@@ -384,7 +384,7 @@ class GECCOBBOBTestbed(Testbed):
             # make sure that the right testbed is loaded:
         elif bbob_detected and sboxcost_detected:
             for ds in dsl:
-                ds.suite = 'bbob-JOINED-sboxcost'
+                ds.suite = 'bbob-JOINED-bbob-boxed'
 
         return dsl
 
@@ -408,7 +408,7 @@ class SBOXCOSTTestbed(GECCOBBOBTestbed):
         for key, val in GECCOBBOBTestbed.settings.items():
             setattr(self, key, val)
 
-        self.name = 'sbox-cost'
+        self.name = 'bbob-boxed'
         self.reference_algorithm_filename = ''   # no reference algorithm for now
         self.reference_algorithm_displayname = ''
         scenario = scenario_sboxcostfixed  # noqa: F841
@@ -424,7 +424,7 @@ class SboxCostJOINEDTestbed(SBOXCOSTTestbed):
     def __init__(self, targetValues):
         for key, val in GECCOBBOBTestbed.settings.items():
             setattr(self, key, val)
-        self.name = 'bbob and sbox-cost'
+        self.name = 'bbob and bbob-boxed'
         self.instantiate_attributes(targetValues)
         self.reference_algorithm_filename = ''  # no reference algorithm for now
         self.reference_algorithm_displayname = ''
