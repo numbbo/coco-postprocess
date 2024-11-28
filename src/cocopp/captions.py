@@ -136,8 +136,8 @@ def get_light_brown_line_text(testbedname):
                                                          # is hard-coded also in the code
     elif (testbedname in [testbedsettings.suite_name_ls,
                           testbedsettings.suite_name_mixint,
-                          'sbox-cost',
-                          'bbob-JOINED-sbox-cost']):
+                          'bbob-boxed',
+                          'bbob-JOINED-boxed']):
         return ""
     else:
         warnings.warn("Current testbed not supported for this caption text.")
