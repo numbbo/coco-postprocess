@@ -19,13 +19,13 @@ scenario_constrainedfixed = 'constrainedfixed'
 scenario_largescalefixed = 'largescalefixed'
 scenario_mixintfixed = 'mixintfixed'
 scenario_biobjmixintfixed = 'biobjmixintfixed'
-scenario_sboxcostfixed = 'sboxcostfixed'
+scenario_bbobboxedfixed = 'bbobboxedfixed'
 
 all_scenarios = [scenario_rlbased, scenario_fixed,
                  scenario_biobjfixed, scenario_biobjrlbased,
                  scenario_biobjextfixed, scenario_constrainedfixed,
                  scenario_largescalefixed, scenario_mixintfixed,
-                 scenario_biobjmixintfixed, scenario_sboxcostfixed]
+                 scenario_biobjmixintfixed, scenario_bbobboxedfixed]
 
 suite_name_single = 'bbob'        # TODO: This looks like a superfluous alias for GECCOBBOBTestbed.settings['name']
 suite_name_single_noisy = 'bbob-noisy'  # Shouldn't suite names better be defined in the classes which defined/describe
@@ -370,7 +370,7 @@ class GECCOBBOBTestbed(Testbed):
             elif detected_suite == 'bbob-JOINED-bbob-largescale':
                 continue
             elif detected_suite == 'bbob-boxed':
-                scenario_sboxcostfixed = True  # noqa: F841
+                scenario_bbobboxed_fixed = True  # noqa: F841
             else:
                 raise ValueError("Data from %s suite is not "
                                  "compatible with other data from "
@@ -411,7 +411,7 @@ class SBOXCOSTTestbed(GECCOBBOBTestbed):
         self.name = 'bbob-boxed'
         self.reference_algorithm_filename = ''   # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_sboxcostfixed  # noqa: F841
+        scenario = scenario_bbobboxedfixed  # noqa: F841
 
         # self.instancesOfInterest = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
 
@@ -428,7 +428,7 @@ class SboxCostJOINEDTestbed(SBOXCOSTTestbed):
         self.instantiate_attributes(targetValues)
         self.reference_algorithm_filename = ''  # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_sboxcostfixed  # noqa: F841
+        scenario = scenario_bbobboxedfixed  # noqa: F841
 
 
 
