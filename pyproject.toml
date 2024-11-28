@@ -7,7 +7,7 @@ requires = [
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "coco-postprocess"
+name = "cocopp"
 authors = [
   {name="Umut Batu"},
   {name="Dimo Brockhoff"},
