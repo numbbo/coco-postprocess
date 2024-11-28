@@ -256,7 +256,7 @@ def _get_remote(url, target_folder=None, redownload=False):
         _makedirs(target_folder)
         _download_definitions(url, target_folder)
         _url_add(target_folder, url)
-        if not official_archives.url(key) and not url in official_archives.urls.values():
+        if not official_archives.url(key) and url not in official_archives.urls.values():
             ArchivesKnown.register(url)
         else:  # TODO: check that ArchivesOfficial is in order?
             pass
@@ -1445,8 +1445,11 @@ for url in coco_urls[-1::-1]:  # loop over possible URLs until successful
         # connection was successful at least once (before or now)
         official_archives.set_as_attributes_in()  # set "official" archives as attributes by suite name
         break
-    except:  # (HTTPError, TimeoutError, URLError)
-        warnings.warn("failed to connect to " + url)
+    except ZeroDivisionError:
+        raise
+    except Exception as e:  # (HTTPError, TimeoutError, URLError)
+        raise
+        warnings.warn("failed to connect to {0} with exception {1}".format(url, e))
 else:
     warnings.warn("Failed fo find workable URL or local folder for official archives."
                   "\n After the www connection is restored, you may need to call"
