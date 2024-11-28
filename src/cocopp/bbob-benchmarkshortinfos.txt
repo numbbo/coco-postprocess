@@ -1,7 +1,7 @@
 1 Sphere
 2 Ellipsoid separable
 3 Rastrigin separable
-4 Skew Rastrigin-Bueche separ
+4 Skew Rastrigin-Bueche
 5 Linear slope
 6 Attractive sector
 7 Step-ellipsoid
@@ -20,5 +20,5 @@
 20 Schwefel x*sin(x)
 21 Gallagher 101 peaks
 22 Gallagher 21 peaks
-23 Katsuuras
+23 Katsuura
 24 Lunacek bi-Rastrigin
