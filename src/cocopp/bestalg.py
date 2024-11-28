@@ -706,7 +706,7 @@ def getAllContributingAlgorithmsToBest(algnamelist, target_lb=1e-8,
 
     selectedalgsperdimension = {}
     for (d, a) in sorted(countsperalgorithm):
-        if not d in selectedalgsperdimension:
+        if d not in selectedalgsperdimension:
             selectedalgsperdimension[d] = []
         selectedalgsperdimension[d].append((countsperalgorithm[(d, a)], a))
 
@@ -801,7 +801,7 @@ def extractBestAlgorithms(args=algs2009, f_factor=2,
 
     selectedalgsperdimension = {}
     for (d, a) in sorted(countsperalgorithm):
-        if not d in selectedalgsperdimension:
+        if d not in selectedalgsperdimension:
             selectedalgsperdimension[d] = []
         selectedalgsperdimension[d].append((countsperalgorithm[(d, a)], a))
 

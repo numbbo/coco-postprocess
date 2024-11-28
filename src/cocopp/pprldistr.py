@@ -271,7 +271,7 @@ def beautifyECDF():
     c = plt.gca().get_children()
     for i in c: # TODO: we only want to extend ECDF lines...
         try:
-            if i.get_drawstyle() == 'steps' and not i.get_linestyle() in ('', 'None'):
+            if i.get_drawstyle() == 'steps' and i.get_linestyle() not in ('', 'None'):
                 xdata = i.get_xdata()
                 ydata = i.get_ydata()
                 if len(xdata) > 0:

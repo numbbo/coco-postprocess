@@ -160,10 +160,10 @@ replace_dict = {
                                                      testbedsettings.suite_name_bi_mixint]) else "(bootstrapped)",
     '!!NOTCHED-BOXES!!': lambda: r"""Notched boxes: interquartile range with median of simulated runs; """
     if genericsettings.scaling_figures_with_boxes else "",
-    '!!DF!!': lambda: r"""\Df""" if not (testbedsettings.current_testbed.name in [testbedsettings.suite_name_bi,
+    '!!DF!!': lambda: r"""\Df""" if (testbedsettings.current_testbed.name not in [testbedsettings.suite_name_bi,
                                                                                   testbedsettings.suite_name_bi_ext,
                                                                                   testbedsettings.suite_name_bi_mixint]) else r"""\DI""",
-    '!!FOPT!!': lambda: r"""\fopt""" if not (testbedsettings.current_testbed.name in [testbedsettings.suite_name_bi,
+    '!!FOPT!!': lambda: r"""\fopt""" if (testbedsettings.current_testbed.name not in [testbedsettings.suite_name_bi,
                                                                                       testbedsettings.suite_name_bi_ext,
                                                                                       testbedsettings.suite_name_bi_mixint]) else r"""\hvref""",
     '!!DIVIDED-BY-DIMENSION!!': lambda: r"""divided by dimension and """ if ynormalize_by_dimension else "",

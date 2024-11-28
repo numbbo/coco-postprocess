@@ -384,11 +384,11 @@ def create(local_path):
             fnlower = filename.lower()
             if ('.extracted' not in dirpath
                 and not fnlower.startswith('.')
-                and not default_definition_filename in filename
+                and default_definition_filename not in filename
                 and not fnlower == 'readme'
                 and not fnlower.endswith(('.git', '.dat', '.mdat', '.rdat', '.tdat', '.info',
                                           '.txt', '.md', '.py', '.ipynb', '.pdf'))
-                and not '.txt' in fnlower
+                and '.txt' not in fnlower
                 ):
                 if filename[-1] not in ('2', 'z') and filename[-2:] not in ('ar', ) and '.zip' not in filename:
                     warnings.warn('Trying to archive unusual file "%s".'
@@ -1087,7 +1087,7 @@ class ListOfArchives(_td.StrList):
     def lists():
         lists = [ListOfArchives._name(n) for n in os.listdir(cocopp_home_archives)
                  if n.startswith(listing_file_start) and
-                    not listing_file_extension + "_2" in n]  # backups add the date like "...txt_2019-04-29_17h23m45s"
+                    listing_file_extension + "_2" not in n]  # backups add the date like "...txt_2019-04-29_17h23m45s"
         d = {}
         for name in lists:
             with open(ListOfArchives._fullfile(name), 'rt') as f:

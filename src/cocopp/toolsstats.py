@@ -710,7 +710,7 @@ def significancetest(entry0, entry1, targets):
     # one of the entry is an instance of BestAlgDataSet
     for entry in (entry0, entry1):
         tmp = entry.detEvals(targets)
-        if not 'funvals' in entry.__dict__ and not 'indicator' in entry.__dict__:  # this looks like a terrible hack
+        if 'funvals' not in entry.__dict__ and 'indicator' not in entry.__dict__:  # this looks like a terrible hack
             isRefAlg = True
             # for i, j in enumerate(tmp[0]):
                 # if np.isnan(j).all():
