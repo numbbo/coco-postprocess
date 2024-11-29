@@ -199,9 +199,9 @@ def save_folder_index_file(filename, image_file_extension):
     current_dir = os.path.dirname(os.path.realpath(filename))
 
     links = get_home_link()
-    links += get_convergence_link(current_dir)
-    links += get_rld_link(current_dir)
     links += get_rld_flex_link(current_dir)
+    links += get_rld_link(current_dir)
+    links += get_convergence_link(current_dir)
     links += add_link(current_dir, None, genericsettings.ppfigdim_file_name + '.html',
                       'Scaling with dimension for selected targets')
     links += add_link(current_dir, None, genericsettings.ppfigcons1_file_name + '.html',
@@ -295,7 +295,7 @@ def get_rld_flex_link(current_dir):
 			configfile.write("\nconst config = " + j + "\n")
 
 	# return the link
-	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime profiles comparison')
+	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime profiles (dynamic navigation)')
 
 
 def get_parent_link(html_page, parent_file_name):
