@@ -370,6 +370,7 @@ class GECCOBBOBTestbed(Testbed):
             elif detected_suite == 'bbob-JOINED-bbob-largescale':
                 continue
             elif detected_suite == 'bbob-boxed':
+                # TODO: this assigned variable is never used, hence the assignment has no effect
                 scenario_bbobboxed_fixed = True  # noqa: F841
             else:
                 raise ValueError("Data from %s suite is not "
@@ -411,7 +412,7 @@ class SBOXCOSTTestbed(GECCOBBOBTestbed):
         self.name = 'bbob-boxed'
         self.reference_algorithm_filename = ''   # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_bbobboxedfixed  # noqa: F841
+        self.settings['scenario'] = scenario_bbobboxedfixed  # noqa: F841
 
         # self.instancesOfInterest = {1: 1, 2: 1, 3: 1, 4: 1, 5: 1}
 
@@ -428,7 +429,7 @@ class SboxCostJOINEDTestbed(SBOXCOSTTestbed):
         self.instantiate_attributes(targetValues)
         self.reference_algorithm_filename = ''  # no reference algorithm for now
         self.reference_algorithm_displayname = ''
-        scenario = scenario_bbobboxedfixed  # noqa: F841
+        self.settings['scenario'] = scenario_bbobboxedfixed  # noqa: F841
 
 
 
