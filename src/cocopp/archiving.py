@@ -67,9 +67,6 @@ are (tar-)zipped files containing a full experiment from a single algorithm.
 
 """
 from __future__ import absolute_import, division, print_function, unicode_literals
-del absolute_import, division, print_function, unicode_literals
-
-__author__ = 'Nikolaus Hansen'
 
 import os
 import shutil as _shutil
@@ -77,32 +74,59 @@ import time as _time
 import warnings
 import hashlib
 import ast
+import platformdirs
+
 from . import toolsdivers as _td  # StrList
 try:
     from urllib.request import urlretrieve as _urlretrieve
 except ImportError:
     from urllib import urlretrieve as _urlretrieve
 
+del absolute_import, division, print_function, unicode_literals
+__author__ = 'Nikolaus Hansen'
+
+
 coco_urls = ["https://coco.gforge.inria.fr/data-archive",  # original location
              "https://numbbo.github.io/gforge/data-archive",  # new backup location
-             # "https://numbbo.github.io/data-archive",  # future location?
+             # "https://numbbo.github.io/data-archive",  # doesn't work because data-archive is the repository name by Github deploying convention
              "https://numbbo.github.io/data-archive/data-archive",  # new location
             ]
 coco_url = coco_urls[-1]  # may be reassigned if it doesn't work out
+_url_to_folder_name_replace = [('numbbo.github.io/data-archive/data-archive', 'da')]
 
 # cocopp needs a directory where it can cache downloaded datasets.
 # 
 # We use `platformdirs` to find the users cache directory in a platform independent way
 # and create a subdirectory within for cocopp.
 
-import platformdirs
 cocopp_home = platformdirs.user_cache_dir("cocopp", ensure_exists=True)
-default_archive_location = os.path.join(cocopp_home, 'data-archives')
+default_archive_location = os.path.join(cocopp_home, 'das')  # a short name
 default_definition_filename = 'coco_archive_definition.txt'
 cocopp_home_archives = default_archive_location
 listing_file_start = 'list_'
 listing_file_extension = '.txt'
 backup_last_filename = ''  # global variable to see whether and where a backup was made
+
+if (not os.path.exists(default_archive_location) and
+    os.path.exists(os.path.join(cocopp_home, 'data-archives'))):
+    try:
+        _shutil.move(os.path.join(cocopp_home, 'data-archives'),
+                     default_archive_location)
+        print('  cocopp.archiving moved the local archives cache to {0}'
+              .format(default_archive_location))
+        if os.path.exists(os.path.join(default_archive_location, 'da')):
+            raise ValueError("path {0} exists".format(
+                os.path.join(default_archive_location, 'da')))
+        _shutil.move(os.path.join(default_archive_location,
+                                  'numbbo.github.io/data-archive/data-archive'),
+                     os.path.join(default_archive_location, 'da'))
+        print('  cocopp.archiving moved the local official archive cache to {0}'
+              .format(os.path.join(default_archive_location, 'da')))
+    except Exception as e:
+        warnings.warn('cocopp.archiving failed to move the local archive cache'
+                      ' to {0} due to the exception {1}\n'
+                      '\nData will be (re-)downloaded to the new location when necessary.'
+                      .format(default_archive_location, e))
 
 def _abs_path(path, *args):
     """return a (OS-dependent) user-expanded path.
@@ -135,6 +159,8 @@ def _url_to_folder_name(url):
     #     warnings.warn('"%s" seems not to be an URL' % url)
     name = url.strip().strip('/').lstrip('http://').lstrip('https://'
                ).lstrip('HTTP://').lstrip('HTTPS://')
+    for old, new in _url_to_folder_name_replace:
+        name = name.replace(old, new)
     return _abs_path(default_archive_location, *name.split('/'))
 
 def _is_url(s):
@@ -246,7 +272,7 @@ def _get_remote(url, target_folder=None, redownload=False):
     from `url` to `target_folder` which doesn't need to exist.
     
     Details: The target folder name is by default derived from the `url` and
-    created within ``default_archive_location == ~/.cocopp/data-archives``.
+    created within ``default_archive_location == .../Caches/cocopp/das``.
     """
     key = url
     url = official_archives.url(url) or url.rstrip('/')
