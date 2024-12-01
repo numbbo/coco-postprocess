@@ -85,6 +85,7 @@ except ImportError:
 
 coco_urls = ["https://coco.gforge.inria.fr/data-archive",  # original location
              "https://numbbo.github.io/gforge/data-archive",  # new backup location
+             # "https://numbbo.github.io/data-archive",  # future location?
              "https://numbbo.github.io/data-archive/data-archive",  # new location
             ]
 coco_url = coco_urls[-1]  # may be reassigned if it doesn't work out
@@ -1448,11 +1449,12 @@ for url in coco_urls[-1::-1]:  # loop over possible URLs until successful
     except ZeroDivisionError:
         raise
     except Exception as e:  # (HTTPError, TimeoutError, URLError)
-        raise
         warnings.warn("failed to connect to {0} with exception {1}".format(url, e))
 else:
     warnings.warn("Failed fo find workable URL or local folder for official archives."
-                  "\n After the www connection is restored, you may need to call"
+                  "\n If your internet connection is stable, consider to update cocopp"
+                  "\n         pip install -U cocopp"
+                  "\n Otherwise, after the www connection is restored, you may need to call"
                   "\n `cocopp.archiving.official_archives.update_all()` to create"
                   "\n valid definition files.")
     official_archives._make_folder_skeleton()      
