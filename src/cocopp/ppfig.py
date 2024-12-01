@@ -72,7 +72,7 @@ def save_figure(filename,
     plt.text(0.5, 0.01, label,
              horizontalalignment="center",
              verticalalignment="bottom",
-             fontsize=10,
+             fontsize=8,
              color='0.5',
              transform=plt.gca().transAxes)
     for format in fig_formats:
