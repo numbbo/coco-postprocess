@@ -102,8 +102,8 @@ def get_directory(directory, extract_files):
                         if ('win32' in sys.platform):
                             longest_file_length = max(len(i) for i in zipfile.ZipFile.namelist(zip_ref))
                             if len(dir_name) + longest_file_length > 259:
-                                raise IOError(2, 'Some of the files cannot be extracted ' +
-                                              'from "%s". The path is too long.' % directory)
+                                warnings.warn('Some of the files can probably not be extracted ' +
+                                              'from "%s" as the path is too long.' % directory)
                         zip_ref.extractall(dir_name)
 
                     print('    archive extracted to folder', dir_name, '...')
@@ -118,8 +118,8 @@ def get_directory(directory, extract_files):
                     tar_file = tarfile.TarFile.open(directory)
                     longest_file_length = max(len(i) for i in tar_file.getnames())
                     if ('win32' in sys.platform) and len(dir_name) + longest_file_length > 259:
-                        raise IOError(2, 'Some of the files cannot be extracted ' +
-                                      'from "%s". The path is too long.' % directory)
+                        warnings.warn('Some of the files can probably not be extracted ' +
+                                      'from "%s" as the path is too long.' % directory)
 
                     try: tar_file.extractall(dir_name, filter='data')
                     except TypeError: tar_file.extractall(dir_name)  # Windows
