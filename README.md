@@ -13,7 +13,7 @@
 The ([`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html)) package uses data generated with the [COCO framework](https://numbbo.it) (comparing not only continuous optimisers) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents. The main documentation page can be found at [getting-started](https://numbbo.it/getting-started#postprocess) and in the [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp), but see also [here](https://numbbo.it).
 
 ## Installation
-To install from [PyPI](https://pypi.org/project/cocopp):
+To install the latest release from [PyPI](https://pypi.org/project/cocopp):
 
     pip install cocopp
 
