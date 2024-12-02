@@ -10,20 +10,27 @@
 </h1>
 
 [![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2594848.svg)][paper]  
-The ([`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html)) package uses data generated with the [COCO framework](https://numbbo.it) (comparing not only continuous optimisers) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents. The main documentation page can be found at [getting-started](https://numbbo.it/getting-started/postprocessing.html) and in the [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp), but see also [here](https://numbbo.github.io).
+The ([`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html)) package uses data generated with the [COCO framework](https://numbbo.it) (comparing not only continuous optimisers) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents. The main documentation page can be found at [getting-started](https://numbbo.it/getting-started#postprocess) and in the [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp), but see also [here](https://numbbo.it).
 
 ## Installation
+To install from [PyPI](https://pypi.org/project/cocopp):
 
     pip install cocopp
 
+To install the current main branch:
+
+    git clone https://github.com/numbbo/coco-postprocess.git
+    cd coco-postprocess
+    pip install .
+
 ## Usage
 
-The main method of the [`cocopp`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.html) package is [`main`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.rungeneric.html#main) (currently aliased to [`cocopp.rungeneric.main`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.rungeneric.html#main)). The [`main`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.rungeneric.html#main) method also allows basic use of the post-processing through a shell command-line interface. The recommended use is however from an IPython/Jupyter shell or notebook:
+The main method of the [`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html) package is [`main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main) (currently aliased to [`cocopp.rungeneric.main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main)). The [`main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main) method also allows basic use of the post-processing through a shell command-line interface. The recommended use is however from an IPython/Jupyter shell or notebook:
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> <span class="py-keyword">import</span> cocopp
 <span class="py-prompt">>>></span> cocopp.main(<span class="py-string">'exdata/my_output another_folder yet_another_or_not'</span>)  <span class="py-comment"></span></pre>
 
-postprocesses data from one or several folders, for example data generated with the help from the [`cocoex`](https://numbbo.github.io/gforge/apidocs-cocoex) module. Each folder should contain data of a full experiment with a single algorithm. (Within the folder the data can be distributed over subfolders). Results can be explored from the <tt class="rst-docutils literal">ppdata/index.html</tt> file, unless a a different output folder is specified with the <tt class="rst-docutils literal"><span class="pre">-o</span></tt> option. **Comparative data** from over 200 full experiments are archived online and can be listed, filtered, and retrieved from [`cocopp.archives`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.archives.html) (of type [`OfficialArchives`](https://numbbo.github.io/gforge/apidocs-cocopp/cocopp.archiving.OfficialArchives.html)) and processed alone or together with local data. For example
+postprocesses data from one or several folders, for example data generated with the help from the [`cocoex`](https://numbbo.github.io/coco-doc/apidocs/cocoex) module. Each folder should contain data of a full experiment with a single algorithm. (Within the folder the data can be distributed over subfolders). Results can be explored from the <tt class="rst-docutils literal">ppdata/index.html</tt> file, unless a a different output folder is specified with the <tt class="rst-docutils literal"><span class="pre">-o</span></tt> option. **Comparative data** from over 200 full experiments are archived online and can be listed, filtered, and retrieved from [archives](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.archiving.COCODataArchive.html) which are attributes of [`cocopp.archives`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.archiving.OfficialArchives.html) and processed alone or together with local data. For example
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> cocopp.archives.bbob(<span class="py-string">'bfgs'</span>)  <span class="py-comment"></span>
 <span class="py-output">['2009/BFGS_...</span></pre>
@@ -40,11 +47,11 @@ Only a trailing `*` is accepted and any string containing the substring is match
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> cocopp.main(<span class="py-string">'bbob/2009/*'</span>)  <span class="py-comment"></span></pre>
 
-can be browsed at [https://numbbo.github.io/ppdata-archive/bbob/2009](https://numbbo.github.io/ppdata-archive/bbob/2009). To display algorithms in the background, the <tt class="rst-docutils literal">genericsettings.background</tt> variable needs to be set:
+can be browsed at [https://numbbo.github.io/ppdata-archive/bbob/2009](https://numbbo.github.io/ppdata-archive/bbob/2009). To display algorithms in the background, the [`cocopp.genericsettings.background`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.genericsettings.html) variable needs to be set:
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> cocopp.genericsettings.background = {<span class="py-builtin">None</span>: cocopp.archives.bbob.get_all(<span class="py-string">'bfgs'</span>)}  <span class="py-comment"></span></pre>
 
-where [`None`](http://docs.python.org/library/constants.html#None) invokes the default color (grey) and line style (solid) <tt class="rst-docutils literal">genericsettings.background_default_style</tt>. Now we could compare our own data with the first <tt class="rst-docutils literal">'bfgs'</tt>-matching archived algorithm where all other archived BFGS data are shown in the background with the command
+where [`None`](http://docs.python.org/library/constants.html#None) invokes the default color (grey) and line style (solid) [`cocopp.genericsettings.background_default_style`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.genericsettings.html). Now we could compare our own data with the first <tt class="rst-docutils literal">'bfgs'</tt>-matching archived algorithm where all other archived BFGS data are shown in the background with the command
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> cocopp.main(<span class="py-string">'exdata/my_output bfgs!'</span>)  <span class="py-comment"></span></pre>
 
