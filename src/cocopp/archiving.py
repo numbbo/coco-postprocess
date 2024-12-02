@@ -679,7 +679,11 @@ class COCODataArchive(_td.StrList):
         elif isinstance(substr, int):
             names = [self[substr]]
         else:
-            names = self.find(substr)
+            try:
+                leading = [self.name.split()[0] + '/']
+            except (AttributeError, TypeError):
+                leading = []
+            names = self.find(substr, leading_strs=leading)
 
         # check that names has only one match
         if len(names) < 1:

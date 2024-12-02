@@ -143,7 +143,7 @@ class StrList(list):
         """alias to `find`"""
         return self.find(*substrs)
 
-    def find(self, *substrs):
+    def find(self, *substrs, leading_strs=()):
         """return entries that match all `substrs`.
 
         This method serves for interactive exploration of available entries
@@ -159,10 +159,14 @@ class StrList(list):
         - an index of `type` `int`
         - a list of indices
 
-        A single substring matches either if an entry contains the
-        substring or if the substring matches as regular expression, where
-        "." matches any single character and ".*" matches any number >= 0
-        of characters.
+        If the beginning of a substring matches the trail of any element of
+        `leading_strs` this part is removed. For example, `'bob/ipop'`
+        becomes `'ipop'` when `leading_strs=['bbob/']`.
+
+        A single substring matches if either an entry contains the
+        substring or the substring matches as regular expression, where "."
+        matches any single character and ".*" matches any number >= 0 of
+        characters.
 
         >>> from cocopp.toolsdivers import StrList
         >>> s = StrList(['abc', 'bcd', 'cde', ' cde'])
@@ -190,6 +194,10 @@ class StrList(list):
                 return StrList(self._names_found)
         names = list(self)
         for s in substrs:
+            for ss in leading_strs:
+                for i in range(len(ss)):
+                    if s.startswith(ss[i:]):
+                        s = s[len(ss[i:]):]  # remove leading part
             rex = _re.compile(s, _re.IGNORECASE)
             try:
                 names = [name for name in names if rex.match(name) or s.lower() in name.lower()]
