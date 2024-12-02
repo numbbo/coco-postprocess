@@ -99,7 +99,7 @@ def main(alg, outputdir, argv=None):
             # setting of a BBOB workshop and issue a warning otherwise:
             curr_instances = (dict((j, i.instancenumbers.count(j)) for j in set(i.instancenumbers)))
             correct = False
-            for instance_set_of_interest in inset.instancesOfInterest:  # noqa: F821
+            for instance_set_of_interest in genericsettings.instancesOfInterest:
                 if curr_instances == instance_set_of_interest:
                     correct = True
             if not correct:
