@@ -21,6 +21,8 @@ import tarfile
 import zipfile
 import hashlib
 
+from . import testbedsettings
+
 if sys.version_info[0] >= 3:
     from urllib.request import urlretrieve
 else:
@@ -145,16 +147,23 @@ def hash(string, len_=None):
 
 def get_output_directory_sub_folder(args, addhash=4):
     """`addhash` indicates the number of chars to add to make the name unique"""
+    try:
+        testbedname = testbedsettings.current_testbed.name
+    except AttributeError:
+        testbedname = ''
+    if testbedname is None or testbedname == 'bbob':
+        testbedname = ''  # assume bbob as default, don't change folder name
+    elif testbedname.startswith('bbob-'):
+        testbedname = testbedname[5:]
 
-    directory = ''
     if not isinstance(args, (list, set, tuple)):
         directory = args.strip().rstrip(os.path.sep)
-
         if not os.path.isdir(directory) and is_recognized_repository_filetype(directory):
             directory = directory[:directory.find('.t')]
         directory = directory.split(':')[-1]
         directory = directory.split(os.sep)[-1].replace(genericsettings.extraction_folder_prefix, '')
     else:
+        directory = ''
         for index, argument in enumerate(args):
             if not os.path.isdir(argument) and is_recognized_repository_filetype(argument):
                 argument = argument[:argument.find('.t')]
@@ -168,6 +177,6 @@ def get_output_directory_sub_folder(args, addhash=4):
     if len(directory) == 0:
         raise ValueError(args)
 
-    return directory + (
+    return testbedname + ('_' if testbedname else '') + directory + (
         '_' + hash(''.join(args), addhash) if addhash else '')
 
