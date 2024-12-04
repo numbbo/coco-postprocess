@@ -1146,7 +1146,7 @@ class ListOfArchives(_td.StrList):
                 warnings.warn('"{0}" is not an archive and is hence removed from the '
                               'list of {1} archives at {2}'
                               .format(foldername, type(self), self.listing_file))
-                self.pop(foldername)
+                self.pop(self.index(foldername))
         self._makepathsabsolute()
         self._remove_double_entries()  # can have gotten here from append or extend
         _make_backup(self.listing_file)
