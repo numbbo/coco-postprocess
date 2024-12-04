@@ -189,7 +189,7 @@ class Testbed(object):
     TODO: how do we pass information from the benchmark to the post-processing?
 
     """
-
+    flex_navigation_json_file=''
     reference_algorithm_displayname = None
     instances_are_uniform = True
     "False for biobjective suites, used (so far only) for simulated restarts in pprldmany"
@@ -273,6 +273,7 @@ class GECCOBBOBTestbed(Testbed):
     settings = dict(
         info_filename='bbob-benchmarkinfos.txt',
         shortinfo_filename=shortinfo_filename,
+        flex_navigation_json_file='bbob-benchmarkinfos.json',
         name=suite_name_single,
         short_names=get_short_names(shortinfo_filename),
         dimensions_to_display=(2, 3, 5, 10, 20, 40),
@@ -439,6 +440,7 @@ class BBOBLargeScaleJOINEDTestbed(GECCOBBOBTestbed):
     dimsOfInterest = (80, 320)
 
     settings = dict(
+        flex_navigation_json_file='bbob-largescalejoined-benchmarkinfos.json',
         dimensions_to_display=(2, 3, 5, 10, 20, 40, 80, 160, 320, 640),
         goto_dimension=160,  # auto-focus on this dimension in html
         reference_algorithm_filename=None,
@@ -488,6 +490,7 @@ class CONSBBOBTestbed(GECCOBBOBTestbed):
         shortinfo_filename=shortinfo_filename,
         short_names=get_short_names(shortinfo_filename),
         name=suite_name_cons,
+        flex_navigation_json_file='',
         functions_with_legend=(1, 54),
         first_function_number=1,
         last_function_number=54,
@@ -595,6 +598,7 @@ class GECCOBBOBNoisyTestbed(GECCOBBOBTestbed):
         info_filename='bbob-noisy-benchmarkinfos.txt',
         shortinfo_filename=shortinfo_filename,
         short_names=get_short_names(shortinfo_filename),
+        flex_navigation_json_file='',
         name=suite_name_single, # TODO: until we clean the code which uses this name, we need to use it also here.
         functions_with_legend=(101, 130),
         first_function_number=101,
@@ -779,6 +783,7 @@ class BBOBLargeScaleTestbed(GECCOBBOBTestbed):
     settings = dict(
         info_filename='bbob-largescale-benchmarkinfos.txt',
         shortinfo_filename=shortinfo_filename,
+        flex_navigation_json_file='bbob-largescale-benchmarkinfos.json',
         name=suite_name_ls,
         short_names=get_short_names(shortinfo_filename),
         dimensions_to_display=(20, 40, 80, 160, 320, 640),
@@ -843,6 +848,7 @@ class GECCOBBOBMixintTestbed(GECCOBBOBTestbed):
 
     settings = dict(
         name=suite_name_mixint,
+        flex_navigation_json_file='bbob-mixint-benchmarkinfos.json',
         first_dimension=5,
         dimensions_to_display=[5, 10, 20, 40, 80, 160],
         goto_dimension=40,  # auto-focus on this dimension in html

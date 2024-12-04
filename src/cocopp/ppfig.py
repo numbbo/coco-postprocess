@@ -282,20 +282,28 @@ def get_rld_link(current_dir):
     return links
 
 def get_rld_flex_link(current_dir):
-	if testbedsettings.current_testbed.name != "bbob":
-		# not implemented yet
-		return ''
+    try:
+        filename = testbedsettings.current_testbed.flex_navigation_json_file
+    except AttributeError:
+        return ''
 
-	# write the config file
-	srcfile = os.path.join(toolsdivers.path_in_package(), 'bbob-benchmarkinfos.json')
-	dstfile = os.path.join(current_dir, 'pprldflex-config.js')
-	with open(srcfile, 'r') as file:
-		j = file.read()
-		with open(dstfile, 'w') as configfile:
-			configfile.write("\nconst config = " + j + "\n")
+    if not filename:
+        return ''
 
-	# return the link
-	return add_link(current_dir, '.', 'pprldflex.html', 'Runtime profiles (with arrow keys navigation)')
+    # if testbedsettings.current_testbed.name != "bbob":
+    #     # not implemented yet
+    #     return ''
+
+    # write the config file
+    srcfile = os.path.join(toolsdivers.path_in_package(), filename)
+    dstfile = os.path.join(current_dir, 'pprldflex-config.js')
+    with open(srcfile, 'r') as file:
+        j = file.read()
+        with open(dstfile, 'w') as configfile:
+            configfile.write("\nconst config = " + j + "\n")
+
+    # return the link
+    return add_link(current_dir, '.', 'pprldflex.html', 'Runtime profiles (with arrow keys navigation)')
 
 
 def get_parent_link(html_page, parent_file_name):
