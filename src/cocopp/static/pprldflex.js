@@ -118,7 +118,7 @@ function buildContent(event)
 		let cols = [2,3,4,5,6,8,10][columns_selected.dim];
 		let colwidth = (99 / cols) + "vw";
 
-		let table = createElement({type: "table", parent: dom.content, classname: "per_dimension"});
+		let table = createElement({type: "table", parent: dom.content, classname: "all_functions"});
 		let j = 0;
 		let tr = null;
 		for (let i=0; i<config.functions.length; i++)
