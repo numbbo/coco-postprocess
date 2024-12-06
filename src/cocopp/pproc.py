@@ -162,7 +162,7 @@ class TargetValues(object):
         if 11 < 3 and isinstance(target_values, TargetValues):  # type cast passing behavior
             return self  # caveat: one might think a copy should be made
             self.__dict__ = target_values.__dict__  # this is not a copy
-            return
+            return  
         self.target_values = sorted(target_values, reverse=True)
         if discretize:
             self.target_values = self._discretize(self.target_values)
@@ -2591,7 +2591,8 @@ class DataSetList(list):
                 if 1 < 3 and i.instancenumbers == o.instancenumbers and (
                     # max(i.instancenumbers) > 5 and
                     not i._data_differ(o)):
-                    warnings.warn("same DataSet found twice,"
+                    warnings.warn("same DataSet with {0} rows found twice," 
+                                  .format(len(o._evals))
                                   + " skipping the second one from "
                                   + str(o.indexFiles) + " with instances "
                                   + str(i.instancenumbers))
