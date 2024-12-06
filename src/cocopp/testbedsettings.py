@@ -350,6 +350,10 @@ class GECCOBBOBTestbed(Testbed):
             if both bbob and bbob-largescale data is in dsl
             and sets the corresponding suite to
             BBOBLargeScaleJOINEDTestbed in this case.
+
+            Also changes the test suite name of all
+            entries to 'bbob-boxed' if only 'bbob'
+            and 'bbob-boxed' entries are detected.
             
             Returns the filtered list as a flat list.
             
@@ -361,7 +365,7 @@ class GECCOBBOBTestbed(Testbed):
         # find out whether we have to do something:
         bbob_detected = False
         bbob_largescale_detected = False
-        sboxcost_detected = False
+        bbob_boxed_detected = False
         for ds in dsl:
             detected_suite = ds.suite_name
             if detected_suite == 'bbob':
@@ -369,22 +373,28 @@ class GECCOBBOBTestbed(Testbed):
             elif detected_suite == 'bbob-largescale':
                 bbob_largescale_detected = True
             elif detected_suite == 'bbob-JOINED-bbob-largescale':
-                continue
+                bbob_largescale_detected = True
+                bbob_detected = True
             elif detected_suite == 'bbob-boxed':
-                # TODO: this assigned variable is never used, hence the assignment has no effect
-                scenario_bbobboxed_fixed = True  # noqa: F841
+                bbob_boxed_detected = True  # noqa: F841
+            elif detected_suite == 'bbob-JOINED-bbob-boxed':
+                bbob_boxed_detected = True
+                bbob_detected = True
             else:
                 raise ValueError("Data from %s suite is not "
                                  "compatible with other data from "
                                  "the bbob and/or bbob-largescale "
+                                 "and/or bbob-boxed "
                                  "suites" % str(ds.suite_name))
 
         # now update all elements in flattened list if needed:
-        if bbob_detected and bbob_largescale_detected:
+        if (bbob_detected and bbob_largescale_detected
+                and not bbob_boxed_detected):
             for ds in dsl:
                 ds.suite = 'bbob-largescale'  # to be available via ds.suite_name
             # make sure that the right testbed is loaded:
-        elif bbob_detected and sboxcost_detected:
+        elif (bbob_detected and bbob_boxed_detected
+                and not bbob_largescale_detected):
             for ds in dsl:
                 ds.suite = 'bbob-JOINED-bbob-boxed'
 
@@ -431,6 +441,37 @@ class SboxCostJOINEDTestbed(SBOXCOSTTestbed):
         self.reference_algorithm_filename = ''  # no reference algorithm for now
         self.reference_algorithm_displayname = ''
         self.settings['scenario'] = scenario_bbobboxedfixed  # noqa: F841
+
+    def filter(self, dsl):
+        """ Changes the test suite name to `bbob-boxed` for all
+            DataSets in dsl if data from both the bbob and the
+            bbob-boxed suite are detected.
+
+            Returns the filtered list as a flat list.
+
+            Gives an error if the data is not compatible.
+        """
+
+        # find out whether we have to do something:
+        bbob_detected = False
+        bbob_boxed_detected = False
+        for ds in dsl:
+            if ds.suite_name == 'bbob':
+                bbob_detected = True
+            elif ds.suite_name == 'bbob-boxed':
+                bbob_boxed_detected = True
+            else:
+                raise ValueError("Data from %s suite is not "
+                                 "compatible with other data from "
+                                 "the bbob and/or bbob-boxed "
+                                 "suites" % str(ds.suite_name))
+
+        # now change all elements in flattened list if needed:
+        if bbob_detected and bbob_boxed_detected:
+            for ds in dsl:
+                ds.suite = 'bbob-boxed'  # to be available via ds.suite_name
+        return dsl
+
 
 
 
@@ -643,6 +684,7 @@ class GECCOBiObjBBOBTestbed(Testbed):
     settings = dict(
         info_filename='bbob-biobj-benchmarkinfos.txt',
         shortinfo_filename=shortinfo_filename,
+        flex_navigation_json_file='bbob-biobj-benchmarkinfos.json',
         name=suite_name_bi,
         short_names=get_short_names(shortinfo_filename),
         dimensions_to_display=(2, 3, 5, 10, 20, 40),
