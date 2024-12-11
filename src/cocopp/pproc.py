@@ -3011,11 +3011,8 @@ class DataSetList(list):
             sys.stdout.write('\n')
 
             maxevals = []
-            for i in range(len(dimensions)):
-                maxeval = []
-                for d in dictDim[dimensions[i]]:
-                    maxeval = int(max((d.mMaxEvals(), maxeval)))
-                maxevals.append(maxeval)
+            for dim in dimensions:  # max has default since Python 3.4
+                maxevals.append(int(max((d.mMaxEvals() for d in dictDim[dim]), default=-1)))
             print('Max evals: %s' % str(maxevals))
 
             if opt == 'all':
