@@ -17,8 +17,11 @@ used by other modules, but does not modify settings of other modules.
 """
 
 import importlib
+import collections
 import warnings
 import numpy as np
+import matplotlib.pyplot as plt
+from matplotlib import colors as _colors
 from . import ppfigdim
 from . import genericsettings as settings, pproc, pprldistr
 from . import testbedsettings as tbs
@@ -47,11 +50,90 @@ def config_target_values_setting(is_expensive, is_runlength_based):
         settings.maxevals_fix_display = settings.xlimit_expensive
     settings.runlength_based_targets = is_runlength_based or is_expensive
 
+def map_indices_to_line_styles(names):
+    """helper function for `config_line_styles`.
+
+    Check for equal names after a float number (which represents a
+    parameter value) and map the respective index in names to the index of
+    first appearence. This is not (directly) used for determining the color.
+    """
+    nn = []
+    for n in names:
+        found = False
+        for i in range(len(n)):
+            if '0' <= n[i] <= '9' or n[i] == '.':
+                found = True
+                continue
+            elif found:
+                break
+        nn.append(n[i:])  # name without trailing float number
+    res = {k: nn.index(v) for k, v in enumerate(nn)}  # index gives the first match
+    return res
+
+def config_line_styles():
+    '''configure `genericsettings.line_styles` for a parameter sweet.
+
+    The colormap and range can be changed via the ``--parameter_sweep=``
+    value, the default value is ``plasma.0.9``, ``viridis`` and
+    ``gnuplot2.0.85`` are viable alternatives.
+
+    The order of the input arguments determines the positioning in the
+    color map. The ``line_style_mapping`` attribute of `genericsettings`
+    can be used to chose the marker and line style like ``{input_position:
+    position_in_original_line_styles}``. When ``input_position`` is not
+    present, the usual marker line style combination is used matching
+    ``input_position``.
+
+    TODO: we may want to keep the original symbol colors?
+    '''
+    s = settings.parameter_sweep
+    if not s or s in (0, '0', None, 'None', False, 'False', 'false', 'off', 'Off', 'OFF'):
+        return
+    if s in (1, '1', True, 'True', 'true', 't', 'on', 'On', 'ON'):
+        cvals = settings.sequential_colormaps
+    else:
+        try:
+            cvals = s.split(',')
+        except AttributeError:
+            warnings.warn("--parameter_sweep={0} value not recognized, you may"
+                          "use 'on' or 'off' or a \nmatplotlib color map name, see also "
+                          "``help(cocopp.config.config_line_styles)``.".format(s))
+            return
+
+    def str_to_colormap(s, len_):
+        """return a color iterator"""
+        cvals = s.split('.')
+        cmap = cvals[0]
+        c0 = float('.' + cvals[1]) if len(cvals) > 1 and len(cvals[1]) > 1 else 0
+        c1 = float('.' + cvals[2]) if len(cvals) > 2 else 1
+        return iter(_colors.to_hex(c) for c in plt.get_cmap(cmap)(
+                    np.linspace(c0, c1, len_)))
+    # map algorithm argument index to first algorithm appearence index
+    mapping = settings.line_style_mapping or map_indices_to_line_styles(
+                        settings._current_args)
+    counts = collections.Counter(mapping.values())  # count number of appearences
+    if settings.verbose >= 0:
+        print("Found {0} distinct algorithm(s) in {1} arguments"
+              .format(len(counts), len(mapping)))
+
+    color_maps = [str_to_colormap(cvals[i % len(cvals)], counts[i])
+                  for i in sorted(counts)]
+
+    settings._default_line_styles = [d.copy() for d in settings.line_styles]  # a backup
+    # modify color in settings.line_styles and set same line and marker style
+    for i, j in mapping.items():
+        s = settings.line_styles[i]
+        # s['markeredgecolor'] = s['color']  # doesn't work
+        s['color'] = next(color_maps[j])
+        for key in s.keys():
+            if key != 'color':
+                s[key] = settings.line_styles[j][key]
 
 def config(suite_name=None):
     """called from a high level, e.g. rungeneric, to configure the lower level
     modules via modifying parameter settings.
     """
+    config_line_styles()
     config_target_values_setting(settings.isExpensive, settings.runlength_based_targets)
     if suite_name:
         tbs.load_current_testbed(suite_name, pproc.TargetValues)

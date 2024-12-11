@@ -18,6 +18,12 @@ interactive_mode = True  # open browser with results, grayscale setting (depreca
 use_recommendations = [False]
 '''use only recommendations data (.mdat files) for the respective algorithm
    where the last element is recycled for the remaining algorithms'''
+parameter_sweep = False
+'''may be `True` or `'on'` or color map names to sweep through (versatile interface).
+   See also `cocopp.config.config_line_styles`.'''
+line_style_mapping = {}
+'''map the input argument position to a line style position, by default the identity.
+   This could useful to get the same style for several algorithm variants.'''
 
 force_assertions = False  # another debug flag for time-consuming assertions
 in_a_hurry = 1000  # [0, 1000] lower resolution, no eps, saves 30% time
@@ -86,6 +92,9 @@ simulated_runlength_bootstrap_sample_size = 30 + int(970 / (1 + 10 * max((0, in_
    for a final camera-ready paper version.
    """
 
+_current_args = None
+'''arguments found in rungeneric.main, namely a list of folders
+   returned by `COCODataArchive.get_extended` of ``cocopp.archives.all``.'''
 
 # single_target_pprldistr_values = (10., 1e-1, 1e-4, 1e-8)  # used as default in pprldistr.plot method, on graph for each
 # single_target_function_values = (1e1, 1e0, 1e-1, 1e-2, 1e-4, 1e-6, 1e-8)  # one figure for each, seems not in use
@@ -192,6 +201,8 @@ line_styles = [  # used by ppfigs and pprlmany, linewidth=1 can also be set here
     {'color': '#8c493c', 'linestyle': '-', 'marker': 'd', 'markersize': 7, 'zorder': 2}]
 
 # see old_line_styles for older line styles
+
+sequential_colormaps = ['plasma..9']  # , 'Greens_r..7', 'Greys_r..7', 'Reds_r..7']
 
 figsize = [6.4, 4.8]  # == rcParamsDefault['figure.figsize'], used in compall.pprldmany
 

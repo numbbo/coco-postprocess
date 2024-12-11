@@ -830,11 +830,11 @@ def main(dictAlg, order=None, outputdir='.', info='default',
                 data = dictData[alg]
             except KeyError:
                 continue
-
-            args = dict(styles[i % len(styles)])  # kw-args passed to plot
+            style = styles[i % len(styles)]
+            args = dict(style)  # kw-args passed to plot
             args.setdefault('markeredgewidth', 1.0)  # was: 1.5
             args.setdefault('markerfacecolor', 'None')  # transparent
-            args.setdefault('markeredgecolor', styles[i % len(styles)]['color'])
+            args.setdefault('markeredgecolor', style['color'])
             args.setdefault('markersize', 9)  # was: 12
             args.setdefault('linewidth', 1)
             args['markersize'] *= genericsettings.marker_size_multiplier
