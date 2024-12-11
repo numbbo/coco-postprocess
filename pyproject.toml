@@ -12,8 +12,10 @@ authors = [
   {name="Umut Batu"},
   {name="Dimo Brockhoff"},
   {name="Paul Dufossé"},
+  {name="Tobias Glasmachers"},
   {name="Nikolaus Hansen"},
   {name="Filip Matzner"},
+  {name="Olaf Mersmann"},
   {name="Raymond Ros"},
   {name="Dejan Tušar"},
 ]
@@ -44,7 +46,7 @@ dependencies = [
 dynamic = ["version"]
 
 [project.urls]
-Homepage = "https://numbbo.github.io"
+Homepage = "https://coco-platform.org"
 Issues = "https://github.com/numbbo/coco-postprocess/issues"
 Repository = "https://github.com/numbbo/coco-postprocess"
 
