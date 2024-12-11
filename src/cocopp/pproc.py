@@ -773,6 +773,8 @@ class DataSet(object):
         suite = None
         if hasattr(self, 'suite'):
             suite = getattr(self, 'suite')
+            if suite == 'sbox-cost':  # not sure whether this is necessary
+                suite = self.suite = 'bbob-boxed'
         if not suite:
             if self.isBiobjective():
                 suite = testbedsettings.default_suite_bi
@@ -1166,7 +1168,7 @@ class DataSet(object):
         `bootstrap` is passed to `detEvals` such that the simulated runs
         use a bootstrapped subset. This will increase the variance from
         repeated `evals_with_simulated_restarts` calls. This may become
-        useful to measure dispersion of runtime distributions.
+        useful to measure dispersion of runtime profiles.
 
         `instance`, when given, uses only the data from this instance. The
         default `samplesize` may not be appropriate in this case.
@@ -1463,6 +1465,8 @@ class DataSet(object):
         
         # Split header into a list of key-value
         for attrname, attrvalue in parseinfo(header):
+            if attrname == 'suite' and attrvalue == 'sbox-cost':
+                attrvalue = 'bbob-boxed'
             try:
                 setattr(self, self._attributes[attrname][0], attrvalue)
             except KeyError:

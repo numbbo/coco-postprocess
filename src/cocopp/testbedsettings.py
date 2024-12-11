@@ -67,6 +67,7 @@ suite_to_testbed = {
     'bbob-biobj-mixint': 'GECCOBBOBBiObjMixintTestbed',
     'bbob-JOINED-bbob-largescale': 'BBOBLargeScaleJOINEDTestbed',
     'bbob-boxed': 'SBOXCOSTTestbed',
+    'sbox-cost': 'SBOXCOSTTestbed',  # .name == bbob-boxed, this is probably superfluous
     'bbob-JOINED-bbob-boxed': 'SboxCostJOINEDTestbed'
 }
 
