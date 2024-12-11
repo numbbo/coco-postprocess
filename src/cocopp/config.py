@@ -17,8 +17,11 @@ used by other modules, but does not modify settings of other modules.
 """
 
 import importlib
+import collections
 import warnings
 import numpy as np
+import matplotlib as mpl
+import matplotlib.pyplot as plt
 from . import ppfigdim
 from . import genericsettings as settings, pproc, pprldistr
 from . import testbedsettings as tbs
@@ -47,11 +50,152 @@ def config_target_values_setting(is_expensive, is_runlength_based):
         settings.maxevals_fix_display = settings.xlimit_expensive
     settings.runlength_based_targets = is_runlength_based or is_expensive
 
+def _str_to_colormap(s, len_):
+    """return a color iterator from a string like ``'plasma.1.8'``"""
+    cvals = s.split('.')
+    c0 = float('.' + cvals[1]) if len(cvals) > 1 and len(cvals[1]) > 1 else 0
+    c1 = float('.' + cvals[2]) if len(cvals) > 2 else 1
+    return iter(mpl.colors.to_hex(c) for c in
+                    plt.get_cmap(cvals[0])(np.linspace(c0, c1, len_)))
+
+def _index_after_parameter(name, return_first_digit_index=False):
+    """return the first index after a sequence indicating a positive float.
+
+    In particular, `1.23` or `1.2e-3` are correctly identified as a float.
+
+    If `return_first_digit_index`, the index of the first digit is returned
+    instead of the first index after the float.
+    """
+    found = False
+    exponent = False
+    accept_minus = False  # allow to read a minus in the exponent
+    for i in range(len(name)):
+        if '0' <= name[i] <= '9' or (
+                name[i] == '.' and not exponent) or (
+                accept_minus and name[i] == '-'):
+            found = True
+            if return_first_digit_index:
+                return i
+            accept_minus = False  # accept only once directly after 'e'
+            continue
+        elif found and not exponent and name[i].lower() == 'e':
+            exponent = True
+            accept_minus = True
+            continue
+        elif found:
+            return i if name[i-1].lower() != 'e' else i - 1
+    return -1
+
+def map_indices_to_line_styles(names):
+    """helper function for `config_line_styles`.
+
+    Map each index of names to the index of the first appearence of the
+    name, where equality of names is determined starting from after a float
+    number (which represents a parameter value) using
+    `_index_after_parameter`.
+    """
+    # names without preceeding float number
+    nn = [name[_index_after_parameter(name):] for name in names]
+    res = {k: nn.index(v) for k, v in enumerate(nn)}  # index gives the first match
+    return res
+
+def sorted_line_styles(styles, names, indices):
+    """use the sorting of names up until and including a float to rearrange `styles`.
+
+    This assumes that the ``names[indices]`` correspond to
+    ``styles[indices]`` and that ``styles[indices]`` (colormap) are in
+    increasing order on input. On output, ``sorted_styles`` are in
+    increasing order w.r.t. the sorting of ``names[indices]``.
+    """
+    def sort_key(i):
+        i0, i1 = _index_after_parameter(names[i], True), _index_after_parameter(names[i])
+        return names[i][:i0], float(names[i][i0:i1])
+
+    sorted_indices = sorted(indices, key=sort_key)
+    # print(names, indices, sorted_indices)  # this looks correct
+    sorted_styles = styles[:]
+    # the line style of sorted_indices[k] becomes the style of indices[k]
+    for i, j in zip(sorted_indices, indices):
+        sorted_styles[i] = styles[j]
+    return sorted_styles
+
+def config_line_styles():
+    '''configure `genericsettings.line_styles` for a parameter sweet
+
+    if ``parameter_sweep`` is given on input. The colormap and range can be
+    changed via the ``--parameter_sweep_colormaps=`` value. The default
+    value is ``'plasma.0.9'``, viable alternatives are ``'viridis'`` or
+    ``'gnuplot2.0.85'`` or a comma separated joined sequence of any of
+    these, same color sweeps are 'Greens_r..7', 'Greys_r..7', 'Reds_r..7'.
+
+    The sorting of the input arguments up to and including a float value in
+    the name determines the positioning in the color map.
+
+    Minor: The ``line_style_mapping`` attribute of `genericsettings` can be
+    used to chose the marker and line style like ``{input_position:
+    position_in_original_line_styles}``. When ``input_position`` is not
+    present, the usual marker line style combination is used matching
+    ``input_position``.
+
+    TODO: we may want to keep the original symbol colors?
+    '''
+    if not settings.parameter_sweep:
+        return
+    if not settings.parameter_sweep_colormaps:
+          cvals = settings.sequential_colormaps
+    else:
+        # check whether s gives a color map
+        s = settings.parameter_sweep_colormaps
+        if s.startswith(tuple(mpl.colormaps())):
+            cvals = s.split(',')
+        else:
+            warnings.warn("{0} doesn't conform with any ``matplotlib.colormaps()={1}``"
+                        "Hence we use the default {2}"
+                        .format(s, plt.colormaps(), settings.sequential_colormaps))
+            cvals = settings.sequential_colormaps
+    # map algorithm argument index to first algorithm appearence index
+    mapping = settings.line_style_mapping or map_indices_to_line_styles(
+                        settings._current_args)
+    counts = collections.Counter(mapping.values())  # count number of appearences
+    if settings.verbose >= 0:
+        print("config_line_styles: found {0} distinct algorithm(s) in indices {1} of {2} arguments"
+              .format(len(counts), sorted(counts), len(mapping)))
+        # print(mapping, counts)
+        if settings.line_styles != settings._default_line_styles:
+            print('config_line_styles:   line styles are (already) different from default')
+            # return
+    color_maps = {}
+    for j, i in enumerate(sorted(counts)):
+        try:
+            color_maps[i] = _str_to_colormap(cvals[j % len(cvals)], counts[i])
+        except ValueError as e:
+            warnings.warn("exception {0} occured while generating color maps".format(e))
+    _previous_line_styles = [d.copy() for d in settings.line_styles]
+    # modify color in settings.line_styles and set same line and marker style
+    # which should be idempotent when applied to line_styles repeatedly
+    for i, j in sorted(mapping.items()):  # sorted w.r.t. input argument order
+        # _current_args names and indices i must align?
+        s = settings.line_styles[i]
+        # s['markeredgecolor'] = s['color']  # doesn't work
+        s['color'] = next(color_maps[j])  # CAVEAT: here the order of i matters!?
+        for key in s.keys():
+            if key != 'color':
+                s[key] = settings.line_styles[j][key]
+    if not settings.parameter_sweep_sort:
+        return
+    # sort styles for each algorithm
+    for alg in counts:
+        indices = [k for k in mapping if mapping[k] == alg]
+        settings.line_styles = sorted_line_styles(
+                settings.line_styles, settings._current_args, indices)
+    if settings.verbose >= 0 and settings.line_styles == _previous_line_styles:
+        print("config_line_styles:   didn't change lines styles")
 
 def config(suite_name=None):
     """called from a high level, e.g. rungeneric, to configure the lower level
     modules via modifying parameter settings.
     """
+    config_line_styles()
     config_target_values_setting(settings.isExpensive, settings.runlength_based_targets)
     if suite_name:
         tbs.load_current_testbed(suite_name, pproc.TargetValues)

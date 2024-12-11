@@ -37,7 +37,10 @@ __all__ = ['main']
 # Used by getopt:
 short_options = "hvo:"
 long_options = ["help", "output-dir=", "noisy", "noise-free",
-               "tab-only", "fig-only", "rld-only", "no-rld-single-fcts",
+               "tab-only", "fig-only",
+               "parameter-sweep",
+               "parameter-sweep-colormaps=",
+               "rld-only", "no-rld-single-fcts",
                "verbose", "settings=", "conv",
                "expensive", "runlength-based",
                "los-only", "crafting-effort=", "pickle",
@@ -184,6 +187,17 @@ def main(argv=None):
 
             all folder/file arguments are prepended with the given value
             which must be a valid path.
+
+        --parameter-sweep
+
+            if given, parse the algorithm name for a float and use the
+            value to determine the color order in a colormap.
+
+        --parameter-sweep-colormaps=colormaps
+
+            `colormaps` can, for example, be ``plasma.0.9,viridis``
+            indicating (here two) map names separated by commata and
+            optionally the range for each map.
 
         --in-a-hurry
 
@@ -337,6 +351,10 @@ def main(argv=None):
                 genericsettings.isLogLoss = False
             elif o == "--no-interactive":
                 genericsettings.interactive_mode = False
+            elif o == "--parameter-sweep":
+                genericsettings.parameter_sweep = True
+            elif o == "--parameter-sweep-colormaps":
+                genericsettings.parameter_sweep_colormaps = a
             else:
                 is_assigned = False
                 if o in longoptlist or o in shortoptlist:
@@ -385,6 +403,8 @@ def main(argv=None):
                           "This will most likely lead to a rather unexpected outcome.")
             # TODO: we would like the users input with timeout to confirm
             # and otherwise raise a ValueError
+
+        genericsettings._current_args = args
 
         update_background_algorithms(inputdir)
 
