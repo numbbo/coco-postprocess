@@ -50,6 +50,17 @@ def config_target_values_setting(is_expensive, is_runlength_based):
         settings.maxevals_fix_display = settings.xlimit_expensive
     settings.runlength_based_targets = is_runlength_based or is_expensive
 
+def _index_after_parameter(name):
+    """return the first index after a sequence of '0'-'9' or '.' chars"""
+    found = False
+    for i in range(len(name)):
+        if '0' <= name[i] <= '9' or name[i] == '.':
+            found = True
+            continue
+        elif found:
+            return i
+    return -1
+
 def map_indices_to_line_styles(names):
     """helper function for `config_line_styles`.
 
@@ -57,18 +68,20 @@ def map_indices_to_line_styles(names):
     parameter value) and map the respective index in names to the index of
     first appearence. This is not (directly) used for determining the color.
     """
-    nn = []
-    for n in names:
-        found = False
-        for i in range(len(n)):
-            if '0' <= n[i] <= '9' or n[i] == '.':
-                found = True
-                continue
-            elif found:
-                break
-        nn.append(n[i:])  # name without trailing float number
+    # names without preceeding float number
+    nn = [name[_index_after_parameter(name):] for name in names]
     res = {k: nn.index(v) for k, v in enumerate(nn)}  # index gives the first match
     return res
+
+def sorted_line_styles(styles, names, indices):
+    """use names up until and including a float as sorting key to rearrange styles"""
+    sorted_indices = sorted(indices,
+                            key=lambda i: names[i][:_index_after_parameter(names[i])])
+    sorted_styles = styles[:]
+    # the line style of sorted_indices[0] should be the style of indices[0]
+    for i, j in zip(sorted_indices, indices):
+        sorted_styles[i] = styles[j]
+    return sorted_styles
 
 def config_line_styles():
     '''configure `genericsettings.line_styles` for a parameter sweet.
@@ -77,9 +90,11 @@ def config_line_styles():
     value, the default value is ``plasma.0.9``, ``viridis`` and
     ``gnuplot2.0.85`` are viable alternatives.
 
-    The order of the input arguments determines the positioning in the
-    color map. The ``line_style_mapping`` attribute of `genericsettings`
-    can be used to chose the marker and line style like ``{input_position:
+    The sorting of the input arguments up to and including a float value in
+    the name determines the positioning in the color map.
+
+    Minor: The ``line_style_mapping`` attribute of `genericsettings` can be
+    used to chose the marker and line style like ``{input_position:
     position_in_original_line_styles}``. When ``input_position`` is not
     present, the usual marker line style combination is used matching
     ``input_position``.
@@ -128,6 +143,11 @@ def config_line_styles():
         for key in s.keys():
             if key != 'color':
                 s[key] = settings.line_styles[j][key]
+    # sort styles for each algorithm
+    for alg in mapping.values():
+        indices = sorted([k for k in mapping.keys() if mapping[k] == alg])
+        settings.line_styles = sorted_line_styles(
+                settings.line_styles, settings._current_args, indices)
 
 def config(suite_name=None):
     """called from a high level, e.g. rungeneric, to configure the lower level
