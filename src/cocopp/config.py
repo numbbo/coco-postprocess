@@ -20,8 +20,8 @@ import importlib
 import collections
 import warnings
 import numpy as np
+import matplotlib as mpl
 import matplotlib.pyplot as plt
-from matplotlib import colors as _colors
 from . import ppfigdim
 from . import genericsettings as settings, pproc, pprldistr
 from . import testbedsettings as tbs
@@ -49,6 +49,14 @@ def config_target_values_setting(is_expensive, is_runlength_based):
     if is_expensive:
         settings.maxevals_fix_display = settings.xlimit_expensive
     settings.runlength_based_targets = is_runlength_based or is_expensive
+
+def _str_to_colormap(s, len_):
+    """return a color iterator from a string like ``'plasma.1.8'``"""
+    cvals = s.split('.')
+    c0 = float('.' + cvals[1]) if len(cvals) > 1 and len(cvals[1]) > 1 else 0
+    c1 = float('.' + cvals[2]) if len(cvals) > 2 else 1
+    return iter(mpl.colors.to_hex(c) for c in
+                    plt.get_cmap(cvals[0])(np.linspace(c0, c1, len_)))
 
 def _index_after_parameter(name):
     """return the first index after a sequence of '0'-'9' or '.' chars"""
@@ -87,8 +95,9 @@ def config_line_styles():
     '''configure `genericsettings.line_styles` for a parameter sweet.
 
     The colormap and range can be changed via the ``--parameter_sweep=``
-    value, the default value is ``plasma.0.9``, ``viridis`` and
-    ``gnuplot2.0.85`` are viable alternatives.
+    value, the default value is ``'plasma.0.9'``, ``'viridis'`` and
+    ``'gnuplot2.0.85'`` and a comma separated joined sequence thereof are
+    viable alternatives.
 
     The sorting of the input arguments up to and including a float value in
     the name determines the positioning in the color map.
@@ -104,25 +113,18 @@ def config_line_styles():
     s = settings.parameter_sweep
     if not s or s in (0, '0', None, 'None', False, 'False', 'false', 'off', 'Off', 'OFF'):
         return
-    if s in (1, '1', True, 'True', 'true', 't', 'on', 'On', 'ON'):
-        cvals = settings.sequential_colormaps
+    if s in (1, '1', True, 'True', 'true', 't', 'on', 'On', 'ON', 'unsorted'):
+          cvals = settings.sequential_colormaps
     else:
-        try:
+        # check whether s gives a color map
+        if s.startswith(tuple(mpl.colormaps())):
             cvals = s.split(',')
-        except AttributeError:
-            warnings.warn("--parameter_sweep={0} value not recognized, you may"
-                          "use 'on' or 'off' or a \nmatplotlib color map name, see also "
-                          "``help(cocopp.config.config_line_styles)``.".format(s))
-            return
-
-    def str_to_colormap(s, len_):
-        """return a color iterator"""
-        cvals = s.split('.')
-        cmap = cvals[0]
-        c0 = float('.' + cvals[1]) if len(cvals) > 1 and len(cvals[1]) > 1 else 0
-        c1 = float('.' + cvals[2]) if len(cvals) > 2 else 1
-        return iter(_colors.to_hex(c) for c in plt.get_cmap(cmap)(
-                    np.linspace(c0, c1, len_)))
+        else:
+            warnings.warn("{0} doesn't conform with any ``matplotlib.colormaps()={1}``"
+                        "Hence we use the default {2}"
+                        .format(settings.parameter_sweep, plt.colormaps(),
+                                settings.sequential_colormaps))
+            cvals = settings.sequential_colormaps
     # map algorithm argument index to first algorithm appearence index
     mapping = settings.line_style_mapping or map_indices_to_line_styles(
                         settings._current_args)
@@ -130,10 +132,11 @@ def config_line_styles():
     if settings.verbose >= 0:
         print("Found {0} distinct algorithm(s) in {1} arguments"
               .format(len(counts), len(mapping)))
-
-    color_maps = [str_to_colormap(cvals[i % len(cvals)], counts[i])
-                  for i in sorted(counts)]
-
+    try:
+        color_maps = [_str_to_colormap(cvals[i % len(cvals)], counts[i])
+                      for i in sorted(counts)]
+    except ValueError as e:
+        warnings.warn("exception {0} occured while generating color maps".format(e))
     settings._default_line_styles = [d.copy() for d in settings.line_styles]  # a backup
     # modify color in settings.line_styles and set same line and marker style
     for i, j in mapping.items():
@@ -143,6 +146,8 @@ def config_line_styles():
         for key in s.keys():
             if key != 'color':
                 s[key] = settings.line_styles[j][key]
+    if settings.parameter_sweep.startswith('unsorted'):
+        return
     # sort styles for each algorithm
     for alg in mapping.values():
         indices = sorted([k for k in mapping.keys() if mapping[k] == alg])
