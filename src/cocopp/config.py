@@ -72,9 +72,10 @@ def _index_after_parameter(name):
 def map_indices_to_line_styles(names):
     """helper function for `config_line_styles`.
 
-    Check for equal names after a float number (which represents a
-    parameter value) and map the respective index in names to the index of
-    first appearence. This is not (directly) used for determining the color.
+    Map each index of names to the index of the first appearence of the
+    name, where equality of names is determined starting from after a float
+    number (which represents a parameter value) using
+    `_index_after_parameter`.
     """
     # names without preceeding float number
     nn = [name[_index_after_parameter(name):] for name in names]
@@ -82,22 +83,30 @@ def map_indices_to_line_styles(names):
     return res
 
 def sorted_line_styles(styles, names, indices):
-    """use names up until and including a float as sorting key to rearrange styles"""
+    """use the sorting of names up until and including a float to rearrange `styles`.
+
+    This assumes that the ``names[indices]`` correspond to
+    ``styles[indices]`` and that ``styles[indices]`` (colormap) are in
+    increasing order on input. On output, ``sorted_styles`` are in
+    increasing order w.r.t. the sorting of ``names[indices]``.
+    """
     sorted_indices = sorted(indices,
                             key=lambda i: names[i][:_index_after_parameter(names[i])])
+    # print(names, indices, sorted_indices)  # this looks correct
     sorted_styles = styles[:]
-    # the line style of sorted_indices[0] should be the style of indices[0]
+    # the line style of sorted_indices[k] becomes the style of indices[k]
     for i, j in zip(sorted_indices, indices):
         sorted_styles[i] = styles[j]
     return sorted_styles
 
 def config_line_styles():
-    '''configure `genericsettings.line_styles` for a parameter sweet.
+    '''configure `genericsettings.line_styles` for a parameter sweet
 
-    The colormap and range can be changed via the ``--parameter_sweep=``
-    value, the default value is ``'plasma.0.9'``, ``'viridis'`` and
-    ``'gnuplot2.0.85'`` and a comma separated joined sequence thereof are
-    viable alternatives.
+    if ``parameter_sweep`` is given on input. The colormap and range can be
+    changed via the ``--parameter_sweep_colormaps=`` value. The default
+    value is ``'plasma.0.9'``, viable alternatives are ``'viridis'`` or
+    ``'gnuplot2.0.85'`` or a comma separated joined sequence of any of
+    these, same color sweeps are 'Greens_r..7', 'Greys_r..7', 'Reds_r..7'.
 
     The sorting of the input arguments up to and including a float value in
     the name determines the positioning in the color map.
@@ -110,49 +119,57 @@ def config_line_styles():
 
     TODO: we may want to keep the original symbol colors?
     '''
-    s = settings.parameter_sweep
-    if not s or s in (0, '0', None, 'None', False, 'False', 'false', 'off', 'Off', 'OFF'):
+    if not settings.parameter_sweep:
         return
-    if s in (1, '1', True, 'True', 'true', 't', 'on', 'On', 'ON', 'unsorted'):
+    if not settings.parameter_sweep_colormaps:
           cvals = settings.sequential_colormaps
     else:
         # check whether s gives a color map
+        s = settings.parameter_sweep_colormaps
         if s.startswith(tuple(mpl.colormaps())):
             cvals = s.split(',')
         else:
             warnings.warn("{0} doesn't conform with any ``matplotlib.colormaps()={1}``"
                         "Hence we use the default {2}"
-                        .format(settings.parameter_sweep, plt.colormaps(),
-                                settings.sequential_colormaps))
+                        .format(s, plt.colormaps(), settings.sequential_colormaps))
             cvals = settings.sequential_colormaps
     # map algorithm argument index to first algorithm appearence index
     mapping = settings.line_style_mapping or map_indices_to_line_styles(
                         settings._current_args)
     counts = collections.Counter(mapping.values())  # count number of appearences
     if settings.verbose >= 0:
-        print("Found {0} distinct algorithm(s) in {1} arguments"
-              .format(len(counts), len(mapping)))
-    try:
-        color_maps = [_str_to_colormap(cvals[i % len(cvals)], counts[i])
-                      for i in sorted(counts)]
-    except ValueError as e:
-        warnings.warn("exception {0} occured while generating color maps".format(e))
-    settings._default_line_styles = [d.copy() for d in settings.line_styles]  # a backup
+        print("config_line_styles: found {0} distinct algorithm(s) in indices {1} of {2} arguments"
+              .format(len(counts), sorted(counts), len(mapping)))
+        # print(mapping, counts)
+        if settings.line_styles != settings._default_line_styles:
+            print('config_line_styles:   line styles are (already) different from default')
+            # return
+    color_maps = {}
+    for j, i in enumerate(sorted(counts)):
+        try:
+            color_maps[i] = _str_to_colormap(cvals[j % len(cvals)], counts[i])
+        except ValueError as e:
+            warnings.warn("exception {0} occured while generating color maps".format(e))
+    _previous_line_styles = [d.copy() for d in settings.line_styles]
     # modify color in settings.line_styles and set same line and marker style
-    for i, j in mapping.items():
+    # which should be idempotent when applied to line_styles repeatedly
+    for i, j in sorted(mapping.items()):  # sorted w.r.t. input argument order
+        # _current_args names and indices i must align?
         s = settings.line_styles[i]
         # s['markeredgecolor'] = s['color']  # doesn't work
-        s['color'] = next(color_maps[j])
+        s['color'] = next(color_maps[j])  # CAVEAT: here the order of i matters!?
         for key in s.keys():
             if key != 'color':
                 s[key] = settings.line_styles[j][key]
-    if settings.parameter_sweep.startswith('unsorted'):
+    if not settings.parameter_sweep_sort:
         return
     # sort styles for each algorithm
-    for alg in mapping.values():
-        indices = sorted([k for k in mapping.keys() if mapping[k] == alg])
+    for alg in counts:
+        indices = [k for k in mapping if mapping[k] == alg]
         settings.line_styles = sorted_line_styles(
                 settings.line_styles, settings._current_args, indices)
+    if settings.verbose >= 0 and settings.line_styles == _previous_line_styles:
+        print("config_line_styles:   didn't change lines styles")
 
 def config(suite_name=None):
     """called from a high level, e.g. rungeneric, to configure the lower level
