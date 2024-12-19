@@ -18,12 +18,24 @@ interactive_mode = True  # open browser with results, grayscale setting (depreca
 use_recommendations = [False]
 '''use only recommendations data (.mdat files) for the respective algorithm
    where the last element is recycled for the remaining algorithms'''
+
 parameter_sweep = False
-'''may be `True` or `'on'` or color map names to sweep through (versatile interface).
-   See also `cocopp.config.config_line_styles`.'''
+'''configure line styles for a parameter sweep, see also
+   `cocopp.config.config_line_styles`'''
+parameter_sweep_colormaps = None
+'''colormap(s) for parameter sweep set from the respective input long_option.
+
+   `colormaps` can, for example, be 'plasma.0.9,viridis' indicating the map
+   names separated by commata and optionally the range for each map.
+'''
+parameter_sweep_sort = True
+'''assign color in sweep by leading float of algorithm name'''
+sequential_colormaps = ['plasma..9']  # 'viridis', 'gnuplot2.0.85', 'Greens_r..7', 'Greys_r..7', 'Reds_r..7']
+'''default color maps for a parameter sweep'''
+
 line_style_mapping = {}
 '''map the input argument position to a line style position, by default the identity.
-   This could useful to get the same style for several algorithm variants.'''
+   This could be useful to get the same style for several algorithm variants. Only effective with when ``bool(parameter_sweep) is True``.'''
 
 force_assertions = False  # another debug flag for time-consuming assertions
 in_a_hurry = 1000  # [0, 1000] lower resolution, no eps, saves 30% time
@@ -200,9 +212,8 @@ line_styles = [  # used by ppfigs and pprlmany, linewidth=1 can also be set here
     {'color': '#8a52bd', 'linestyle': '-', 'marker': 'o', 'markersize': 7, 'zorder': 2},
     {'color': '#8c493c', 'linestyle': '-', 'marker': 'd', 'markersize': 7, 'zorder': 2}]
 
+_default_line_styles = [dict(d) for d in line_styles]  # we may modify linestyles and can get back the original
 # see old_line_styles for older line styles
-
-sequential_colormaps = ['plasma..9']  # , 'Greens_r..7', 'Greys_r..7', 'Reds_r..7']
 
 figsize = [6.4, 4.8]  # == rcParamsDefault['figure.figsize'], used in compall.pprldmany
 
