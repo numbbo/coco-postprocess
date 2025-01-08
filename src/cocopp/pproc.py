@@ -1525,7 +1525,7 @@ class DataSet(object):
                     f = open(self.pickleFile, 'w') # TODO: what if file already exist?
                 pickle.dump(self, f)
                 f.close()
-                if genericsettings.verbose:
+                if genericsettings.verbose > 0:
                     print('Saved pickle in %s.' %(self.pickleFile))
             except IOError as e:
                 print("I/O error(%s): %s" % (e.errno, e.strerror))
@@ -2385,8 +2385,8 @@ def get_DataSetList(*args, **kwargs):
                 # to be compatible with DataSet.__init__:
                 if not testbedsettings.current_testbed:
                     testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
-                # genericsettings.verbosity > 0 and
-                print("  using pickled DataSetList", end=' ')  # remove when all went well for a while?
+                if genericsettings.verbose > 0:
+                    print("  using pickled DataSetList {0}".format(name), end=' ')
                 return dsl
     if _using_recommendations:  # do not pickle recommendations for the time being
         return fallback()
@@ -3484,7 +3484,7 @@ def parseinfo(s):
     Keys should not use comma or quote characters.
 
     """
-    p = re.compile(r'\ *([^,=]+?)\ *=\ *(".+?"|\'.+?\'|[^,]+)\ *(?=,|$)')
+    p = re.compile(r'\ *([^,=]+?)\ *=\ *(".*?"|\'.*?\'|[^,]+)\ *(?=,|$)')
     res = []
     for elem0, elem1 in p.findall(s):
         if elem1.startswith('\'') and elem1.endswith('\''): # HACK
