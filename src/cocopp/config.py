@@ -61,12 +61,16 @@ def _str_to_colormap(s, len_):
 def _index_after_parameter(name):
     """return the first index after a sequence of '0'-'9' or '.' chars"""
     found = False
+    exponent = False
     for i in range(len(name)):
-        if '0' <= name[i] <= '9' or name[i] == '.':
+        if '0' <= name[i] <= '9' or (name[i] == '.' and not exponent):
             found = True
             continue
+        elif found and not exponent and name[i].lower() == 'e':
+            exponent = True
+            continue
         elif found:
-            return i
+            return i if name[i-1].lower() != 'e' else i - 1
     return -1
 
 def map_indices_to_line_styles(names):
