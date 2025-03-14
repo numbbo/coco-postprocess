@@ -321,6 +321,8 @@ def plotLegend(handles, maxval):
         if genericsettings.len_of_names_in_pprldmany_legend:
             return genericsettings.len_of_names_in_pprldmany_legend
 
+        if not label_list:
+            return 0
         maxLength = max(len(i) for i in label_list)
         numberOfCharacters = 7  # == len("best 2009") - 2, we add 2 later
         firstPart = [i[:numberOfCharacters] for i in label_list]
@@ -331,8 +333,10 @@ def plotLegend(handles, maxval):
         return min(numberOfCharacters + 2, maxLength)
 
     handles_with_legend = [h for h in handles if not plt.getp(h[-1], 'label').startswith('_line')]
+    # assert len(handles_with_legend)
     handles_with_legend = [h for h in handles_with_legend  # fix for matplotlib since v 3.5.0
                            if not plt.getp(h[-1], 'label').startswith('_child')]
+    # assert len(handles_with_legend)
     label_list = [toolsdivers.strip_pathname1(plt.getp(h[-1], 'label')) for h in handles_with_legend]
     numberOfCharacters = label_length(label_list)
     for h in handles_with_legend:
@@ -890,20 +894,23 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             for label in labels:
                 commandnames.append(algtocommand[label])
             # file_obj.write(headleg)
-            if len(
-                    order) > 28:  # latex sidepanel won't work well for more than 25 algorithms, but original labels are also clipped
-                file_obj.write(r'\providecommand{\perfprofsidepanel}{\mbox{%s}\vfill\mbox{%s}}'
-                        % (commandnames[0], commandnames[-1]))
+            if not commandnames:  # see issue #46, no data in the foreground
+                file_obj.write(r'\providecommand{\perfprofsidepanel}{\mbox{no data}}')  # never tested
             else:
-                fontsize_command = r'\tiny{}' if len(order) > 19 else ''
-                file_obj.write(r'\providecommand{\perfprofsidepanel}{{%s\mbox{%s}' %
-                        (fontsize_command, commandnames[0]))  # TODO: check len(labels) > 0
-                for i in range(1, len(labels)):
-                    file_obj.write('\n' + r'\vfill \mbox{%s}' % commandnames[i])
-                file_obj.write('}}\n')
-            # file_obj.write(footleg)
-            if genericsettings.verbose:
-                print('Wrote right-hand legend in %s' % file_name)
+                if len(
+                        order) > 28:  # latex sidepanel won't work well for more than 25 algorithms, but original labels are also clipped
+                    file_obj.write(r'\providecommand{\perfprofsidepanel}{\mbox{%s}\vfill\mbox{%s}}'
+                            % (commandnames[0], commandnames[-1]))
+                else:
+                    fontsize_command = r'\tiny{}' if len(order) > 19 else ''
+                    file_obj.write(r'\providecommand{\perfprofsidepanel}{{%s\mbox{%s}' %
+                            (fontsize_command, commandnames[0]))
+                    for i in range(1, len(labels)):
+                        file_obj.write('\n' + r'\vfill \mbox{%s}' % commandnames[i])
+                    file_obj.write('}}\n')
+                # file_obj.write(footleg)
+                if genericsettings.verbose:
+                    print('Wrote right-hand legend in %s' % file_name)
 
     if info:
         figureName = os.path.join(outputdir, '%s_%s' % (genericsettings.pprldmany_file_name, info))
