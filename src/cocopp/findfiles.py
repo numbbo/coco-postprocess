@@ -16,6 +16,7 @@ TODO: we do not use pickle files anymore.
 from __future__ import absolute_import, division, print_function
 import os
 import sys
+import time
 import warnings
 import tarfile
 import zipfile
@@ -145,7 +146,7 @@ def hash(string, len_=None):
         h = h[:len_]
     return h
 
-def get_output_directory_sub_folder(args, addhash=4):
+def get_output_directory_sub_folder(args, addhash=0, addtime=True):
     """`addhash` indicates the number of chars to add to make the name unique"""
     try:
         testbedname = testbedsettings.current_testbed.name
@@ -178,5 +179,8 @@ def get_output_directory_sub_folder(args, addhash=4):
         raise ValueError(args)
 
     return testbedname + ('_' if testbedname else '') + directory + (
+        '_' + time.strftime("%m%d%H%M%S")
+        # + '{:.2f}'.format(time.time()).split('.')[1]
+            if addtime else '') + (
         '_' + hash(''.join(args), addhash) if addhash else '')
 
