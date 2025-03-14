@@ -4,23 +4,29 @@
       <img src="https://raw.githubusercontent.com/numbbo/coco/0ea5f5784c5fa0543261d9c104b490d2d95566f9/logo/coco-pp-300.webp">          
   </td>
   <td>
-      COmparing Continuous Optimisers (COCO) Post-Processing 
+      COmparing Continuous Optimisers (COCO) PostProcess
 </td>
 </table>
 </h1>
 
-[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2594848.svg)][paper]   [![PyPI Downloads](https://static.pepy.tech/badge/cocopp/month)](https://pepy.tech/projects/cocopp)
+[![version](https://img.shields.io/pypi/v/cocopp?color=blue)](https://pypi.org/project/cocopp)
+[![license](https://img.shields.io/pypi/l/cocopp)](https://pypi.org/project/cocopp)
+[![download](https://img.shields.io/pypi/dm/cocopp.svg?label=PyPI%20downloads)][pypi]
+[![DOI](https://zenodo.org/badge/DOI/10.5281/zenodo.2594848.svg)][codereference]
+[![paper](https://img.shields.io/badge/DOI-10.1080%2F10556788.2020.1808977-blue)][paper]
 
-The ([`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html)) package uses data generated with the [COCO framework](https://numbbo.it) (comparing not only continuous optimisers) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents.
+The [`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html) Python package
+implements the postprocess part of [COCO: A Platform for Comparing Continuous Optimizers in a Black-Box Setting][paper], comparing not only continuous optimisers.
+The package uses data generated with the [COCO framework](https://coco-platform.org) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents.
 
 ## Documentation
 
-The main documentation pages for the `post-process` package `cocopp` can be found at
+The main documentation pages for the `coco-postprocess` package `cocopp` can be found at
 
 - [getting-started](https://numbbo.it/getting-started#postprocess)
 - [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp)
-- [Issue tracker](https://github.com/numbbo/coco-postprocess/issues)
-- [Source code](https://github.com/numbbo/coco-postprocess)
+- [Issue tracker and bug reports](https://github.com/numbbo/coco-postprocess/issues)
+- [source code page](https://github.com/numbbo/coco-postprocess) on GitHub
 - [COCO home page](https://coco-platform.org)
 
 Below are the installation instruction and some usage examples.
@@ -73,5 +79,7 @@ where [`None`](http://docs.python.org/library/constants.html#None) invokes the d
 
 <pre class="py-doctest"><span class="py-prompt">>>></span> dslist = cocopp.main(<span class="py-string">'exdata/my_output bfgs!'</span>)  <span class="py-comment"></span></pre>
 
-[paper]: https://doi.org/10.5281/zenodo.2594848
+[codereference]: https://doi.org/10.5281/zenodo.2594848
+[paper]: https://doi.org/10.1080/10556788.2020.1808977
+[pypi]: https://pypi.org/project/cocopp
 
