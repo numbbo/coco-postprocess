@@ -79,6 +79,10 @@ styles = [  # sort of rainbow style, most difficult (red) first
 
 refcolor = 'wheat'
 
+instance_text_fontsize = 14
+'''font size of instance number text in the scaling figure'''
+instance_text_max_len = 45
+'''for longer text the `instance_text_fontsize` is decreased'''
 
 # should correspond with the colors in pprldistr.
 
@@ -575,8 +579,10 @@ def main(dsList, _valuesOfInterest, outputdir):
         else:
             display_text = 'instances %s' % [d.instancenumbers for d in dictFunc[func]]
         display_text += _valuesOfInterest.short_info
+        fs_scaler = min((1, instance_text_max_len / 
+                            (0.1 + max([len(t) for t in display_text.split('\n')]))))
         plt.text(plt.xlim()[0], plt.ylim()[0],
-                 display_text, fontsize=14, horizontalalignment="left",
+                 display_text, fontsize=fs_scaler * instance_text_fontsize, horizontalalignment="left",
                  verticalalignment="bottom")
 
         if func in testbedsettings.current_testbed.functions_with_legend:

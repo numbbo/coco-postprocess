@@ -61,6 +61,8 @@ xticks_fontsize = 16
 yticks_fontsize = 14
 title_fontsize = 20
 size_correction_from_n_foreground = 1  # is (re-)set in main and used in plotdata
+instance_text_max_len = 45
+'''for longer text the fontsize of ``0.6 * label_fontsize`` is decreased'''
 
 def text_infigure_if_constraints():
     """to be displayed in the figure corner
@@ -974,11 +976,13 @@ def main(dictAlg, order=None, outputdir='.', info='default',
             
     text = text.rstrip(', ')
     text += ' instances'
+    fs_scaler = 0.6 * min((1, instance_text_max_len / 
+                              (0.1 + max([len(t) for t in text.split('\n')]))))
     plt.text(0.01, 0.99, text,
              horizontalalignment="left",
              verticalalignment="top",
              transform=plt.gca().transAxes,
-             fontsize=0.6*label_fontsize)
+             fontsize=fs_scaler * label_fontsize)
     if len(dictFunc) == 1:
         plt.title(' '.join((str(list(dictFunc.keys())[0]),
                             testbedsettings.current_testbed.short_names[list(dictFunc.keys())[0]])),

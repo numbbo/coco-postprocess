@@ -22,6 +22,9 @@ fontsize = 14.0
 legend_text_max_len = 14
 legend = False
 
+instance_text_max_len = 45
+'''for longer text the `fontsize` in the instance text is decreased'''
+
 def legend_fontsize_scaler(number_of_entries=None):
     """return a fontsize scaling factor depending on the number of entries
     in the legend.
@@ -625,8 +628,10 @@ def main(dictAlg, html_file_prefix, sorted_algorithms=None, output_dir='ppdata',
         infotext = infotext.rstrip(', ')
         infotext += ' instances\n'
         infotext += 'target ' + target.label_name() + ': ' + target.label(0)
+        fs_scaler = min((1, instance_text_max_len / 
+                            (0.1 + max([len(t) for t in infotext.split('\n')]))))
         plt.text(plt.xlim()[0], plt.ylim()[0],
-                 infotext, fontsize=fontsize, horizontalalignment="left",
+                 infotext, fontsize=fs_scaler * fontsize, horizontalalignment="left",
                  verticalalignment="bottom")
 
         save_figure(filename, dictAlg[algorithms_with_data[0]][0].algId)
