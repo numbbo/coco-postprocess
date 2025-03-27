@@ -179,7 +179,7 @@ def get_output_directory_sub_folder(args, addhash=0, addtime=True):
         raise ValueError(args)
 
     return testbedname + ('_' if testbedname else '') + directory + (
-        '_' + time.strftime("%m%d%H%M%S")
+        '_' + time.strftime("%m%d%Hh%M%S")
         # + '{:.2f}'.format(time.time()).split('.')[1]
             if addtime else '') + (
         '_' + hash(''.join(args), addhash) if addhash else '')
