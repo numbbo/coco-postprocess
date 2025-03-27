@@ -963,7 +963,9 @@ def main(dictAlg, order=None, outputdir='.', info='default',
     num_of_instances = []
     for alg in algorithms_with_data:
         try:
-            num_of_instances.append(len((dictAlgperFunc[alg])[0].instancenumbers))
+            # DONE (fix #49): we need all functions of alg
+            for dictAlgperFunc in dictFunc.values():
+                num_of_instances.append(len(dictAlgperFunc[alg][0].instancenumbers))
         except IndexError:
             pass
     # issue a warning if number of instances is inconsistent, but always
