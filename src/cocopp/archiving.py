@@ -86,7 +86,7 @@ del absolute_import, division, print_function, unicode_literals
 __author__ = 'Nikolaus Hansen'
 
 
-coco_urls = ["https://coco.gforge.inria.fr/data-archive",  # original location
+coco_urls = [# "https://coco.gforge.inria.fr/data-archive",  # original location (doesn't exist any more)
              "https://numbbo.github.io/gforge/data-archive",  # new backup location
              # "https://numbbo.github.io/data-archive",  # doesn't work because data-archive is the repository name by Github deploying convention
              "https://numbbo.github.io/data-archive/data-archive",  # new location
