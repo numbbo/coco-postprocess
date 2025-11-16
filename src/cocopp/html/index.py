@@ -1,8 +1,8 @@
 """Main interface for generating folder index pages."""
 
-from pathlib import Path
-from typing import List, Dict
+from typing import Dict
 import logging
+import os
 from .generator import HtmlGenerator, HtmlContent  
 from .writer import HtmlWriter
 from .. import genericsettings
@@ -11,41 +11,29 @@ from .. import genericsettings
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
-def collect_algorithm_data(directory: Path) -> Dict[str, List[str]]:
-    """Collect algorithm data from directory structure.
+def collect_algorithm_data(directory):
+    """Collect algorithm data from directory structure."""
+    data = {'single': [], 'comparison': []}
     
-    Args:
-        directory: Path to scan for algorithm data
-        
-    Returns:
-        Dictionary with 'single' and 'comparison' algorithm lists
-    """
-    try:
-        data = {
-            'single': [],
-            'comparison': []
-        }
-        
-        for item in directory.iterdir():
-            if not item.is_dir():
-                continue
-                
-            # Check for single algorithm results
-            single_file = item / f"{genericsettings.single_algorithm_file_name}.html"
-            if single_file.exists():
-                data['single'].append(item.name)
-                
-            # Check for comparison results    
-            many_file = item / f"{genericsettings.many_algorithm_file_name}.html"
-            if many_file.exists():
-                data['comparison'].append(item.name)
-                
+    if not os.path.isdir(directory):
         return data
-    except Exception as e:
-        logger.error(f"Error collecting algorithm data: {str(e)}")
-        return {'single': [], 'comparison': []}
+    
+    for item in os.listdir(directory):
+        item_path = os.path.join(directory, item)
+        if not os.path.isdir(item_path):
+            continue
+        
+        single_file = os.path.join(item_path, '%s.html' % genericsettings.single_algorithm_file_name)
+        if os.path.isfile(single_file):
+            data['single'].append(item)
+        
+        many_file = os.path.join(item_path, '%s.html' % genericsettings.many_algorithm_file_name)
+        if os.path.isfile(many_file):
+            data['comparison'].append(item)
+    
+    return data
 
-def update_parent_index(parent_index: Path) -> None:
+def update_parent_index(parent_index_path):
     """Update the parent index.html file with links to algorithm results.
     
     This function scans the parent directory for algorithm results and 
@@ -53,14 +41,14 @@ def update_parent_index(parent_index: Path) -> None:
     and comparison results.
     
     Args:
-        parent_index: Path to the parent index.html file
+        parent_index_path: Path to the parent index.html file
         
     Raises:
         IOError: If there are issues reading/writing the index file
     """
     try:
         generator = HtmlGenerator()
-        parent_dir = parent_index.parent
+        parent_dir = os.path.dirname(os.path.realpath(parent_index_path))
         
         # Collect data about available algorithms
         algo_data = collect_algorithm_data(parent_dir)
@@ -72,22 +60,16 @@ def update_parent_index(parent_index: Path) -> None:
         if algo_data['comparison']:
             links.append('<H2>Comparison Data</H2>')
             for algo in sorted(algo_data['comparison']):
-                link = generator.add_link(
-                    path=str(Path(algo) / f"{genericsettings.many_algorithm_file_name}.html"),
-                    label=algo,
-                    indent='&nbsp;&nbsp;'
-                )
+                path = os.path.join(algo, '%s.html' % genericsettings.many_algorithm_file_name)
+                link = generator.add_link(path, algo, '&nbsp;&nbsp;')
                 links.append(link)
                 
         # Add single algorithm section
         if algo_data['single']:
             links.append('<H2>Single Algorithm Data</H2>')
             for algo in sorted(algo_data['single']):
-                link = generator.add_link(
-                    path=str(Path(algo) / f"{genericsettings.single_algorithm_file_name}.html"),
-                    label=algo,
-                    indent='&nbsp;&nbsp;'
-                )
+                path = os.path.join(algo, '%s.html' % genericsettings.single_algorithm_file_name)
+                link = generator.add_link(path, algo, '&nbsp;&nbsp;')
                 links.append(link)
                 
         # Create content object
@@ -105,16 +87,16 @@ def update_parent_index(parent_index: Path) -> None:
         
         # Safely write the file
         writer = HtmlWriter()
-        writer.backup_if_exists(parent_index)
-        writer.write_safely(parent_index, html)
+        writer.backup_if_exists(parent_index_path)
+        writer.write_safely(parent_index_path, html)
         
-        logger.info(f"Successfully updated parent index at {parent_index}")
+        logger.info("Successfully updated parent index at %s" % parent_index_path)
         
     except Exception as e:
-        logger.error(f"Failed to update parent index: {str(e)}")
-        raise IOError(f"Failed to update parent index: {str(e)}")
+        logger.error("Failed to update parent index: %s" % str(e))
+        raise IOError("Failed to update parent index: %s" % str(e))
         
-def save_folder_index(filepath: str, image_extension: str) -> None:
+def save_folder_index(filepath, image_extension):
     """Generate and save a folder index file.
     
     Args:
@@ -126,7 +108,7 @@ def save_folder_index(filepath: str, image_extension: str) -> None:
         
     # Generate content
     generator = HtmlGenerator()
-    current_dir = str(Path(filepath).parent)
+    current_dir = os.path.dirname(os.path.realpath(filepath))
     content = generator.generate_folder_content(current_dir, image_extension)
     
     # Render to HTML
@@ -138,6 +120,7 @@ def save_folder_index(filepath: str, image_extension: str) -> None:
     writer.write_safely(filepath, html)
     
     # Update parent index if needed
-    parent_index = Path(filepath).parent.parent / 'index.html'
-    if parent_index.exists():
-        update_parent_index(parent_index)
+    parent_dir = os.path.dirname(current_dir)
+    parent_index_path = os.path.join(parent_dir, 'index.html')
+    if os.path.isfile(parent_index_path):
+        update_parent_index(parent_index_path)
