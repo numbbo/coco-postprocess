@@ -2,7 +2,7 @@
 
 import logging
 import os
-from .generator import HtmlGenerator, HtmlContent  
+from .generator import HtmlGenerator
 from .writer import HtmlWriter
 from .. import genericsettings
 
@@ -38,9 +38,8 @@ def collect_algorithm_data(directory):
 def update_parent_index(parent_index_path):
     """Update the parent index.html file with links to algorithm results.
     
-    This function scans the parent directory for algorithm results and 
-    generates a new index page with organized links to single algorithm
-    and comparison results.
+    This function only writes the HTML file once. Links are managed
+    dynamically via JavaScript based on available algorithm directories.
     
     Args:
         parent_index_path: Path to the parent index.html file
@@ -55,50 +54,23 @@ def update_parent_index(parent_index_path):
         # Collect data about available algorithms
         algo_data = collect_algorithm_data(parent_dir)
         
-        # Generate links sections
-        links = []
-        
-        # Add comparison section if we have any
-        if algo_data['comparison']:
-            links.append('<H2>Comparison Data</H2>')
-            for algo in sorted(algo_data['comparison']):
-                # Use absolute path for checking, relative for linking
-                abs_path = os.path.join(parent_dir, algo, '%s.html' % genericsettings.many_algorithm_file_name)
-                rel_path = os.path.join(algo, '%s.html' % genericsettings.many_algorithm_file_name)
-                if os.path.isfile(abs_path):
-                    link = generator.add_link(rel_path, algo, '&nbsp;&nbsp;')
-                    links.append(link)
-                
-        # Add single algorithm section
-        if algo_data['single']:
-            links.append('<H2>Single Algorithm Data</H2>')
-            for algo in sorted(algo_data['single']):
-                # Use absolute path for checking, relative for linking
-                abs_path = os.path.join(parent_dir, algo, '%s.html' % genericsettings.single_algorithm_file_name)
-                rel_path = os.path.join(algo, '%s.html' % genericsettings.single_algorithm_file_name)
-                if os.path.isfile(abs_path):
-                    link = generator.add_link(rel_path, algo, '&nbsp;&nbsp;')
-                    links.append(link)
-                
-        # Create content object
-        content = HtmlContent(
-            title="COCO Post-Processing Results",
-            header="COCO Post-Processing Results",
-            body="",
-            links=links,
-            images=[],
-            footer=""
+        # Generate data structure for dynamic rendering
+        data = generator.generate_parent_index_data(
+            algo_data,
+            genericsettings.single_algorithm_file_name,
+            genericsettings.many_algorithm_file_name
         )
         
         # Render HTML
-        html = generator.render(content)
+        html = generator.render(data)
         
-        # Safely write the file
+        # Write only if file doesn't exist (initial creation)
         writer = HtmlWriter()
-        writer.backup_if_exists(parent_index_path)
-        writer.write_safely(parent_index_path, html)
-        
-        logger.info("Successfully updated parent index at %s" % parent_index_path)
+        if not os.path.isfile(parent_index_path):
+            writer.write_safely(parent_index_path, html)
+            logger.info("Created parent index at %s" % parent_index_path)
+        else:
+            logger.info("Parent index already exists at %s (using dynamic JS updates)" % parent_index_path)
         
     except Exception as e:
         logger.error("Failed to update parent index: %s" % str(e))
@@ -106,6 +78,9 @@ def update_parent_index(parent_index_path):
         
 def save_folder_index(filepath, image_extension):
     """Generate and save a folder index file.
+    
+    The HTML file is created once with static structure. Dynamic content
+    is managed via JavaScript and server-side data updates.
     
     Args:
         filepath: Path where the index file should be saved
@@ -115,23 +90,26 @@ def save_folder_index(filepath, image_extension):
         return
     
     try:
-        # Generate content
+        # Generate content data
         generator = HtmlGenerator()
         current_dir = os.path.dirname(os.path.realpath(filepath))
-        content = generator.generate_folder_content(current_dir, image_extension)
+        data = generator.generate_folder_content(current_dir, image_extension)
         
         # Render to HTML
-        html = generator.render(content)
+        html = generator.render(data)
         
-        # Safely write to file with backup
+        # Write only if file doesn't exist (initial creation)
         writer = HtmlWriter()
-        writer.backup_if_exists(filepath)
-        writer.write_safely(filepath, html)
+        if not os.path.isfile(filepath):
+            writer.write_safely(filepath, html)
+            logger.info("Created folder index at %s" % filepath)
+        else:
+            logger.info("Folder index already exists at %s (using dynamic JS updates)" % filepath)
         
         # Update parent index if needed
         parent_dir = os.path.dirname(current_dir)
         parent_index_path = os.path.join(parent_dir, 'index.html')
-        if os.path.isfile(parent_index_path):
+        if not os.path.isfile(parent_index_path):
             update_parent_index(parent_index_path)
             
     except Exception as e:
