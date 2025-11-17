@@ -6,7 +6,6 @@ from .generator import HtmlGenerator
 from .writer import HtmlWriter
 from .. import genericsettings
 
-# Configure logging
 logging.basicConfig(level=logging.INFO)
 logger = logging.getLogger(__name__)
 
@@ -51,20 +50,20 @@ def update_parent_index(parent_index_path):
         generator = HtmlGenerator()
         parent_dir = os.path.dirname(os.path.realpath(parent_index_path))
         
-        # Collect data about available algorithms
+        # to collect data from available algorithms
         algo_data = collect_algorithm_data(parent_dir)
         
-        # Generate data structure for dynamic rendering
+        # generating data structure for dynamic rendering
         data = generator.generate_parent_index_data(
             algo_data,
             genericsettings.single_algorithm_file_name,
             genericsettings.many_algorithm_file_name
         )
         
-        # Render HTML
+        # HTML rendering
         html = generator.render(data)
         
-        # Write only if file doesn't exist (initial creation)
+        # initial creation of the file (will be created only if it doesn't already exist)
         writer = HtmlWriter()
         if not os.path.isfile(parent_index_path):
             writer.write_safely(parent_index_path, html)
@@ -90,15 +89,15 @@ def save_folder_index(filepath, image_extension):
         return
     
     try:
-        # Generate content data
+        # content data generation
         generator = HtmlGenerator()
         current_dir = os.path.dirname(os.path.realpath(filepath))
         data = generator.generate_folder_content(current_dir, image_extension)
         
-        # Render to HTML
+        # rendering to HTML
         html = generator.render(data)
         
-        # Write only if file doesn't exist (initial creation)
+        # initial creation of the file (created only if it doesn't already exist)
         writer = HtmlWriter()
         if not os.path.isfile(filepath):
             writer.write_safely(filepath, html)
@@ -106,7 +105,7 @@ def save_folder_index(filepath, image_extension):
         else:
             logger.info("Folder index already exists at %s (using dynamic JS updates)" % filepath)
         
-        # Update parent index if needed
+        # update parent index if needed
         parent_dir = os.path.dirname(current_dir)
         parent_index_path = os.path.join(parent_dir, 'index.html')
         if not os.path.isfile(parent_index_path):

@@ -1,4 +1,4 @@
-// Data injected by server
+// data injected by server
 var contentData = window.contentData || {};
 
 function renderLinks(data) {
@@ -14,7 +14,7 @@ function renderLinks(data) {
         });
     }
     
-    // Comparison section
+    // comparison code
     if (data.comparison && data.comparison.length > 0) {
         html += '<h2>Comparison Data</h2>';
         data.comparison.forEach(function(algo) {
@@ -23,7 +23,7 @@ function renderLinks(data) {
         });
     }
     
-    // Single algorithm section
+    // single algorithm code
     if (data.single && data.single.length > 0) {
         html += '<h2>Single Algorithm Data</h2>';
         data.single.forEach(function(algo) {
@@ -48,7 +48,7 @@ function renderImages(data) {
     container.innerHTML = html;
 }
 
-// Render on page load
+// rendering code
 document.addEventListener('DOMContentLoaded', function() {
     if (contentData) {
         renderLinks(contentData);

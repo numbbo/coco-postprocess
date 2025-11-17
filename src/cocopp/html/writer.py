@@ -15,7 +15,7 @@ class HtmlWriter:
         """
         filepath = str(filepath)
         
-        # Create parent directories if they don't exist
+        # creating parent directories (if they don't already exist)
         parent_dir = os.path.dirname(filepath)
         if parent_dir and not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
@@ -24,6 +24,6 @@ class HtmlWriter:
             with open(filepath, 'w', encoding='utf-8', newline='') as f:
                 f.write(content)
                 f.flush()
-                os.fsync(f.fileno())  # Force write to disk on Mac
+                os.fsync(f.fileno())  # forcing writing to disk (for mac users)
         except Exception as e:
             raise IOError("Failed to write %s: %s" % (filepath, str(e)))
