@@ -1,8 +1,6 @@
 """Safe file writing utilities for HTML output."""
 
 import os
-import shutil
-import tempfile
 
 class HtmlWriter:
     """Handles safe writing of HTML files with atomic operations."""
@@ -22,19 +20,10 @@ class HtmlWriter:
         if parent_dir and not os.path.exists(parent_dir):
             os.makedirs(parent_dir)
         
-        # Write to temporary file first
-        fd, tmp_path = tempfile.mkstemp(dir=parent_dir or '.', text=True)
         try:
-            with os.fdopen(fd, 'w', encoding='utf-8', newline='') as tmp:
-                tmp.write(content)
-            
-            # Atomic move - replaces if exists
-            shutil.move(tmp_path, filepath)
-            
+            with open(filepath, 'w', encoding='utf-8', newline='') as f:
+                f.write(content)
+                f.flush()
+                os.fsync(f.fileno())  # Force write to disk on Mac
         except Exception as e:
-            # Clean up temp file if anything goes wrong
-            try:
-                os.unlink(tmp_path)
-            except OSError:
-                pass
             raise IOError("Failed to write %s: %s" % (filepath, str(e)))
