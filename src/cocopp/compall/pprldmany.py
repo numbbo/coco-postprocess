@@ -766,16 +766,12 @@ def main(
         run_numbers = []
         for dsl in dictDim.values():
             run_numbers.extend([ds.nbRuns() for ds in dsl])
-        if genericsettings.in_a_hurry >= 100:
-            samplesize = max(run_numbers)
-        else:
-            try:
-                lcm = np.lcm.reduce(run_numbers)  # lowest common multiplier
-            except:
-                lcm = max(run_numbers)  # fallback for old numpy versions
-            # slight abuse of bootstrap_sample_size to avoid a huge number
-            samplesize = min((int(genericsettings.simulated_runlength_bootstrap_sample_size), lcm))
-        if testbedsettings.current_testbed.instances_are_uniform:
+        samplesize = max(run_numbers)
+        assert samplesize > 0
+        multiplier = (100 + 1000 / (1 + genericsettings.in_a_hurry)) / samplesize
+        samplesize *= max((2, int(multiplier)))
+        if (genericsettings.in_a_hurry < 100 and  # still necessary?
+            testbedsettings.current_testbed.instances_are_uniform):
             samplesize = max(
                 (int(genericsettings.simulated_runlength_bootstrap_sample_size), samplesize)
             )  # maybe more bootstrapping with unsuccessful trials
@@ -784,13 +780,12 @@ def main(
             warnings.warn(warntxt)
         if not isinstance(samplesize, int):
             warntxt = (
-                "samplesize={} was of type {}. This must be considered a bug."
-                "\n run_numbers={} \n lcm={}"
-                "\n genericsettings.simulated_runlength_bootstrap_sample_size={}".format(
+                "samplesize={0} was of type {1}. This must be considered a bug."
+                "\n run_numbers={2}"
+                "\n genericsettings.simulated_runlength_bootstrap_sample_size={3}".format(
                     samplesize,
                     type(samplesize),
                     run_numbers,
-                    lcm if "lcm" in locals() else '"not computed"',
                     genericsettings.simulated_runlength_bootstrap_sample_size,
                 )
             )

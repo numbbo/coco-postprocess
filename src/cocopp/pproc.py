@@ -2144,12 +2144,22 @@ class DataSet(object):
         ):
             return self._instance_multipliers  # instancenumbers did not change
         instance_counters = collections.Counter(self.instancenumbers)
-        """``instance_counters[self.instancenumbers[i]]`` is the
-           counter for self.evals[:, i+1]"""
-        try:
-            lcm = np.lcm.reduce(list(instance_counters.values()))  # lowest common multiplier
-        except AttributeError:  # old versions of numpy don't know lcm
-            lcm = np.prod(list(set(list(instance_counters.values()))))
+        '''``instance_counters[self.instancenumbers[i]]`` is the
+            counter for ``self.evals[:, i+1]``. The `Repeater` experimental
+            setup should always result in the same number for all instances.'''
+        if len(set(instance_counters.values())) == 1:  # should usually be the case
+            lcm = list(instance_counters.values())[0]
+        else:
+            try:
+                lcm = np.lcm.reduce(list(instance_counters.values()))  # lowest common multiplier
+            except AttributeError:  # old versions of numpy don't know lcm
+                lcm = np.prod(list(set(list(instance_counters.values()))))
+            if lcm > 24:  # repetitions per instance
+                lcm0, lcm = lcm, max(instance_counters.values())
+                lcm *= max((1, int(24 / lcm)))  # -> 13 <= lcm <= 24
+                warnings.warn("Instance counts should be the same but they are not.\n"
+                              "lcm(instance_counters) = lcm({0}) = {1} set to {2}"
+                              .format(instance_counters, lcm0, lcm))
         instance_multipliers = tuple(int(lcm / instance_counters[i]) for i in self.instancenumbers)
         if not hasattr(self, "_instance_multipliers"):  # to prevent lint warning
             self._instance_multipliers = instance_multipliers
