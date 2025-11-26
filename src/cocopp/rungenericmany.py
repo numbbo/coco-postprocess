@@ -113,6 +113,7 @@ def main(args, outputdir):
     dsList = DataSetList(testbedsettings.current_testbed.filter(dsList))
     dsList.filter(genericsettings.filter_data_condition)  # after the above filter to prevent unnecessary warnings
     dictAlg = dsList.dictByAlgName()
+    print_done()
 
     config.config()  # make sure that the filtered settings are taken into account
 

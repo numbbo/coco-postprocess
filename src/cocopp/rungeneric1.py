@@ -70,6 +70,7 @@ def main(alg, outputdir, argv=None):
     print("  loading data...")
 
     dsList = DataSetList(alg)
+    print_done()
 
     if not dsList:
         raise Usage("Nothing to do: post-processing stopped. For more information check the messages above.")

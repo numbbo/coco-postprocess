@@ -19,10 +19,12 @@ from __future__ import unicode_literals
 import os
 import sys
 import getopt
+import time
 import warnings
 import webbrowser
 import matplotlib
 from . import genericsettings, testbedsettings, rungeneric1, rungenericmany, toolsdivers, bestalg, archiving
+from . import _version
 from .toolsdivers import truncate_latex_command_file, print_done, diff_attr
 from .ppfig import Usage
 from .compall import ppfigs
@@ -403,8 +405,6 @@ def main(argv=None):
 
         truncate_latex_command_file(latex_commands_filename)
 
-        print("Post-processing (%s)" % ("1" if len(args) == 1 else "2+"))  # to not break doctests
-
         # manage data paths as given in args
         data_archive = archiving.official_archives.all  # was: archiving.COCODataArchive()
         args = data_archive.get_extended(args)
@@ -414,6 +414,10 @@ def main(argv=None):
             warnings.warn("Several data arguments point to the very same location.This will most likely lead to a rather unexpected outcome.")
             # TODO: we would like the users input with timeout to confirm
             # and otherwise raise a ValueError
+        print("Post-processing (%s, cocopp%s, %s)" % (
+                ("%d dataset" % len(args)) + ("s" if len(args) > 1 else ""),
+                _version.__version__,
+                time.asctime()))  # to not break doctests
 
         genericsettings._current_args = args
 

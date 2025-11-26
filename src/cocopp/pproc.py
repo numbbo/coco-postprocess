@@ -3907,7 +3907,8 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
             # alg = os.path.split(i.rstrip(os.sep))[1]  # trailing slash or backslash
             # if alg == '':
             #    alg = os.path.split(os.path.split(i)[0])[1]
-            print("  using:", alg)
+            if genericsettings.verbose is True or genericsettings.verbose > 1:
+                print("  using:", alg)
 
             # Prevent duplicates
             if all(i != alg for i in sortedAlgs):
