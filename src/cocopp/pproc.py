@@ -1133,8 +1133,20 @@ class DataSet(object):
                     genericsettings.instancesOfInterest
                 )
             )
+        # check monotonicity
+        diff = np.diff(self.evals, axis=0)
+        # of targets
+        if np.any(diff[:, 0] > 0):
+            is_consistent = False
+            warnings.warn("targets of {0} are not monotone: {1}".format(str(self), self.evals[:, 0]))
+        # of evals
+        nonmonotone = np.nonzero(np.any(diff[:, 1:] < 0, axis=0))[0]
+        if len(nonmonotone):
+            is_consistent = False
+            warnings.warn("evals of {0} are not monotone in columns {1}".format(str(self), nonmonotone + 1))
+
         if not is_consistent:
-            warnings.warn("Some DataSet of {0} was not consistent".format(self.algId))  # should rather be in the previous messages
+            warnings.warn("{0} was not consistent".format(str(self)))  # should rather be in the previous messages
         assert self._evals.shape[1] - 1 == len(self.instancenumbers), self
         assert self.evals.shape[1] - 1 == len(self.maxevals), self
         return is_consistent
