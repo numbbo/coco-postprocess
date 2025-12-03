@@ -3885,6 +3885,11 @@ def processInputArgs(args, process_background_algorithms=False):
 
 
 def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
+    """call ``get_DataSetList(arg)`` on each ``arg in args`` and feed results into `dsList`.
+
+    Output `sortedAlgs` is the list of algorithm names.
+    Output `dictAlg` is the `dsList` reorganized by algorithm name.
+    """
     for ialg, alg in enumerate(args):
         alg = alg.strip().rstrip(os.path.sep)  # lstrip would not be the same folder anymore
         if alg == "":  # might cure an lf+cr problem when using cywin under Windows
