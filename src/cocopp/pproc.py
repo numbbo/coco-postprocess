@@ -2157,9 +2157,9 @@ class DataSet(object):
             if lcm > 24:  # repetitions per instance
                 lcm0, lcm = lcm, max(instance_counters.values())
                 lcm *= max((1, int(24 / lcm)))  # -> 13 <= lcm <= 24
-                warnings.warn("Instance counts should be the same but they are not.\n"
-                              "lcm(instance_counters) = lcm({0}) = {1} set to {2}"
-                              .format(instance_counters, lcm0, lcm))
+                warnings.warn("Instance counts of {0} should be the same but they are not.\n"
+                              "lcm(instance_counters) = lcm({1}) = {2} set to {3}"
+                              .format(str(self), instance_counters, lcm0, lcm))
         instance_multipliers = tuple(int(lcm / instance_counters[i]) for i in self.instancenumbers)
         if not hasattr(self, "_instance_multipliers"):  # to prevent lint warning
             self._instance_multipliers = instance_multipliers
