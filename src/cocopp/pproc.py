@@ -37,6 +37,7 @@ import matplotlib.pyplot as plt
 from collections import OrderedDict
 from . import genericsettings, findfiles, toolsstats, toolsdivers
 from . import testbedsettings, dataformatsettings
+from . import _version
 from .readalign import split, align_data, HMultiReader, VMultiReader, openfile
 from .readalign import HArrayMultiReader, VArrayMultiReader, alignArrayData
 from .ppfig import consecutiveNumbers
@@ -2714,11 +2715,15 @@ def get_DataSetList(*args, **kwargs):
         else:
             if isinstance(dsl, DataSetList):  # found valid pickle file
                 # to be compatible with DataSet.__init__:
-                if not testbedsettings.current_testbed:
-                    testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
-                if genericsettings.verbose > 0:
-                    print("  using pickled DataSetList {0}".format(name), end=" ")
-                return dsl
+                if dsl[0].suite_name == 'bbob-constrained' and (
+                        not hasattr(dsl, '_cocopp_version')):  # before '2.8.2':
+                    os.remove(name)  # remove probably wrong pickle file
+                else:
+                    if not testbedsettings.current_testbed:
+                        testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
+                    if genericsettings.verbose > 0:
+                        print("  using pickled DataSetList {0}".format(name), end=" ")
+                    return dsl
     if _using_recommendations:  # do not pickle recommendations for the time being
         return fallback()
     dsl = fallback()
@@ -2763,6 +2768,8 @@ class DataSetList(list):
 
         if isinstance(args, string_types):
             args = [args]
+
+        self._cocopp_version = _version.version
 
         if len(args) and (isinstance(args[0], DataSet) or not check_data_type and hasattr(args[0], "algId")):
             # TODO: loaded instances are not DataSets but
