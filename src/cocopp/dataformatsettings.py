@@ -1,6 +1,7 @@
 from __future__ import absolute_import, division, print_function
 from . import genericsettings
 import warnings
+import numpy as np
 
 current_data_format = None  # used in readalign as global var
 
@@ -59,9 +60,10 @@ class BBOBNewDataFormat(DataFormat):
             + DataFormat.align_data_into_evals.__doc__
             + """
 
-        Writes attributes of `dataset`, in particular `evals_constraints`,
-        and `evals_function`, and `evals` as weighted sum of the two,
-        unless no single constraints evaluation is found.
+        Writes attributes of `dataset`, in particular `evals_constraints`, and
+        `evals_function`, and `evals` as weighted sum of the two, unless no
+        single constraints evaluation is found or
+        ``genericsettings.weight_evaluations_constraints[1] == 0``.
         """
         )
         dataset.evals_function, maxevals, finalfunvals = aligner(data, self.evaluation_idx, self.function_value_idx)
@@ -81,7 +83,9 @@ class BBOBNewDataFormat(DataFormat):
         # check whether all constraints evaluations are zero
         # we then conclude that we don't need the evals_function and
         # evals_constraints attributes
-        if not dataset.evals_constraints[:, 1:].any():  # all zero, should it better depend on testbed.has_constraints?
+        if (genericsettings.weight_evaluations_constraints[1] == 0
+                or not dataset.evals_constraints[:, 1:].any()):
+            # all zero, should it better depend on testbed.has_constraints?
             # if evals_function <= 1 we rather keep attributes to be on the save side for debugging?
             dataset._evals = dataset.evals_function
             del dataset.evals_function  # clean dataset namespace
@@ -92,14 +96,33 @@ class BBOBNewDataFormat(DataFormat):
             dataset._evals = dataset.evals_function.copy()
             if genericsettings.weight_evaluations_constraints[0] != 1:
                 dataset._evals[:, 1:] *= genericsettings.weight_evaluations_constraints[0]
-            # (target) f-value rows are not aligned, so we need to find for
-            # each evals the respective data row in evals_constraints
-            j, j_max = 0, len(dataset.evals_constraints[:, 0])
-            for i, eval_row in enumerate(dataset._evals):
-                # find j such that target[j] < target[i] (don't rely on floats being equal, though we probably could)
-                while j < j_max and dataset.evals_constraints[j, 0] + 1e-14 > eval_row[0]:
-                    j += 1  # next smaller (target) f-value
-                eval_row[1:] += dataset.evals_constraints[j - 1, 1:] * genericsettings.weight_evaluations_constraints[1]
+            # assign directly when targets are identical, no perceivable time advantage
+            if np.all(dataset._evals[:, 0] == dataset.evals_constraints[:, 0]):
+                if genericsettings.weight_evaluations_constraints[1] == 1:
+                    dataset._evals[:, 1:] += dataset.evals_constraints[:, 1:]
+                else:
+                    dataset._evals[:, 1:] += dataset.evals_constraints[:, 1:] * genericsettings.weight_evaluations_constraints[1]
+            else:  # (target) f-value rows are not aligned, so we need to find for
+                   # each evals the respective data row in evals_constraints
+                warnings.warn('Function and constraints targets of {0} do not align'.format(str(self)))
+                j, j_max = 0, len(dataset.evals_constraints[:, 0])
+                for i, eval_row in enumerate(dataset._evals):
+                    # find j such that target[j] < target[i] (don't rely on floats being equal, though we probably could)
+                    # take first row which is equal
+                    if dataset.evals_constraints[j, 0] + 1e-14 <= eval_row[0]:
+                        if dataset.evals_constraints[j, 0] - 1e-14 < eval_row[0]:
+                            warnings.warn("wrong alignment of targets {0} (function, i={1}) and {2} (constraints, j={3})"
+                                        .format(eval_row[0], i,
+                                                dataset.evals_constraints[j, 0], j))
+                        eval_row[1:] += dataset.evals_constraints[j, 1:] * genericsettings.weight_evaluations_constraints[1]
+                        continue
+                    while j < j_max and dataset.evals_constraints[j, 0] + 1e-14 >= eval_row[0]:
+                        j += 1  # next smaller (target) f-value
+                        # if there are same targets (there should not), we take the last line
+                    # BUG fixed since v2.8.2: j == 0 was possible and 
+                    # dataset.evals_constraints[0-1, 1:] is the last dataset
+                    assert j > 0
+                    eval_row[1:] += dataset.evals_constraints[j - 1, 1:] * genericsettings.weight_evaluations_constraints[1]
             # TODO: not sure this is always what we want, but it is at least consistent with dataset.evals
             return (
                 genericsettings.weight_evaluations_constraints[0] * maxevals + genericsettings.weight_evaluations_constraints[1] * maxevals_cons,
