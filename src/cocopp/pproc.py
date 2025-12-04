@@ -2769,7 +2769,7 @@ class DataSetList(list):
         if isinstance(args, string_types):
             args = [args]
 
-        self._cocopp_version = _version.version
+        self._cocopp_version = _version.__version__
 
         if len(args) and (isinstance(args[0], DataSet) or not check_data_type and hasattr(args[0], "algId")):
             # TODO: loaded instances are not DataSets but
