@@ -19,18 +19,6 @@ The [`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html) Pyt
 implements the postprocess part of [COCO: A Platform for Comparing Continuous Optimizers in a Black-Box Setting][paper], comparing not only continuous optimisers.
 The package uses data generated with the [COCO framework](https://coco-platform.org) and produces output figures and tables in `html` format and for inclusion into `LaTeX` documents.
 
-## Documentation
-
-The main documentation pages for the `coco-postprocess` package `cocopp` can be found at
-
-- [getting-started](https://numbbo.it/getting-started#postprocess)
-- [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp)
-- [Issue tracker and bug reports](https://github.com/numbbo/coco-postprocess/issues)
-- [source code page](https://github.com/numbbo/coco-postprocess) on GitHub
-- [COCO home page](https://coco-platform.org)
-
-Below are the installation instruction and some usage examples.
-
 ## Installation
 
 To install the latest release from [PyPI](https://pypi.org/project/cocopp):
@@ -47,7 +35,19 @@ To install the current main branch:
     pip install .
 ```
 
-## Usage
+The full release history can be found [here](https://github.com/numbbo/coco-postprocess/releases) or [here](https://pypi.org/project/cocopp/#history).
+
+## Documentation
+
+The documentation for the `coco-postprocess` package `cocopp` can be found at
+
+- [getting-started](https://numbbo.it/getting-started#postprocess)
+- [API documentation](https://numbbo.github.io/coco-doc/apidocs/cocopp)
+- [Issue tracker and bug reports](https://github.com/numbbo/coco-postprocess/issues)
+- [source code page](https://github.com/numbbo/coco-postprocess) on GitHub
+- [COCO home page](https://coco-platform.org)
+
+## Usage (see also [here](https://coco-platform.org/getting-started/#general-usage))
 
 The main interface to the [`cocopp`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.html) package is the [`main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main) method (an alias to [`cocopp.rungeneric.main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main)). The [`main`](https://numbbo.github.io/coco-doc/apidocs/cocopp/cocopp.rungeneric.html#main) method allows for basic usage of `cocopp` through a shell command-line interface. The recommended use is however from an IPython/Jupyter shell or notebook:
 
