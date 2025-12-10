@@ -22,8 +22,11 @@ import tempfile
 import shutil
 import subprocess
 import doctest
+import numpy as np
 
 from cocopp import archiving
+from cocopp import official_archives
+from cocopp import pproc as _pproc
 
 import matplotlib  # just to make sure the following is actually done first
 
@@ -464,6 +467,7 @@ def main(arguments):
             assert result == 0, "Test failed: running postprocessing on bbob-constrained data"
 
     do_doctest()  # to be backwards compatible we run everything in main
+    do_pickle_regression_test()  # messes up other tests, maybe by calling config?
 
 
 def do_doctest():
@@ -506,6 +510,28 @@ def do_doctest():
     if failure_count > 0:
         raise ValueError("%d of %d tests failed" % (failure_count, test_count))
 
+
+def do_pickle_regression_test(name='strained/2022/al3-cma'):
+    """read in a pickled data set and compare to data read from the original data.
+
+    Assumes that the pickled data already exist at the usually expected place
+    side by side the original data.
+    """
+    name = official_archives.all.get_extended(name)[0]
+    dsl1 = _pproc.get_DataSetList(name)  # also called from cocopp.load2
+    if not _pproc._pickle_file_read:
+        print("{} pickled data could not be read in, hence"
+                " the pickle_regression_test can not be done"
+                .format(name))
+        return
+    ignore_val, _pproc._ignore_pickle_files = _pproc._ignore_pickle_files, True
+    dsl2 = _pproc.get_DataSetList(name)
+    _pproc._ignore_pickle_files = ignore_val
+    assert not _pproc._pickle_file_read, (name, _pproc._pickle_file_read)
+
+    dsl2._is_same_list_assert(dsl1)
+
+    print("*** readin_regression_test done ***")
 
 """
         import cocopp
