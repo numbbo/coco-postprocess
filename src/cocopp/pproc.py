@@ -30,6 +30,7 @@ import json
 import hashlib
 import functools
 import collections
+import time
 from six import string_types, advance_iterator
 import numpy
 import numpy as np
@@ -59,6 +60,12 @@ _block_using_recommendations = True
 _using_recommendations = None
 """`bool` to determine which data are used in the `DataSet` constructor"""
 
+_ignore_pickle_files = False
+"""if `True`, do not try to read data from pickle files.
+   This is useful for regression testing."""
+
+_pickle_file_read = ""
+"""record the name of last read pickle file or "" when file was not found or not read"""
 
 def _set_using_recommendations(index):
     """set module variable `_using_recommendations`
@@ -2600,6 +2607,11 @@ class DataSet(object):
             except AttributeError:
                 return np.all((a == b) | (np.isnan(a) & np.isnan(b)))
 
+        if self._evals.shape == ds._evals.shape:
+            inan0 = np.isnan(self._evals)
+            inan1 = np.isnan(ds._evals)
+            if np.all(inan0 == inan1) and np.all(self._evals[~inan0] == ds._evals[~inan0]):
+                return []
         targets = sorted(set.union(set(self._evals[:, 0]), set(ds._evals[:, 0])))
         if not targets:
             return []
@@ -2691,7 +2703,10 @@ def get_DataSetList(*args, **kwargs):
     def fallback():
         return DataSetList(*args, **kwargs)
 
-    if len(args) != 1 or len(kwargs) or sys.version_info[0] < 3:
+    global _pickle_file_read
+    _pickle_file_read = ""
+
+    if _ignore_pickle_files or len(args) != 1 or len(kwargs) or sys.version_info[0] < 3:
         return fallback()
     arg1 = args[0]
     if isinstance(arg1, string_types):
@@ -2723,10 +2738,13 @@ def get_DataSetList(*args, **kwargs):
                         testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
                     if genericsettings.verbose > 0:
                         print("  using pickled DataSetList {0}".format(name), end=" ")
+                    _pickle_file_read = name
                     return dsl
-    if _using_recommendations:  # do not pickle recommendations for the time being
-        return fallback()
+    # no pickle file found
     dsl = fallback()
+    if _using_recommendations:
+        return dsl  # do not pickle recommendations for the time being
+    # pickle read in data
     try:
         with open(name, "wb") as f:
             pickle.dump(dsl, f)
@@ -3748,6 +3766,18 @@ class DataSetList(list):
         result = hashlib.sha1(reference_values_string.encode("utf-8")).hexdigest()
         # The generated hash it's very long so we truncate it.
         return result[:16]
+
+    def _is_same_list_assert(self, dsl1):
+        """shallow-ish check whether ``self == dsl1``.
+
+        In particular check the entries in `ds._evals` on equality for each ``ds in self``.
+        """
+        dsl2 = self
+        assert dsl1 is not dsl2
+        assert dsl1 == dsl2
+        assert all([ds1 == ds2 for ds1, ds2 in zip(dsl1, dsl2)])
+        for ds1, ds2 in zip(dsl1, dsl2):
+            assert not ds1._data_differ(ds2), (ds1._data_differ(ds2), ds1._evals, ds2._evals)
 
 
 def parseinfoold(s):
