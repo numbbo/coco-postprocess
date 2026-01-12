@@ -14,6 +14,8 @@ import numpy as np
 from matplotlib import pyplot as plt
 import shutil
 from six import advance_iterator
+from cocopp.html.index import save_folder_index
+
 # from pdb import set_trace
 
 # absolute_import => . refers to where ppfig resides in the package:
@@ -496,7 +498,7 @@ def save_single_functions_html(filename,
     toolsdivers.replace_in_file(filename + add_to_names + '.html', '??COCOVERSION??', '<br />Data produced with COCO %s' % (toolsdivers.get_version_label(None)))
 
     if parentFileName:
-        save_folder_index_file(os.path.join(current_dir, parentFileName + '.html'), extension)
+        save_folder_index(os.path.join(current_dir, parentFileName + '.html'), extension)
 
 
 def write_dimension_links(dimension, dimensions, index):
