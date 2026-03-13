@@ -102,7 +102,10 @@ _url_to_folder_name_replace = [("numbbo.github.io/data-archive/data-archive", "d
 # We use `platformdirs` to find the users cache directory in a platform independent way
 # and create a subdirectory within for cocopp.
 
-cocopp_home = platformdirs.user_cache_dir("cocopp", ensure_exists=True)
+try:
+    cocopp_home = platformdirs.user_cache_dir("cocopp", ensure_exists=True)
+except TypeError:
+    cocopp_home = platformdirs.user_cache_dir("cocopp")  # True is default anyway
 default_archive_location = os.path.join(cocopp_home, "das")  # a short name
 default_definition_filename = "coco_archive_definition.txt"
 cocopp_home_archives = default_archive_location
