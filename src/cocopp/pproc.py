@@ -789,6 +789,11 @@ class DataSet(object):
     def isBiobjective(self):
         return hasattr(self, "indicator")
 
+    @property
+    def has_constraints(self):
+        """"""
+        return hasattr(self, 'evals_constraints')
+
     def get_data_format(self):
         # TODO: data_format is a specification of the files written by the
         # experiment loggers. I believe it was never meant to be a specification
@@ -1030,15 +1035,12 @@ class DataSet(object):
             # self.maxevals = maxevals
             # self.finalfunvals = finalfunvals
             # CHECKING PROCEDURE
-            tmp = []
-            for i in range(min((len(self._maxevals), len(self.readmaxevals)))):
-                tmp.append(self._maxevals[i] == self.readmaxevals[i])
-            if testbedsettings.current_testbed.has_constraints:
-                tmp = False
-            else:
-                tmp = not all(tmp)
-            if tmp or len(self._maxevals) != len(self.readmaxevals):
-                warnings.warn("The maxevals from {} and {} disagree:\n  {}\n  {}".format(indexfile, dataFiles, self.readmaxevals, self._maxevals))
+            if not self.has_constraints:  # see issue 65, readmaxevals don't count g-evaluations
+                tmp = []
+                for i in range(min((len(self._maxevals), len(self.readmaxevals)))):
+                    tmp.append(self._maxevals[i] == self.readmaxevals[i])
+                if not all(tmp) or len(self._maxevals) != len(self.readmaxevals):
+                    warnings.warn("The maxevals from {} and {} disagree:\n  {}\n  {}".format(indexfile, dataFiles, self.readmaxevals, self._maxevals))
             self._cut_data()
         if len(self._evals):
             self._target = self._evals[:, 0]  # needed for biobj best alg computation
