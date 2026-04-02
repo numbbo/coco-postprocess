@@ -63,7 +63,7 @@ xticks_fontsize = 16
 yticks_fontsize = 14
 title_fontsize = 20
 size_correction_from_n_foreground = 1  # is (re-)set in main and used in plotdata
-instance_text_max_len = 45
+instance_text_max_len = 100  # default was 45=10+8*4.5, now 125=10+9*(4.5 / 1.5 + 7), about times 50% wider but 7 silent chars
 """for longer text the fontsize of ``0.6 * label_fontsize`` is decreased"""
 
 
@@ -1037,21 +1037,35 @@ def main(
     # add number of instances
     text += "\n"
     num_of_instances = []
+    num_of_instances_functions = []
+    num_of_instance_numbers = []
     for alg in algorithms_with_data:
         try:
             # DONE (fix #49): we need all functions of alg
-            for dictAlgperFunc in dictFunc.values():
+            for _f, dictAlgperFunc in sorted(dictFunc.items()):
                 num_of_instances.append(len(dictAlgperFunc[alg][0].instancenumbers))
+                num_of_instances_functions.append(_f)
+                num_of_instance_numbers.append(len(set(dictAlgperFunc[alg][0].instancenumbers)))
         except IndexError:
             pass
-    # issue a warning if number of instances is inconsistent, but always
-    # display only the present number of instances, i.e. remove copies
-    if len(set(num_of_instances)) > 1 and genericsettings.warning_level >= 5:
-        warnings.warn("Number of instances inconsistent over all algorithms: %s instances found." % str(num_of_instances))
-    num_of_instances = set(num_of_instances)
-    for n in num_of_instances:
-        text += "%d, " % n
-
+    min_num = max((1/1.1, min(num_of_instance_numbers)))  # should never be < 1
+    # issue a warning if number of instances is inconsistent
+    # number of instances (repetitions) are rarely the same with the ExperimentRepeater
+    if len(set(num_of_instances)) > 1 and any(
+            (n / min_num) % 1 for n in num_of_instances
+            ) and genericsettings.warning_level >= 1:
+        warnings.warn("Number of instances was not a multiple of %s for all algorithms:"
+                      " %s instances found." % (str(min_num), str(num_of_instances)))
+    # display each number of instances once, i.e. remove copies
+    # and now also the respective lowest/first function number
+    # (somewhat adapted to higher number of instance repetitions)
+    _ndone = []
+    for _n, _f in zip(num_of_instances, num_of_instances_functions):
+        if _n in _ndone:
+            continue  # display each number only once
+        text += "$%d^{f%d}\\!$, " % (_n, _f)  # annotate number with first function
+        # added 4-5 chars, now it is 14-15 chars
+        _ndone.append(_n)
     text = text.rstrip(", ")
     text += " instances"
     fs_scaler = 0.6 * min((1, instance_text_max_len / (0.1 + max([len(t) for t in text.split("\n")]))))
