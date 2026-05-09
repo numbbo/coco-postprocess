@@ -63,7 +63,7 @@ xticks_fontsize = 16
 yticks_fontsize = 14
 title_fontsize = 20
 size_correction_from_n_foreground = 1  # is (re-)set in main and used in plotdata
-instance_text_max_len = 100  # default was 45=10+8*4.5, now 125=10+9*(4.5 / 1.5 + 7), about times 50% wider but 7 silent chars
+instance_text_max_len = 100  # default was 45=10+8*4.5, now 100=10+9*(4.5 / 1.5 + 7), about times 50% wider but 7 silent chars
 """for longer text the fontsize of ``0.6 * label_fontsize`` is decreased"""
 
 
@@ -1060,15 +1060,19 @@ def main(
     # and now also the respective lowest/first function number
     # (somewhat adapted to higher number of instance repetitions)
     _ndone = []
+    same_f = len(set(num_of_instances_functions)) == 1
     for _n, _f in zip(num_of_instances, num_of_instances_functions):
         if _n in _ndone:
             continue  # display each number only once
-        text += "$%d^{f%d}\\!$, " % (_n, _f)  # annotate number with first function
+        if same_f:
+            text += "%d, " % _n  # annotate number with first function
+        else:
+            text += "$%d^{f%d}\\!$, " % (_n, _f)  # annotate number with first function
         # added 4-5 chars, now it is 14-15 chars
         _ndone.append(_n)
     text = text.rstrip(", ")
     text += " instances"
-    fs_scaler = 0.6 * min((1, instance_text_max_len / (0.1 + max([len(t) for t in text.split("\n")]))))
+    fs_scaler = 0.7 * min((1, instance_text_max_len / (0.1 + max([len(t) for t in text.split("\n")]))))
     plt.text(
         0.01, 0.99, text, horizontalalignment="left", verticalalignment="top", transform=plt.gca().transAxes, fontsize=fs_scaler * label_fontsize
     )
