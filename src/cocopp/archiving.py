@@ -688,19 +688,23 @@ class COCODataArchive(_td.StrList):
                 leading = []
             names = self.find(substr, leading_strs=leading)
 
-        # check that names has only one match
+        # check that names has only one match or an exact match
         if len(names) < 1:
             if len(self) > 0:  # there are known data entries but substr doesn't match
                 raise ValueError("'%s' has no match in data archive" % substr)
             # a blank archive, hope for the best, match must be exact
             names = [substr]
         elif len(names) > 1:
-            raise ValueError(
-                "'%s' has multiple matches in the data archive:\n   %s\n"
-                "Either pick a single match, or use the `get_all` or\n"
-                "`get_first` method, or use the ! (first) or * (all)\n"
-                "marker and try again." % (substr, "\n   ".join(names))
-            )
+            if substr in names:  # we have an exact match
+                names = [substr]
+            else:
+                raise ValueError(
+                    "'%s' has multiple matches in the data archive:\n   %s\n"
+                    "Either pick a single match, or use the `get_all` or\n"
+                    "`get_first` method, or use the ! (first) or * (all)\n"
+                    "marker with `get_extended` or `cocopp.main` and try again."
+                    % (substr, "\n   ".join(names))
+                )
         # create full path
         full_name = self.full_path(names[0])
         if os.path.exists(full_name):
