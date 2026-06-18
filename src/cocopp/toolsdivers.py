@@ -371,6 +371,7 @@ def strip_pathname1(name):
         .replace(".tar.gz", "")
         .replace(".tgz", "")
         .replace(".tar", "")
+        .replace(".zip", "")
         .replace(genericsettings.extraction_folder_prefix, "")
         .strip(os.sep)
         .replace(os.sep, "/")
