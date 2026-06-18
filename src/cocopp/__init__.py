@@ -11,7 +11,7 @@ the package, sufficient for most use cases.
 
 >>> import cocopp
 >>> sorted(cocopp.Interface.dir())
-['archives', 'config', 'genericsettings', 'load', 'main']
+['archives', 'config', 'genericsettings', 'load', 'main', 'remote_archives']
 >>> all(hasattr(cocopp, name) for name in cocopp.Interface.dir())
 True
 
@@ -125,6 +125,13 @@ if archives is not None:
 # bbob_noisy = 'use `archives.bbob_noisy` instead'
 # bbob_biobj = 'use `archives.bbob_biobj` instead'
 
+def remote_archives():
+    """return a list of URLs containing COCO archives.
+
+    Elements of this list can be used directly with `cocopp.archiving.get`, see
+    https://coco-platform.org/howto-publish.html#using-an-archive-by-url
+    """
+    return archiving.RemoteListOfArchives()
 
 class Interface:
     """collection of the most user-relevant modules, methods and data.
@@ -132,6 +139,8 @@ class Interface:
     `archives`: online data archives of type `OfficialArchives`
 
     `archiving`: methods to archive data and retrieve archived data put online
+
+    `remote_archives`: a function returning a list of URLs of known remote COCO archives
 
     `config`: dynamic configuration tool (advanced)
 
@@ -152,6 +161,7 @@ class Interface:
     genericsettings = genericsettings
     load = load
     main = main
+    remote_archives = remote_archives
 
 
 # clean up namespace

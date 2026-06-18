@@ -1524,9 +1524,10 @@ class ArchivesLocal(ListOfArchives):
 
 
 class ArchivesKnown(ListOfArchives):
-    """Known (and already used) remote COCO data archives.
+    """Known or already used remote COCO data archives.
 
-    These include the official archives from `OfficialArchives`.
+    These do not include the official archives, see `cocopp.archives.urls` and
+    ``help(cocopp.archives)`` for these.
     """
 
     __doc__ += ListOfArchives.__doc__
