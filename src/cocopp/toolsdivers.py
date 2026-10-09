@@ -415,6 +415,51 @@ def number_of_digits(val, precision=1e-13):
     """returns the number of non-zero digits of a number, e.g. two for 1200 or three for 2.03."""
     raise NotImplementedError()
 
+ratio2threshold = 1.995
+'''return relative additive change below and multiplicative change above threshold
+   used in `ratio2html` and `ratio2tex`'''
+
+def ratio2html(ratio, signed=False):
+    """return the relative change represented in `ratio` as html snippet
+
+    which may be used within <math>.
+    """
+    return _ratio2str(ratio, '{}%', '&times;{}', signed, ratio2threshold)
+
+def ratio2tex(ratio, signed=False):
+    """return the relative change represented in `ratio` as LaTeX snippet
+
+    to be used in math mode.
+    """
+    return _ratio2str(ratio, r'{}\%', r'\times{}', signed, ratio2threshold)
+
+def _ratio2str(ratio, formplus='{}%', formtimes='&times;{}', signed=False, threshold=1.995):
+    """format the relative change below `threshold` as additive percentage, otherwise as factor
+    """
+    sign = ''
+    if signed:
+        sign = np.sign(ratio - 1)
+        if sign == 0:
+            sign = ''
+        elif sign < 0:
+            sign = '-'
+        else:
+            sign = '+'
+    if ratio < threshold:  # -100..99%
+        val = int(np.round(100 * (ratio - 1)))
+        assert val <= 100, locals()
+        return sign + formplus.format(np.abs(val) if signed else val)  # noqa: UP032
+    return formtimes.format(num2str(ratio, 2))  # noqa: UP032
+
+def _num2str2(n, digits=2, signed=False):
+    """another attempt, not used, formats ``n=0.99, digits=1`` poorly, num2str seems good"""
+    if 10**(digits-1) <= np.abs(n) < 10**(digits+3):
+        return ('{:+}' if signed else '{}').format(int(np.round(n)))
+    # exponent format adds three chars
+    s = ('{{:+.{}}}' if signed else '{{:.{}}}').format(digits)
+    s = s.format(n)
+    s = s.replace('e-0', 'e-').replace('e+', 'e').replace('e0', 'e')
+    return s
 
 def num2str(val, significant_digits=2, force_rounding=False, max_predecimal_digits=5, max_postdecimal_leading_zeros=1, remove_trailing_zeros=True):
     """returns the shortest string representation with either ``significant_digits``

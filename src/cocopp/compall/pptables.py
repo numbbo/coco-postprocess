@@ -30,8 +30,9 @@ def get_table_caption():
         + testbedsettings.current_testbed.string_evals
         + r""") divided by the respective !!BEST-ERT!! (when finite) in
         #1.
-        This \ERT\ ratio and, in braces as dispersion measure, the half difference between
-        10 and 90\%-tile of !!BOOTSTRAPPED!! run lengths appear for each algorithm and 
+        This \ERT\ ratio, and as relative dispersion measures the 
+        10\%-tile (bottom) and 90\%-tile (top)
+        of !!BOOTSTRAPPED!! run lengths, appear for each algorithm and 
         """
     )
     table_caption_one_noreference = (
@@ -39,9 +40,10 @@ def get_table_caption():
         Expected runtime (\ERT) to reach given targets, measured
         in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""", in #1. For each function, the \ERT\ 
-        and, in braces as dispersion measure, the half difference between 10 and 
-        90\%-tile of !!BOOTSTRAPPED!! runtimes is shown for the different
+        + r""", in #1. For each function, the \ERT,
+        and as relative dispersion measures the 
+        10\%-tile (bottom) and 90\%-tile (top)
+        of !!BOOTSTRAPPED!! runtimes, is shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
         + r"""values as shown in the top row. 
@@ -118,8 +120,6 @@ maxfloatrepr = 10000.0
 samplesize = genericsettings.simulated_runlength_bootstrap_sample_size
 precfloat = 2
 precscien = 2
-precdispersion = 1  # significant digits for dispersion
-
 
 def cite(alg_name, is_noise_free, is_noisy):
     """Returns the citation key associated to the algorithm name.
@@ -369,9 +369,9 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     tmp = toolsstats.drawSP(
                         ec[succ], entry.maxevals[succ == False], [10, 50, 90], samplesize=entry.bootstrap_sample_size(samplesize)
                     )[0]
-                    tmpdisp.append((tmp[-1] - tmp[0]) / 2.0)
+                    tmpdisp.append((tmp[0], tmp[-1]))  # 10 and 90%tiles
                 else:
-                    tmpdisp.append(numpy.nan)
+                    tmpdisp.append(None)
                 tmpert.append(ert)
             algerts.append(tmpert)
             algevals.append(evals)
@@ -595,13 +595,23 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 # curlineHtml.append('<td>&nbsp;</td>')
                 # continue
 
+                def html_subsup(sub, sup):
+                    return (  # noqa: UP030, UP032
+                        r'<math><msubsup>'
+                        r'<mn></mn>'  # no base
+                        r'<mn>{0}</mn>' # number lower
+                        r'<mn>{1}</mn>' # number upper
+                        r'</msubsup></math>').format(sub, sup)
+
                 # write "raw" ERT when reference is inf:
                 if numpy.isfinite(ert) and refalgentries and numpy.isinf(refalgert[j]):
                     tableentry = r"\textbf{%s}" % writeFEvalsMaxPrec(algerts[i][j], 2)
                     tableentryHtml = "<b>%s</b>" % writeFEvalsMaxPrec(algerts[i][j], 2)
-                    if dispersion and numpy.isfinite(dispersion):
-                        tableentry += r"\mbox{\tiny (%s)}" % writeFEvalsMaxPrec(dispersion, precdispersion)
-                        tableentryHtml += " (%s)" % writeFEvalsMaxPrec(dispersion, precdispersion)
+                    if dispersion:
+                        tableentry += r"{{\ensuremath{{_{}^{}}}}}".format(
+                                            *(td.ratio2tex(d / ert) for d in dispersion))
+                        tableentryHtml += ' ' + html_subsup(
+                                            *(td.ratio2html(d / ert) for d in dispersion)) + ' '
                     curline.append(r"\multicolumn{2}{%s}{%s}%s" % (alignment, tableentry, str_significance_subsup))
                     curlineHtml.append('<td sorttable_customkey="%f">%s%s</td>\n' % (algerts[i][j], tableentryHtml, str_significance_subsup_html))
                     continue
@@ -626,14 +636,13 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                             tmpHtml = "<b>%s</b>" % tmp
                             tmp = r"\textbf{%s}" % tmp
 
-                    if not numpy.isnan(dispersion):
-                        tmpdisp = dispersion / denom
-                        if tmpdisp >= maxfloatrepr or tmpdisp < 0.005:  # TODO: hack
-                            tmpdisp = writeFEvalsMaxPrec(tmpdisp, precdispersion, maxfloatrepr=tmpdisp)
-                        else:
-                            tmpdisp = writeFEvalsMaxPrec(tmpdisp, precdispersion, maxfloatrepr=maxfloatrepr)
-                        tmp += r"\mbox{\tiny (%s)}" % tmpdisp
-                        tmpHtml += " (%s)" % tmpdisp
+                    if dispersion and numpy.isfinite(data):  # data == ert / denom
+                        tmp += r"{{\ensuremath{{_{}^{}}}}}".format(
+                            *(td.ratio2tex((d / denom) / data, signed=True)
+                              for d in dispersion))
+                        tmpHtml += ' ' + html_subsup(
+                            *(td.ratio2html((d / denom) / data, signed=True)
+                              for d in dispersion)) + ' '
                     curline.append(r"\multicolumn{2}{%s}{%s%s}" % (alignment, tmp, str_significance_subsup))
                     if numpy.isinf(sortKey):
                         sortKey = sys.maxsize
@@ -655,14 +664,14 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     else:
                         tmp2html = []
                         tmp2html.extend(tmp2)
-                    if not numpy.isnan(dispersion):
-                        tmpdisp = dispersion / denom
-                        if tmpdisp >= maxfloatrepr or tmpdisp < 0.01:
-                            tmpdisp = writeFEvalsMaxPrec(tmpdisp, precdispersion, maxfloatrepr=tmpdisp)
-                        else:
-                            tmpdisp = writeFEvalsMaxPrec(tmpdisp, precdispersion, maxfloatrepr=maxfloatrepr)
-                        tmp2[-1] += r"\mbox{\tiny (%s)}" % (tmpdisp)
-                        tmp2html[-1] += " (%s)" % tmpdisp
+                    if dispersion and numpy.isfinite(data):
+                        tmp2[-1] += r"{{\ensuremath{{_{}^{}}}}}".format(
+                            *(td.ratio2tex(d / denom / data, signed=True)
+                              for d in dispersion))
+                        tmp2html[-1] += ' ' + html_subsup(*(td.ratio2html(
+                                    d / denom / data, signed=True)
+                                    for d in dispersion)) + ' '
+
                     tmp2[-1] += str_significance_subsup
                     tmp2html[-1] += str_significance_subsup_html
                     curline.extend(tmp2)
