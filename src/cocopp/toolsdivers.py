@@ -451,6 +451,28 @@ def _ratio2str(ratio, formplus='{}%', formtimes='&times;{}', signed=False, thres
         return sign + formplus.format(np.abs(val) if signed else val)  # noqa: UP032
     return formtimes.format(num2str(ratio, 2))  # noqa: UP032
 
+def html_subsup(sub, sup, base='', end=''):
+    """typeset ``base_sub^sup`` in html math mode"""
+    return (  # noqa: F523, UP032
+        '<math><msubsup>'
+        '<mn>{2}</mn>'  # no base
+        '<mn>{0}</mn>' # number lower
+        '<mn>{1}</mn>' # number upper
+        '</msubsup></math>{3}').format(sub, sup, base, end)
+
+def prepend_succ_str(succ, tex, html, indent='-0.5em', lindent=r'\!\!\!\!'):
+    """prepend success as subscript for ERT iff 0 < succ < 0.95
+
+    return also an html style-command for indent.
+    """
+    if succ > 0 and (i := int(np.round(10 * succ))) <= 9:
+        tex = r"$%s{}_{.%d}$" % (lindent, i) + tex  # \! = -0.1em
+        html = html_subsup('.%d' % i, '') + html
+        indent = 'style="text-indent: %s;"' % indent
+    else:
+        indent = ''
+    return indent, tex, html
+
 def _num2str2(n, digits=2, signed=False):
     """another attempt, not used, formats ``n=0.99, digits=1`` poorly, num2str seems good"""
     if 10**(digits-1) <= np.abs(n) < 10**(digits+3):

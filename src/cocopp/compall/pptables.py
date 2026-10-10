@@ -28,11 +28,11 @@ def get_table_caption():
         r"""%
         Expected runtime (\ERT\ in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""") divided by the respective !!BEST-ERT!! (when finite) in
-        #1.
-        This \ERT\ ratio, and as relative dispersion measures the 
-        10\%-tile (bottom) and 90\%-tile (top)
-        of !!BOOTSTRAPPED!! run lengths, appear for each algorithm and 
+        + r""") divided by the respective !!BEST-ERT!! (when finite) in #1.
+        This \ERT\ ratio is preceeded by the success rate (if smaller .95, as
+        one-digit subscript) and accompanied by two relative dispersion
+        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        of !!BOOTSTRAPPED!! run lengths, and appears for each algorithm and 
         """
     )
     table_caption_one_noreference = (
@@ -40,10 +40,11 @@ def get_table_caption():
         Expected runtime (\ERT) to reach given targets, measured
         in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""", in #1. For each function, the \ERT,
-        and as relative dispersion measures the 
-        10\%-tile (bottom) and 90\%-tile (top)
-        of !!BOOTSTRAPPED!! runtimes, is shown for the different
+        + r""", in #1. 
+        The \ERT\ is preceeded by the success rate (if smaller .95, as one-digit
+        subscript) and accompanied by two relative dispersion measures,
+        indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
         + r"""values as shown in the top row. 
@@ -56,7 +57,7 @@ def get_table_caption():
     table_caption_two1 = (
         r"""%
         target, the corresponding reference \ERT\
-        in the first row. The different target !!DF!!-values are shown in the top row.
+        is in the first row. The different target !!DF!!-values are shown in the top row.
         \#succ is the number of trials that reached the (final) target
         $!!FOPT!! + """
         + testbedsettings.current_testbed.hardesttargetlatex
@@ -65,12 +66,12 @@ def get_table_caption():
     )
     table_caption_two2 = r"""%
         run-length based target, the corresponding reference \ERT\
-        (preceded by the target !!DF!!-value in \textit{italics}) in the first row. 
+        (preceded by the target !!DF!!-value in \textit{italics}) is in the first row. 
         \#succ is the number of trials that reached the target value of the last column.
         """
     table_caption_rest = (
         r"""%
-        The median number of conducted function evaluations is additionally given in 
+        The median number of conducted function evaluations is given in 
         \textit{italics}, if the target in the last column was never reached.
         The best entry is marked by a star when the largest $p$-value of pairwise
         rank-sum tests with the other algorithms either obeys $0.01 < p \le 0.05$
@@ -333,6 +334,7 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
         algerts = []
         algevals = []
         algdisp = []
+        algsucc = []
         algnbsucc = []
         algnbruns = []
         algmedmaxevals = []
@@ -357,8 +359,9 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
 
             evals = entry.detEvals(targets)
             # tmpdata = []
-            tmpdisp = []
+            tmpdisp = []  # dispersion
             tmpert = []
+            tmpsucc = []
             for i, e in enumerate(evals):
                 succ = numpy.isnan(e) == False
                 ec = e.copy()  # note: here was the previous bug (changes made in e also appeared in evals !)
@@ -373,10 +376,12 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 else:
                     tmpdisp.append(None)
                 tmpert.append(ert)
+                tmpsucc.append(sum(succ) / len(succ))
             algerts.append(tmpert)
             algevals.append(evals)
             # algdata.append(tmpdata)
             algdisp.append(tmpdisp)
+            algsucc.append(tmpsucc)
             algmedmaxevals.append(numpy.median(entry.maxevals))
             algmedfinalfunvals.append(numpy.median(entry.finalfunvals))
             # algmedmaxevals.append(numpy.median(entry.maxevals)/df[0])
@@ -552,14 +557,14 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
             curlineHtml = ['<th style="width:%dpx">%s</th>\n' % (table_first_column_width, str_to_latex(strip_pathname3(alg)))]
 
             zipToEnumerate = (
-                zip(algerts[i], algdisp[i], isBoldArray[i], algtestres[i]) if refalgentries else zip(algerts[i], algdisp[i], isBoldArray[i])
+                zip(algerts[i], algdisp[i], algsucc[i], isBoldArray[i], algtestres[i]) if refalgentries else zip(algerts[i], algdisp[i], algsucc[i], isBoldArray[i])
             )
 
             for j, tmp in enumerate(zipToEnumerate):  # j is target index
                 if refalgentries:
-                    ert, dispersion, isBold, testres = tmp
+                    ert, dispersion, succ, isBold, testres = tmp
                 else:
-                    ert, dispersion, isBold = tmp
+                    ert, dispersion, succ, isBold = tmp
 
                 alignment = r"@{\,}l@{\,}"
                 if j == len(algerts[i]) - 1:
@@ -595,25 +600,20 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 # curlineHtml.append('<td>&nbsp;</td>')
                 # continue
 
-                def html_subsup(sub, sup):
-                    return (  # noqa: UP030, UP032
-                        r'<math><msubsup>'
-                        r'<mn></mn>'  # no base
-                        r'<mn>{0}</mn>' # number lower
-                        r'<mn>{1}</mn>' # number upper
-                        r'</msubsup></math>').format(sub, sup)
-
                 # write "raw" ERT when reference is inf:
                 if numpy.isfinite(ert) and refalgentries and numpy.isinf(refalgert[j]):
                     tableentry = r"\textbf{%s}" % writeFEvalsMaxPrec(algerts[i][j], 2)
                     tableentryHtml = "<b>%s</b>" % writeFEvalsMaxPrec(algerts[i][j], 2)
+                    indent, tableentry, tableentryHtml = td.prepend_succ_str(
+                                    succ, tableentry, tableentryHtml)
                     if dispersion:
                         tableentry += r"{{\ensuremath{{_{}^{}}}}}".format(
                                             *(td.ratio2tex(d / ert) for d in dispersion))
-                        tableentryHtml += ' ' + html_subsup(
+                        tableentryHtml += '&thinsp;' + td.html_subsup(
                                             *(td.ratio2html(d / ert) for d in dispersion)) + ' '
                     curline.append(r"\multicolumn{2}{%s}{%s}%s" % (alignment, tableentry, str_significance_subsup))
-                    curlineHtml.append('<td sorttable_customkey="%f">%s%s</td>\n' % (algerts[i][j], tableentryHtml, str_significance_subsup_html))
+                    curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>\n' % (
+                        indent, algerts[i][j], tableentryHtml, str_significance_subsup_html))
                     continue
 
                 denom = 1
@@ -636,17 +636,21 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                             tmpHtml = "<b>%s</b>" % tmp
                             tmp = r"\textbf{%s}" % tmp
 
+                    indent, tmp, tmpHtml = td.prepend_succ_str(succ, tmp, tmpHtml)
+
                     if dispersion and numpy.isfinite(data):  # data == ert / denom
                         tmp += r"{{\ensuremath{{_{}^{}}}}}".format(
                             *(td.ratio2tex((d / denom) / data, signed=True)
                               for d in dispersion))
-                        tmpHtml += ' ' + html_subsup(
+                        tmpHtml += '&thinsp;' + td.html_subsup(
                             *(td.ratio2html((d / denom) / data, signed=True)
                               for d in dispersion)) + ' '
-                    curline.append(r"\multicolumn{2}{%s}{%s%s}" % (alignment, tmp, str_significance_subsup))
+
+                    curline.append(r"\multicolumn{2}{%s}{%s%s}" % (
+                                                alignment, tmp, str_significance_subsup))
                     if numpy.isinf(sortKey):
                         sortKey = sys.maxsize
-                    curlineHtml.append('<td sorttable_customkey="%f">%s%s</td>' % (sortKey, tmpHtml, str_significance_subsup_html))
+                    curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>' % (indent, sortKey, tmpHtml, str_significance_subsup_html))
                 else:
                     tmp2 = tmp.split(".", 1)
                     if len(tmp2) < 2:
@@ -664,11 +668,12 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     else:
                         tmp2html = []
                         tmp2html.extend(tmp2)
+                    indent, tmp2[0], tmp2html[0] = td.prepend_succ_str(succ, tmp2[0], tmp2html[0])
                     if dispersion and numpy.isfinite(data):
                         tmp2[-1] += r"{{\ensuremath{{_{}^{}}}}}".format(
                             *(td.ratio2tex(d / denom / data, signed=True)
-                              for d in dispersion))
-                        tmp2html[-1] += ' ' + html_subsup(*(td.ratio2html(
+                            for d in dispersion))
+                        tmp2html[-1] += '&thinsp;' + td.html_subsup(*(td.ratio2html(
                                     d / denom / data, signed=True)
                                     for d in dispersion)) + ' '
 
@@ -676,7 +681,8 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     tmp2html[-1] += str_significance_subsup_html
                     curline.extend(tmp2)
                     tmp2html = ("").join(str(item) for item in tmp2html)
-                    curlineHtml.append('<td sorttable_customkey="%f">%s</td>' % (data, tmp2html))
+                    curlineHtml.append('<td %s sorttable_customkey="%f">%s</td>' % (
+                                        indent, data, tmp2html))
 
             curline.append("%d" % algnbsucc[i])
             curline.append("/%d" % algnbruns[i])

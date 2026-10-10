@@ -57,9 +57,10 @@ def get_table_caption():
         r"""%
         Expected runtime (\ERT\ in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""") divided by the \ERT\ of !!THE-REF-ALG!! in #1. This \ERT\
-        ratio, and as relative dispersion measures the 
-        10\%-tile (bottom) and 90\%-tile (top)
+        + r""") divided by the \ERT\ of !!THE-REF-ALG!! in #1.
+        This \ERT\ ratio is preceeded by the success rate (if smaller .95, as
+        one-digit subscript) and accompanied by two relative dispersion
+        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! run lengths, appear in the second row of each cell,  
         the best \ERT\
         """
@@ -96,9 +97,10 @@ def get_table_caption():
         in number of """
         + testbedsettings.current_testbed.string_evals
         + r""" in #1. For each function, the \ERT,
-        and as relative dispersion measures the 
-        10\%-tile (bottom) and 90\%-tile (top)
-        of !!BOOTSTRAPPED!! runtimes, is shown for the different
+        is preceeded by the success rate (if smaller .95, as one-digit
+        subscript) and accompanied by two relative dispersion measures,
+        indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
         + r"""values as shown in the top row. 
@@ -234,6 +236,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
             # data = entry.detERT(targetsOfInterest)
             evals = entry.detEvals(targetsOfInterest((f, d)))
             dispersion = []
+            succrate = []
             data = []
             for i in evals:
                 succ = np.isfinite(i)  # was: (np.isnan(i) == False)
@@ -250,6 +253,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                     dispersion.append((tmp2[0], tmp2[-1]))
                 else:
                     dispersion.append(None)
+                succrate.append(np.sum(succ) / len(succ))
             if data != ertdata:
                 # comment before computeERT was called unconditionally at the end of DataSet.__init__:
                 # warning comes only in balance_instances=True setting only for bfgs but not for randsearch or bipop
@@ -377,14 +381,6 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                 # else:
                 # tableentry += s
 
-                def html_subsup(sub, sup):
-                    return (  # noqa: F523, UP032
-                        '<math><msubsup>'
-                        '<mn></mn>'  # no base
-                        '<mn>{0}</mn>' # number lower
-                        '<mn>{1}</mn>' # number upper
-                        '</msubsup></math>').format(sub, sup)
-
                 if dispersion[i] and np.isfinite(ert):
                     s = r'$_{}^{}$'.format(*(td.ratio2tex(d / ert, signed=True)
                                              # normalization by refalgdata cancels
@@ -393,9 +389,11 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                         tableentry = tableentry[:-1] + s + r'}'
                     else:
                         tableentry += s
-                    tableentryHtml += html_subsup(
-                        *(td.ratio2html(d / ert, signed=True)
-                          for d in dispersion[i]))
+                    tableentryHtml += td.html_subsup(*(td.ratio2html(d / ert, signed=True)
+                          for d in dispersion[i]), end='&thinsp;&thinsp;')
+
+                indent, tableentry, tableentryHtml = td.prepend_succ_str(
+                                succrate[i], tableentry, tableentryHtml)
 
                 if superscript:
                     s = r"$^{" + superscript + r"}$"
@@ -408,7 +406,7 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                     tableentryHtml += shtml
 
                 tableentryHtml = tableentryHtml.replace(r"$\infty$", r"&infin;")
-                curlineHtml.append("<td>%s</td>\n" % tableentryHtml)
+                curlineHtml.append("<td %s >%s</td>\n" % (indent, tableentryHtml))
                 curline.append(tableentry)
 
                 # curline.append(tableentry)
