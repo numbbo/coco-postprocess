@@ -415,26 +415,34 @@ def number_of_digits(val, precision=1e-13):
     """returns the number of non-zero digits of a number, e.g. two for 1200 or three for 2.03."""
     raise NotImplementedError()
 
-ratio2threshold = 1.995
-'''return relative additive change below and multiplicative change above threshold
-   used in `ratio2html` and `ratio2tex`'''
+ratio2thresholds = (0.5, 1.995)
+'''return relative additive change within this range and multiplicative change
+   otherwise, used in `ratio2html` and `ratio2tex`'''
 
-def ratio2html(ratio, signed=False):
+def ratio2html(ratio, signed=True):
     """return the relative change represented in `ratio` as html snippet
 
     which may be used within <math>.
     """
-    return _ratio2str(ratio, '{}%', '&times;{}', signed, ratio2threshold)
+    return _ratio2str(ratio, '{}%', '&times;{}', '&divide;{}',
+                      signed, ratio2thresholds)
 
-def ratio2tex(ratio, signed=False):
+def ratio2tex(ratio, signed=True):
     """return the relative change represented in `ratio` as LaTeX snippet
 
     to be used in math mode.
     """
-    return _ratio2str(ratio, r'{}\%', r'\times{}', signed, ratio2threshold)
+    return _ratio2str(ratio, r'{}\%', r'\times {}', r'\div {}',
+                      signed, ratio2thresholds)
 
-def _ratio2str(ratio, formplus='{}%', formtimes='&times;{}', signed=False, threshold=1.995):
-    """format the relative change below `threshold` as additive percentage, otherwise as factor
+def _ratio2str(ratio, formplus='{}%', formtimes='&times;{}', formdiv='&divide;{}',
+               signed=True, thresholds=(0.5, 1.995)):
+    """format `ratio` as additive percentage when in the threshold range
+
+    and as factor otherwise. Assume ``ratio >= 0``.
+
+    A single threshold indicates the upper value. ``formtimes`` or ``formdiv``
+    may be `None` thereby ignoring the respective threshold.
     """
     sign = ''
     if signed:
@@ -445,25 +453,28 @@ def _ratio2str(ratio, formplus='{}%', formtimes='&times;{}', signed=False, thres
             sign = '-'
         else:
             sign = '+'
-    if ratio < threshold:  # -100..99%
+    if formtimes is not None and ratio >= thresholds[-1]:  # -100..99%
+        return formtimes.format(num2str(ratio, 2))
+    if formdiv is None or ratio >= thresholds[0]:
         val = int(np.round(100 * (ratio - 1)))
-        assert val <= 100, locals()
-        return sign + formplus.format(np.abs(val) if signed else val)  # noqa: UP032
-    return formtimes.format(num2str(ratio, 2))  # noqa: UP032
+        return sign + formplus.format(np.abs(val) if signed else val)
+    return formdiv.format('inf' if ratio == 0 else num2str(1 / ratio, 2))
 
-def html_subsup(sub, sup, base='', end=''):
+def html_subsup(sub, sup, base='', endlower=''):
     """typeset ``base_sub^sup`` in html math mode"""
-    return (  # noqa: F523, UP032
+    return (  # noqa: UP030, UP032
         '<math><msubsup>'
         '<mn>{2}</mn>'  # no base
-        '<mn>{0}</mn>' # number lower
+        '<mn>{0}{3}</mn>' # number lower
         '<mn>{1}</mn>' # number upper
-        '</msubsup></math>{3}').format(sub, sup, base, end)
+        '</msubsup></math>').format(sub, sup, base, endlower)
 
 def prepend_succ_str(succ, tex, html, indent='-0.5em', lindent=r'\!\!\!\!'):
-    """prepend success as subscript for ERT iff 0 < succ < 0.95
+    """prepend single digit precision `succ` as subscript to `tex` and `html` strings
 
-    return also an html style-command for indent.
+    iff ``0 < succ < 0.95``.
+
+    return also a style-command for (negative) indent with html.
     """
     if succ > 0 and (i := int(np.round(10 * succ))) <= 9:
         tex = r"$%s{}_{.%d}$" % (lindent, i) + tex  # \! = -0.1em
@@ -471,7 +482,7 @@ def prepend_succ_str(succ, tex, html, indent='-0.5em', lindent=r'\!\!\!\!'):
         indent = 'style="text-indent: %s;"' % indent
     else:
         indent = ''
-    return indent, tex, html
+    return tex, html, indent
 
 def _num2str2(n, digits=2, signed=False):
     """another attempt, not used, formats ``n=0.99, digits=1`` poorly, num2str seems good"""

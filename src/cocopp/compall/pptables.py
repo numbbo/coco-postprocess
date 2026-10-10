@@ -28,8 +28,9 @@ def get_table_caption():
         r"""%
         Expected runtime (\ERT\ in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""") divided by the respective !!BEST-ERT!! (when finite) in #1.
-        This \ERT\ ratio is preceeded by the success rate (if smaller .95, as
+        + r""") divided by the respective !!BEST-ERT!! (when finite, shown
+        along the function id) in #1.
+        This \ERT\ ratio is preceeded by the success rate, if smaller than .95 (as
         one-digit subscript) and accompanied by two relative dispersion
         measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! run lengths, and appears for each algorithm and 
@@ -40,10 +41,10 @@ def get_table_caption():
         Expected runtime (\ERT) to reach given targets, measured
         in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""", in #1. 
-        The \ERT\ is preceeded by the success rate (if smaller .95, as one-digit
-        subscript) and accompanied by two relative dispersion measures,
-        indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        + r""", in #1.
+        The \ERT\ is preceeded by the success rate if smaller than .95 (as
+        one-digit subscript) and accompanied by two relative dispersion
+        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
@@ -56,8 +57,7 @@ def get_table_caption():
     )
     table_caption_two1 = (
         r"""%
-        target, the corresponding reference \ERT\
-        is in the first row. The different target !!DF!!-values are shown in the top row.
+        target. The different target !!DF!!-values are shown in the top row.
         \#succ is the number of trials that reached the (final) target
         $!!FOPT!! + """
         + testbedsettings.current_testbed.hardesttargetlatex
@@ -66,7 +66,7 @@ def get_table_caption():
     )
     table_caption_two2 = r"""%
         run-length based target, the corresponding reference \ERT\
-        (preceded by the target !!DF!!-value in \textit{italics}) is in the first row. 
+        is given along the function id and preceded by the target !!DF!!-value (in \textit{italics}).
         \#succ is the number of trials that reached the target value of the last column.
         """
     table_caption_rest = (
@@ -78,7 +78,7 @@ def get_table_caption():
         or $10^{-k-1} < p \le 10^{-k}$ when the star is followed by the number $k$,
         with Bonferroni correction by the number of functions (!!TOTAL-NUM-OF-FUNCTIONS!!). """
         + (
-            r"""A ${}$ signifies the number of trials that were worse than the ERT of !!THE-REF-ALG!! """
+            r"""A ${}$ signifies the number of trials that were worse than the ERT of !!THE-REF-ALG!! """  # noqa: UP032
             r"""shown only when less than 10 percent were worse and the ERT was better.""".format(significance_vs_ref_symbol)
             if not (
                 testbedsettings.current_testbed.reference_algorithm_filename == ""
@@ -121,6 +121,7 @@ maxfloatrepr = 10000.0
 samplesize = genericsettings.simulated_runlength_bootstrap_sample_size
 precfloat = 2
 precscien = 2
+
 
 def cite(alg_name, is_noise_free, is_noisy):
     """Returns the citation key associated to the algorithm name.
@@ -269,6 +270,8 @@ def get_top_indices_of_columns(table, max_rank=None):
 
     return ranked
 
+# this latex format needs to be tested, the right subspace is for preceded success rate
+sform_subsup_tex = r"$_{{\,{}\,\,}}^{{\,{}}}$"
 
 # TODO: function_headings argument need to be tested, default should be changed according to templates
 def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, latex_commands_file=""):  # [1, 13, 101]
@@ -581,16 +584,19 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 ):
                     logp = -numpy.ceil(numpy.log10(nbtests * significance_versus_others[j][1]))
                     logp = numpy.min((9, logp))  # not messing up the format and handling inf
-                    str_significance_subsup = r"^{%s%s}" % (significance_vs_others_symbol, str(int(logp)) if logp > 1 else "")
-                    str_significance_subsup_html = "<sup>%s%s</sup>" % (significance_vs_others_symbol_html, str(int(logp)) if logp > 1 else "")
+                    str_significance_subsup = r"^{\,\,%s%s}" % (  # top needs no space to the right
+                            significance_vs_others_symbol, str(int(logp)) if logp > 1 else "")
+                    str_significance_subsup_html = "<sup>&thinsp;%s%s</sup>" % (
+                            significance_vs_others_symbol_html, str(int(logp)) if logp > 1 else "")
 
                 # create subscript arrow for significance against reference
                 if refalgentries:
                     if testres is not None:
                         # tmp2[-1] += r'$^{%s}$' % superscript
                         nb = str(int(testres + 1 / 2))  # rounded number of runs that were worse
-                        str_significance_subsup += r"_{%s%s}" % (significance_vs_ref_symbol, nb)
-                        str_significance_subsup_html += "<sub>%s%s</sub>" % (significance_vs_ref_symbol_html, nb)
+                        str_significance_subsup += r"_{\,\,%s%s\,}" % (significance_vs_ref_symbol, nb)
+                        str_significance_subsup_html += "<sub>&thinsp;%s%s&thinsp;</sub>" % (
+                                significance_vs_ref_symbol_html, nb)
 
                 if str_significance_subsup:
                     str_significance_subsup = "$%s$" % str_significance_subsup
@@ -604,14 +610,16 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 if numpy.isfinite(ert) and refalgentries and numpy.isinf(refalgert[j]):
                     tableentry = r"\textbf{%s}" % writeFEvalsMaxPrec(algerts[i][j], 2)
                     tableentryHtml = "<b>%s</b>" % writeFEvalsMaxPrec(algerts[i][j], 2)
-                    indent, tableentry, tableentryHtml = td.prepend_succ_str(
+                    tableentry, tableentryHtml, indent = td.prepend_succ_str(
                                     succ, tableentry, tableentryHtml)
                     if dispersion:
-                        tableentry += r"{{\ensuremath{{_{}^{}}}}}".format(
+                        # TODO: latex format needs to be tested
+                        tableentry += sform_subsup_tex.format(
                                             *(td.ratio2tex(d / ert) for d in dispersion))
                         tableentryHtml += '&thinsp;' + td.html_subsup(
-                                            *(td.ratio2html(d / ert) for d in dispersion)) + ' '
-                    curline.append(r"\multicolumn{2}{%s}{%s}%s" % (alignment, tableentry, str_significance_subsup))
+                                            *(td.ratio2html(d / ert) for d in dispersion))
+                    curline.append(r"\multicolumn{2}{%s}{%s}%s" % (
+                            alignment, tableentry, str_significance_subsup))
                     curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>\n' % (
                         indent, algerts[i][j], tableentryHtml, str_significance_subsup_html))
                     continue
@@ -635,22 +643,19 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                         if isBold:
                             tmpHtml = "<b>%s</b>" % tmp
                             tmp = r"\textbf{%s}" % tmp
-
-                    indent, tmp, tmpHtml = td.prepend_succ_str(succ, tmp, tmpHtml)
-
-                    if dispersion and numpy.isfinite(data):  # data == ert / denom
-                        tmp += r"{{\ensuremath{{_{}^{}}}}}".format(
-                            *(td.ratio2tex((d / denom) / data, signed=True)
-                              for d in dispersion))
+                    tmp, tmpHtml, indent = td.prepend_succ_str(succ, tmp, tmpHtml)
+                    if dispersion and numpy.isfinite(ert):  # data == ert / denom
+                        # dispersion = prctile and ert are commensurable
+                        tmp += sform_subsup_tex.format(
+                            *(td.ratio2tex(d / ert, signed=True) for d in dispersion))
                         tmpHtml += '&thinsp;' + td.html_subsup(
-                            *(td.ratio2html((d / denom) / data, signed=True)
-                              for d in dispersion)) + ' '
-
+                            *(td.ratio2html(d / ert, signed=True) for d in dispersion))
                     curline.append(r"\multicolumn{2}{%s}{%s%s}" % (
                                                 alignment, tmp, str_significance_subsup))
                     if numpy.isinf(sortKey):
                         sortKey = sys.maxsize
-                    curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>' % (indent, sortKey, tmpHtml, str_significance_subsup_html))
+                    curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>' % (
+                                    indent, sortKey, tmpHtml, str_significance_subsup_html))
                 else:
                     tmp2 = tmp.split(".", 1)
                     if len(tmp2) < 2:
@@ -668,14 +673,13 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     else:
                         tmp2html = []
                         tmp2html.extend(tmp2)
-                    indent, tmp2[0], tmp2html[0] = td.prepend_succ_str(succ, tmp2[0], tmp2html[0])
-                    if dispersion and numpy.isfinite(data):
-                        tmp2[-1] += r"{{\ensuremath{{_{}^{}}}}}".format(
-                            *(td.ratio2tex(d / denom / data, signed=True)
-                            for d in dispersion))
+                    tmp2[0], tmp2html[0], indent = td.prepend_succ_str(succ, tmp2[0], tmp2html[0])
+                    if dispersion and numpy.isfinite(ert):  # data == ert / denom
+                        # dispersion [prctile] and ert are commensurable -> ratio is good
+                        tmp2[-1] += sform_subsup_tex.format(
+                            *(td.ratio2tex(d / ert, signed=True) for d in dispersion))
                         tmp2html[-1] += '&thinsp;' + td.html_subsup(*(td.ratio2html(
-                                    d / denom / data, signed=True)
-                                    for d in dispersion)) + ' '
+                                    d / ert, signed=True) for d in dispersion))
 
                     tmp2[-1] += str_significance_subsup
                     tmp2html[-1] += str_significance_subsup_html

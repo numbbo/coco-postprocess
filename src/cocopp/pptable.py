@@ -57,17 +57,16 @@ def get_table_caption():
         r"""%
         Expected runtime (\ERT\ in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""") divided by the \ERT\ of !!THE-REF-ALG!! in #1.
-        This \ERT\ ratio is preceeded by the success rate (if smaller .95, as
+        + r""") divided by the \ERT\ of !!THE-REF-ALG!! (when finite, shown along the function id) in #1.
+        This \ERT\ ratio is preceded by the success rate if smaller than .95 (as
         one-digit subscript) and accompanied by two relative dispersion
         measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
-        of !!BOOTSTRAPPED!! run lengths, appear in the second row of each cell,  
-        the best \ERT\
+        of !!BOOTSTRAPPED!! run lengths.
         """
     )
     table_caption_rlbased = (
         r"""%
-        in the first. The different target """
+        The different target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
         + r"""values are shown in the top row. 
         \#succ is the number of trials that reached the (final) target $!!FOPT!! 
@@ -76,9 +75,9 @@ def get_table_caption():
     )
     table_caption_fixedtargets = (
         r"""%
-        (preceded by the target """
+        The target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
-        + r"""value in \textit{italics}) in the first. 
+        + r"""value is given in the top row. 
         \#succ is the number of trials that reached the target value of the last column.
         """
     )
@@ -96,14 +95,14 @@ def get_table_caption():
         Expected runtime (\ERT) to reach given targets, measured
         in number of """
         + testbedsettings.current_testbed.string_evals
-        + r""" in #1. For each function, the \ERT,
-        is preceeded by the success rate (if smaller .95, as one-digit
+        + r""" in #1. The \ERT\
+        is preceded by the success rate if smaller than .95 (as one-digit
         subscript) and accompanied by two relative dispersion measures,
         indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
-        + r"""values as shown in the top row. 
+        + r"""values as given in the top row for each function.
         \#succ is the number of trials that reached the last target 
         $!!FOPT!! + !!HARDEST-TARGET-LATEX!!$.
         The median number of conducted evaluations is additionally given in 
@@ -352,6 +351,21 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                         if len(tmp) == 1:
                             tableentry += "&"
 
+                tableentry, tableentryHtml, indent = td.prepend_succ_str(
+                                succrate[i], tableentry, tableentryHtml)
+
+                if dispersion[i] and np.isfinite(ert):
+                    # subsup two dispersion numbers TODO: LaTeX format needs to be tested
+                    s = r'$_{{\,{}\,\,}}^{{\,{}}}$'.format(*(td.ratio2tex(d / ert, signed=True)
+                                             # normalization by refalgdata cancels
+                                             for d in dispersion[i]))
+                    if tableentry.endswith('}'):
+                        tableentry = tableentry[:-1] + s + r'}'
+                    else:
+                        tableentry += s
+                    tableentryHtml += '&thinsp;' + td.html_subsup(*(td.ratio2html(d / ert, signed=True)
+                          for d in dispersion[i]), endlower='&thinsp;&thinsp;')
+
                 superscript = ""
                 superscriptHtml = ""
 
@@ -380,20 +394,6 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                 # tableentry = tableentry[:-1] + s + r'}'
                 # else:
                 # tableentry += s
-
-                if dispersion[i] and np.isfinite(ert):
-                    s = r'$_{}^{}$'.format(*(td.ratio2tex(d / ert, signed=True)
-                                             # normalization by refalgdata cancels
-                                             for d in dispersion[i]))
-                    if tableentry.endswith('}'):
-                        tableentry = tableentry[:-1] + s + r'}'
-                    else:
-                        tableentry += s
-                    tableentryHtml += td.html_subsup(*(td.ratio2html(d / ert, signed=True)
-                          for d in dispersion[i]), end='&thinsp;&thinsp;')
-
-                indent, tableentry, tableentryHtml = td.prepend_succ_str(
-                                succrate[i], tableentry, tableentryHtml)
 
                 if superscript:
                     s = r"$^{" + superscript + r"}$"
