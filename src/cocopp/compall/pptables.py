@@ -607,7 +607,7 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 # continue
 
                 # write "raw" ERT when reference is inf:
-                if numpy.isfinite(ert) and refalgentries and numpy.isinf(refalgert[j]):
+                if numpy.isfinite(ert) and refalgentries and not numpy.isfinite(refalgert[j]):
                     tableentry = r"\textbf{%s}" % writeFEvalsMaxPrec(algerts[i][j], 2)
                     tableentryHtml = "<b>%s</b>" % writeFEvalsMaxPrec(algerts[i][j], 2)
                     tableentry, tableentryHtml, indent = td.prepend_succ_str(
@@ -618,7 +618,7 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                                             *(td.ratio2tex(d / ert) for d in dispersion))
                         tableentryHtml += '&thinsp;' + td.html_subsup(
                                             *(td.ratio2html(d / ert) for d in dispersion))
-                    curline.append(r"\multicolumn{2}{%s}{%s}%s" % (
+                    curline.append(r"\multicolumn{2}{%s}{%s%s}" % (  # fixed as above and in compall/pptables
                             alignment, tableentry, str_significance_subsup))
                     curlineHtml.append('<td %s sorttable_customkey="%f">%s%s</td>\n' % (
                         indent, algerts[i][j], tableentryHtml, str_significance_subsup_html))
