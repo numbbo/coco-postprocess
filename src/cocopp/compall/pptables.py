@@ -9,6 +9,8 @@ import os
 import sys
 import numpy
 
+from .. import toolsdivers as td
+
 from .. import genericsettings, bestalg, toolsstats, pproc, ppfigparam, testbedsettings, captions, ppfig
 from ..pptex import writeFEvals2, writeFEvalsMaxPrec, tableXLaTeX, numtotext
 from ..toolsstats import significance_all_best_vs_other, best_alg_indices
@@ -493,7 +495,7 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                 # write ftarget:fevals
                 counter = 1
                 for i in range(len(refalgert[:-1])):
-                    temp = "%.1e" % targets_of_interest((df[1], df[0]))[i]
+                    temp = td.num2str(targets_of_interest((df[1], df[0]))[i], 2)
                     if temp[-2] == "0":
                         temp = temp[:-2] + temp[-1]
                     curline.append(r"\multicolumn{2}{@{}c@{}}{\textit{%s}:%s \quad}" % (temp, writeFEvalsMaxPrec(refalgert[i], 2)))
@@ -501,7 +503,7 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
                     curlineHtml = [item.replace("REPLACE%d" % counter, replaceValue) for item in curlineHtml]
                     counter += 1
 
-                temp = "%.1e" % targets_of_interest((df[1], df[0]))[-1]
+                temp = td.num2str(targets_of_interest((df[1], df[0]))[-1], 2)
                 if temp[-2] == "0":
                     temp = temp[:-2] + temp[-1]
                 curline.append(r"\multicolumn{2}{@{}c@{}|}{\textit{%s}:%s }" % (temp, writeFEvalsMaxPrec(refalgert[-1], 2)))

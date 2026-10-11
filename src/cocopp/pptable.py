@@ -28,6 +28,7 @@ import warnings
 import numpy as np
 from . import genericsettings, bestalg, toolsstats, pproc
 from . import testbedsettings
+from . import toolsdivers as td
 from .pptex import tableLaTeX, writeFEvals2, writeFEvalsMaxPrec
 from .toolsstats import significancetest
 from .toolsdivers import prepend_to_file
@@ -187,12 +188,12 @@ def main(dsList, dims_of_interest, outputdir, latex_commands_file):
                 if isinstance(targetsOfInterest, pproc.RunlengthBasedTargetValues):
                     # write ftarget:fevals
                     for i in range(len(refalgdata[:-1])):
-                        temp = "%.1e" % targetsOfInterest((f, d))[i]
+                        temp = td.num2str(targetsOfInterest((f, d))[i], 2)
                         if temp[-2] == "0":
                             temp = temp[:-2] + temp[-1]
                         curline.append(r"\multicolumn{2}{@{}c@{}}{\textit{%s}:%s \quad}" % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
                         curlineHtml.append("<td><i>%s</i>:%s</td>\n" % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
-                    temp = "%.1e" % targetsOfInterest((f, d))[-1]
+                    temp = td.num2str(targetsOfInterest((f, d))[-1], 2)
                     if temp[-2] == "0":
                         temp = temp[:-2] + temp[-1]
                     curline.append(r"\multicolumn{2}{@{}c|@{}}{\textit{%s}:%s \quad}" % (temp, writeFEvalsMaxPrec(refalgdata[i], 2)))
