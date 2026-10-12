@@ -93,7 +93,12 @@ def usage():
 def main(argv=None):
     r"""Main routine for post-processing data from COCO.
 
-    Synopsis::
+    A comprensive package documentation can be found at
+    https://coco-platform.org
+
+    The following is somewhat outdated.
+
+    Synopsis from a system shell::
 
         python -m cocopp [data_folder [more_data_folders]]
 
@@ -117,22 +122,10 @@ def main(argv=None):
     case, for example, "bbob/.*7.*cma"  matches "bbob/2017/DTS-CMA-ES-Pitra.tgz"
     (among others).
 
-    This routine will:
-
-    * call sub-routine :py:func:`cocopp.rungeneric1.main` for one
-      input argument (see also --include-single option); the input
-      argument will be used as output sub-folder relative to the main
-      output folder,
-    * call sub-routine :py:func:`cocopp.rungenericmany.main`
-      (2 or more input arguments) for the input arguments altogether.
-    * alternatively call sub-routine :py:func:`cocopp.__main__.main` if option
-      flag --test is used. In this case it will run through the
-      post-processing tests.
-
     Usecase from a Python shell
     ---------------------------
     To fine-control the behavior of the module, it is highly recommended
-    to work from an (I)Python shell. For example::
+    to work from an (I)Python shell or notebook. For example::
 
         import cocopp
         cocopp.genericsettings.background = {None: cocopp.bbob.get_all("2009/")}
@@ -142,8 +135,8 @@ def main(argv=None):
     all archived results from 2009 in the background. `cocopp.bbob` is a
     `cocopp.archiving.COCODataArchive` class.
 
-    This may take 5-15 minutes to complete, because more than 30 algorithm
-    datasets are processed.
+    With the background algorithms, this may take 5-15 minutes to complete,
+    because more than 30 algorithm datasets are processed.
 
     Output
     ------
@@ -233,7 +226,6 @@ def main(argv=None):
             generated pdfs will have the fonts included (important for ACM style
             LaTeX submissions)
 
-
     Exceptions raised:
 
     *Usage* -- Gives back a usage message.
@@ -258,6 +250,18 @@ def main(argv=None):
     `DataSetList`. The ``-o`` option changes the output folder from the
     default :file:`ppdata` to :file:`outputfolder`. The arguments can
     also be presented as a list of strings.
+
+    Details: this routine will
+
+    * call sub-routine :py:func:`cocopp.rungeneric1.main` for one
+      input argument (see also --include-single option); the input
+      argument will be used as output sub-folder relative to the main
+      output folder,
+    * call sub-routine :py:func:`cocopp.rungenericmany.main`
+      (2 or more input arguments) for the input arguments altogether.
+    * alternatively call sub-routine :py:func:`cocopp.__main__.main` if option
+      flag --test is used. In this case it will run through the
+      post-processing tests.
 
     """
     # global shortoptlist

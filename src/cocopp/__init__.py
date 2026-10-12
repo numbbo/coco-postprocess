@@ -9,6 +9,9 @@ and for including into LaTeX-documents.
 The `cocopp.Interface` class contains the most basic commands and data of
 the package, sufficient for most use cases.
 
+A comprensive package documentation can be found at
+https://coco-platform.org
+
 >>> import cocopp
 >>> sorted(cocopp.Interface.dir())
 ['archives', 'config', 'genericsettings', 'load', 'main', 'remote_archives']
@@ -16,17 +19,17 @@ the package, sufficient for most use cases.
 True
 
 The main method of the `cocopp` package is `main` (currently aliased to
-`cocopp.rungeneric.main`). The `main` method also allows basic use of the
-post-processing through a command-line interface. The recommended use
-is however from an IPython/Jupyter shell:
+`cocopp.rungeneric.main`). While the `main` method allows basic use of the
+post-processing through a command-line interface, the recommended usage
+is from an IPython/Jupyter notebook shell:
 
 >>> import cocopp
 >>> cocopp.main('exdata/my_output another_folder yet_another_or_not')  # doctest:+SKIP
 
-postprocesses data from one or several folders, for example data
-generated with the help from the `cocoex` module. Each folder should
-contain data of a full experiment with a single algorithm. (Within the
-folder the data can be distributed over subfolders).
+postprocesses data from one or several folders, for example data generated with
+the `cocoex` module. Each folder should contain data of a full experiment with a
+single algorithm. Within this folder, the data can be distributed over any
+number and depth of subfolders.
 
 Results can be explored from the ``ppdata/index.html`` file, unless a
 a different output folder is specified with the ``-o`` option.
