@@ -59,8 +59,8 @@ def get_table_caption():
         + testbedsettings.current_testbed.string_evals
         + r""") divided by the \ERT\ of !!THE-REF-ALG!! (when finite, shown along the function id) in #1.
         This \ERT\ ratio is preceded by the success rate if smaller than .95 (as
-        one-digit subscript) and accompanied by two relative dispersion
-        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        one-digit subscript) and accompanied by two \emph{relative} dispersion
+        measures (additive in \% or multiplicative), indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! run lengths.
         """
     )
@@ -68,7 +68,7 @@ def get_table_caption():
         r"""%
         The different target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
-        + r"""values are shown in the top row. 
+        + r"""values are shown along the function id, follow by the measured \ERT\ of the reference algorithm. 
         \#succ is the number of trials that reached the (final) target $!!FOPT!! 
         + !!HARDEST-TARGET-LATEX!!$.
         """
@@ -97,7 +97,7 @@ def get_table_caption():
         + testbedsettings.current_testbed.string_evals
         + r""" in #1. The \ERT\
         is preceded by the success rate if smaller than .95 (as one-digit
-        subscript) and accompanied by two relative dispersion measures,
+        subscript) and accompanied by two \emph{relative} dispersion measures (additive in \% or multiplicative),
         indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """

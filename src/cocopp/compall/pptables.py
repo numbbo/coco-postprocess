@@ -20,7 +20,12 @@ from ..toolsdivers import str_to_latex, strip_pathname1, strip_pathname3, replac
 def get_table_caption():
     """Sets table caption.
 
-    Based on the testbedsettings.current_testbed
+    To make changes effective in html too, execute::
+
+        python scripts/preparehtml.py
+        cp scripts/latex_commands_for_html.html src/cocopp/latex_commands_for_html.html
+
+    Captions are based on the testbedsettings.current_testbed
     and genericsettings.runlength_based_targets.
     """
 
@@ -31,8 +36,8 @@ def get_table_caption():
         + r""") divided by the respective !!BEST-ERT!! (when finite, shown
         along the function id) in #1.
         This \ERT\ ratio is preceeded by the success rate, if smaller than .95 (as
-        one-digit subscript) and accompanied by two relative dispersion
-        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        one-digit subscript) and accompanied by two \emph{relative} dispersion
+        measures (additive in \% or multiplicative), indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! run lengths, and appears for each algorithm and 
         """
     )
@@ -43,8 +48,8 @@ def get_table_caption():
         + testbedsettings.current_testbed.string_evals
         + r""", in #1.
         The \ERT\ is preceeded by the success rate if smaller than .95 (as
-        one-digit subscript) and accompanied by two relative dispersion
-        measures, indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
+        one-digit subscript) and accompanied by two \emph{relative} dispersion
+        measures (additive in \% or multiplicative), indicating the 10\%-tile (subscript) and 90\%-tile (superscript)
         of !!BOOTSTRAPPED!! runtimes, and shown for the different
         target """
         + ("!!DF!!-" if not testbedsettings.current_testbed.has_constraints else "precision ")
@@ -65,8 +70,8 @@ def get_table_caption():
         """
     )
     table_caption_two2 = r"""%
-        run-length based target, the corresponding reference \ERT\
-        is given along the function id and preceded by the target !!DF!!-value (in \textit{italics}).
+        run-length based target. The corresponding measured reference \ERT,
+        shown along the function id, is preceded by the target !!DF!!-value (in \textit{italics}).
         \#succ is the number of trials that reached the target value of the last column.
         """
     table_caption_rest = (
