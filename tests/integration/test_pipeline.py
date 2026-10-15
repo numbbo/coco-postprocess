@@ -262,7 +262,7 @@ def test_output_is_deterministic(bbob_small, tmp_path):
 
 
 def test_main_twice_in_same_session(bbob_small, bbob_old_format, tmp_path):
-    """state must not leak between two calls in the same session (test.py subtest 19)"""
+    """state must not leak between two calls in the same session (subtest 19 of the former cocopp/test.py)"""
     import contextlib
     import io
     import warnings
