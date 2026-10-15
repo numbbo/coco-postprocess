@@ -21,7 +21,7 @@ authors = [
 ]
 description = "Benchmarking framework for all types of black-box optimization algorithms, postprocessing."
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.10"
 license = {text = "BSD-3-Clause"}
 classifiers = [
   "Development Status :: 4 - Beta",
