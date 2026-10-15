@@ -1209,6 +1209,8 @@ class DataSet(object):
         with an interface analogous to `detEvals`. Elements of the returned
         list correspond to the elements of `targets`.
 
+        TODO: return unsuccessful optionally as negative numbers instead of nan?
+
         `samplesize` is by default the smallest multiple of ``nbRuns()``
         that is not smaller than 45 and it remains the same even when
         instances are not uniform and hence simulated separately. If
@@ -1379,6 +1381,9 @@ class DataSet(object):
                 ssingle = int(np.round((ssum - len(res[t])) / (len(evals_dict) - count)))
                 if samplesize_ is None and instances_are_singular_:
                     assert len(evals) == 1, evals
+                    if evals[0] < 0:  # fixed in Oct 2026
+                        # res[t].extend([np.nan])  # should be an array?
+                        evals[0] = np.nan
                     res[t].extend(evals)
                 # if instances_multipliers_are_the_same but > 1, we
                 # would need all evals to be uniformely either finite
