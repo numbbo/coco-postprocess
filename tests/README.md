@@ -1,8 +1,7 @@
 # Tests for `cocopp`
 
 A pytest test suite meant as a safety net for restructuring the package.
-It complements (and does not yet replace) the legacy runner
-`python -m cocopp.test`.
+It replaces the former test runner `python -m cocopp.test`.
 
 ## Running
 
@@ -11,6 +10,8 @@ uv venv && uv pip install -e . pytest      # or: pip install -e . pytest
 pytest tests                               # everything except network tests, ~10 minutes
 pytest tests -m "not slow"                 # unit, module and smoke tests, ~1 minute
 pytest tests --run-network                 # also tests using the online data archives
+pytest tests/network --run-network -k "not legacy"   # as in CI: archives, doctests, former default tests
+python tests/run_doctests.py               # only the doctests (writes into the package folder!)
 pytest tests -n auto                       # in parallel, with pytest-xdist installed
 ```
 
@@ -22,7 +23,7 @@ pytest tests -n auto                       # in parallel, with pytest-xdist inst
 | `integration/` | the plotting and table modules called directly (`test_modules.py`) and the full pipeline `cocopp.main` on many scenarios (`test_pipeline.py`) |
 | `regression/` | golden-file snapshots of the complete text output of the pipeline |
 | `smoke/` | the command line entry points, run in subprocesses |
-| `network/` | the official online archives and the scenarios of the legacy `cocopp/test.py`, including its doctests |
+| `network/` | the official online archives, the doctests, and the scenarios of the former `cocopp/test.py` |
 
 Helpers:
 
@@ -35,6 +36,7 @@ Helpers:
 - `pipeline.py` runs `cocopp.main` in-process and defines the `SCENARIOS`
   shared by the integration and regression tests (each runs once per session).
 - `snapshots.py` takes, stores, compares and extracts output snapshots.
+- `run_doctests.py` runs the doctests of all package modules.
 
 ## Isolation and randomness
 

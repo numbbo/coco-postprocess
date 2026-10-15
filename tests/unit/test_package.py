@@ -21,7 +21,7 @@ ALL_MODULES = sorted(
 
 def test_module_list_is_complete():
     # if this fails, a module was added or removed: update the tests accordingly
-    assert len(ALL_MODULES) == 47
+    assert len(ALL_MODULES) == 46
     for name in ["cocopp.pproc", "cocopp.compall.pprldmany", "cocopp.comp2.ppscatter", "cocopp.rungeneric"]:
         assert name in ALL_MODULES
 

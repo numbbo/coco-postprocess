@@ -27,8 +27,9 @@ jobs:
       run: |
         python -m pip install --upgrade pip
         python -m pip install build
-    - name: Build source Python package
-      run: python -m build -s -o dist .
+    - name: Build source and wheel Python packages
+      # cocopp is pure python, hence a single py3-none-any wheel serves all Python versions
+      run: python -m build -o dist .
     - name: Publish release distributions to PyPI
       uses: pypa/gh-action-pypi-publish@release/v1
     - name: Release
