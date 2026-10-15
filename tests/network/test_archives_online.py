@@ -1,15 +1,16 @@
 """Tests that need the official online COCO data archives.
 
 These are skipped unless pytest is called with ``--run-network``. They
-port the scenarios of the legacy test runner ``python -m cocopp.test``
-(which is still used in CI) to pytest. Downloaded data are cached in
+contain the scenarios of the former test runner ``python -m cocopp.test``
+(``cocopp/test.py``), which they replace. Downloaded data are cached in
 the user's cocopp cache folder (as with any use of `cocopp.archives`).
 
-The full post-processing runs of the legacy "all" tests are additionally
-marked ``slow``.
+The full post-processing runs of the former "all" tests (named
+``test_legacy_*``) are additionally marked ``slow`` and are not run in CI.
 """
 
 import os
+import re
 import subprocess
 import sys
 
@@ -103,14 +104,14 @@ def test_postprocess_constrained_archive_by_url(tmp_path):
     ids=lambda a: a[:40],
 )
 def test_legacy_all_scenarios(args, tmp_path):
-    """the "all" scenarios (subtests 3-20) of the legacy ``python -m cocopp.test all``"""
+    """the "all" scenarios (subtests 3-20) of the former ``python -m cocopp.test all``"""
     run = _run_official(args, tmp_path)
     assert "ALL done" in run.stdout
 
 
 @pytest.mark.slow
 def test_legacy_main_twice_in_one_process(package_copy, tmp_path):
-    """legacy subtest 19: post-process archived data twice in the same python session"""
+    """former subtest 19: post-process archived data twice in the same python session"""
     script = "import cocopp; cocopp.main('--no-interactive slsqp!'); cocopp.main('--no-interactive abc*')"
     env = dict(os.environ, PYTHONPATH=str(package_copy.parent), MPLBACKEND="Agg")
     res = subprocess.run([sys.executable, "-c", script], cwd=str(tmp_path), env=env, capture_output=True, text=True, timeout=3600)
@@ -119,7 +120,7 @@ def test_legacy_main_twice_in_one_process(package_copy, tmp_path):
 
 
 def test_pickle_regression(quiet):
-    """legacy ``do_pickle_regression_test``: data read from a pickle file equal data read from the archive"""
+    """former ``do_pickle_regression_test``: data read from a pickle file equal data read from the archive"""
     name = cocopp.archives.all.get_extended("strained/2022/al3-cma")[0]
     dsl1 = pproc.get_DataSetList(name)
     if not pproc._pickle_file_read:
@@ -134,13 +135,15 @@ def test_pickle_regression(quiet):
     dsl2._is_same_list_assert(dsl1)
 
 
-@pytest.mark.slow
 def test_package_doctests(package_copy):
-    """run the doctests of all modules like ``python -m cocopp.test doctest`` (the CI does this)
+    """run the doctests of all modules with ``tests/run_doctests.py``
 
     The doctests run in the throw-away package copy because they change
     into the package folder and may write files there.
     """
+    runner = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), "run_doctests.py")
     env = dict(os.environ, PYTHONPATH=str(package_copy.parent), MPLBACKEND="Agg")
-    res = subprocess.run([sys.executable, "-m", "cocopp.test", "doctest"], cwd=str(package_copy.parent), env=env, capture_output=True, text=True, timeout=1800)
+    res = subprocess.run([sys.executable, runner], cwd=str(package_copy.parent), env=env, capture_output=True, text=True, timeout=1800)
     assert res.returncode == 0, res.stdout[-5000:] + res.stderr[-5000:]
+    summary = re.search(r"doctests: (\d+) of (\d+) examples failed", res.stdout)
+    assert summary and summary.group(1) == "0" and int(summary.group(2)) > 100, res.stdout[-2000:]

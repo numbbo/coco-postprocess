@@ -91,7 +91,7 @@ def test_cli_postprocess_two(run_python, bbob_small, bbob_small_b, tmp_path):
 
 @pytest.mark.slow
 def test_python_api_main_twice(run_python, bbob_small, bbob_old_format):
-    """corresponds to subtest 19 of the legacy ``cocopp/test.py``"""
+    """corresponds to subtest 19 of the former ``cocopp/test.py``"""
     script = "import cocopp; cocopp.main(%r); cocopp.main(%r)" % ("--no-interactive -o a " + bbob_small, "--no-interactive -o b " + bbob_old_format)
     res = run_python("-c", script)
     assert res.returncode == 0, res.stderr[-3000:]

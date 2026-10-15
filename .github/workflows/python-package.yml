@@ -20,14 +20,15 @@ jobs:
     - name: Install dependencies
       run: |
         python -m pip install --upgrade pip
-        python -m pip install ruff
+        python -m pip install ruff pytest
     - name: Lint with ruff
-      run: ruff check src
+      run: ruff check src tests
     - name: Install package
       run: pip install .
-    - name: Run doctests
-      run: python -m cocopp.test doctest  # takes about 5 seconds
     - name: Run tests
-      run: python -m cocopp.test  # takes about 5 minutes
-    # - name: Run all tests
-    #   run: python -m cocopp.test all  # takes about 30 minutes    
+      run: pytest tests  # offline, including the full pipeline and snapshot tests, takes about 10 minutes
+    - name: Run tests using the online data archives
+      # the doctests, the archives, and the former default scenarios of python -m cocopp.test
+      run: pytest tests/network --run-network -k "not legacy"
+    # - name: Run all tests using the online data archives
+    #   run: pytest tests/network --run-network  # takes about 30 minutes
