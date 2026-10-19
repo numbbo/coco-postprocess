@@ -80,8 +80,12 @@ def true_number_of_trials(ds):
 
 
 class DataWithFewSuccesses:
-    """The `all` property is an `OrderedDict` with all ``(dimension, funcId)``-
+    """This class is superseded by `cocoex.ExperimentRepeater` for its main usecase,
 
+    to continue experimenting on functions with low success rate until the
+    budget is exhausted.
+
+    The `all` property is an `OrderedDict` with all ``(dimension, funcId)``-
     tuples that have less than ``self.minsuccesses`` successes. The tuples
     are the `dict` keys, the values are the respective numbers for
     ``[evaluations, successes, trials]``, where evaluations are the average
@@ -213,10 +217,10 @@ class DataWithFewSuccesses:
 
     def print(self):
         """return a `str` with the number of data sets with too few successes"""
-        return "DataWithFewSuccesses: {}/{}".format(len(self.result), len(self.dsl))
+        return "DataWithFewSuccesses: {}/{}".format(len(self.result), len(self.dsl))  # TODO: .result does not exist, probably `.all` was meant!?
 
     def __len__(self):
-        return len(self.result)
+        return len(self.result)  # TODO: .result does not exist, probably `.all` was meant!?
 
 
 def load(filename):
