@@ -3000,6 +3000,8 @@ class DataSetList(list):
                         i.modsFromPickleVersion = True
 
                     for name in i.__dict__:  # was: dir(i) which catches all properties
+                        if name in ('dataFiles', 'indexFiles'):
+                            continue  # already done above
                         if isinstance(getattr(i, name), list):
                             getattr(i, name).extend(getattr(o, name))
 
