@@ -926,13 +926,13 @@ class COCODataArchive(_td.StrList):
             # allow to re-download data by tagging possibly outdated data
             self._redownload_if_changed = self.downloaded
         else:
-            print(
+            warnings.warn(
                 "This archive has no remote URL. If you intended to update the\n"
                 "definition file from the local data, call\n"
                 '    create("%s")\n'
-                "and\n"
+                "and then\n"
                 '    get("%s")\n'
-                "to get an updated instance." % (2 * [self.local_data_path])
+                "to get an updated instance." % tuple(2 * [self.local_data_path])
             )
         # update the definition list in this class
         # and the URL in the definition file:
