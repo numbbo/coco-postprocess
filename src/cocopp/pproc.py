@@ -3659,6 +3659,8 @@ class DataSetList(list):
         best_instances_lines = []
         for i in range(len(best_dicts)):
             vals = best_dicts[i].values()
+            # TODO np.sort(values()) is bound to fail,
+            # either np.sort(list(values)) or sorted(values()) ?
             best_instances_lines.append(np.sort(vals)[: np.min((number, len(vals)))])
 
         if any(line is None for line in best_lines):
