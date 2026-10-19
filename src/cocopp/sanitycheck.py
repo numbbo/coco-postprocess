@@ -152,6 +152,7 @@ def main(argv=None):
 
     try:
         try:
+            # TODO: shortoptlist is not global in rungeneric
             opts, args = getopt.getopt(argv, rungeneric.shortoptlist, rungeneric.longoptlist)
         except getopt.error as msg:
             raise Usage(msg)
