@@ -1031,13 +1031,14 @@ def sliding_window_data(data, width=2, operator=np.median, number_of_stats=0, on
     if width < 2:
         return (data, [])
     if width >= len(data):
-        warnings.warn("sliding window width %d should be smaller than " + "the number of data %d" % int(width), len(data))
+        warnings.warn("sliding window width %d should be smaller than "  # noqa: UP031
+                      "the number of data %d" % (int(width), len(data)))
     down = width // 2
     up = width // 2 + (width % 2)
     d = np.asarray(data)
     smoothened_data = []
     stats = []
-    stats_mod = len(d) // number_of_stats
+    stats_mod = len(d) // number_of_stats  # TODO: ZeroDivision bug!?
     i_last_stats = 0
     next = 0.1 + 1.8 * np.random.rand()
     for i in range(len(d)):
