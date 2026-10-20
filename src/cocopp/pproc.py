@@ -2654,6 +2654,7 @@ class DataSet(object):
         """
         if smallest_target > self.evals[0, 0]:
             raise ValueError("smallest_target=%f argument is larger than the largest recorded target %f" % (smallest_target, self.evals[0, 0]))
+        precision = self.precision if hasattr(self, 'precision') else smallest_target
         plot_kwargs.update(plot_formats)
         median_kwargs = dict(median_formats)
         plot_kwargs.setdefault("clip_on", False)  # doesn't help
@@ -2664,7 +2665,7 @@ class DataSet(object):
         #   iter(plt.cm.plasma(np.linspace(0, 0.7, self.nbRuns()))))
         median_kwargs.setdefault("color", plot_kwargs.get("color", "black"))
         # max_plotted_eval = np.nanmax(self.evals[:,1:])
-        final_evals = self.detEvals([np.max([self.precision, smallest_target])])[0]
+        final_evals = self.detEvals([np.max([precision, smallest_target])])[0]
         for i in self._argsort(smallest_target):  # ranges from 1 to nbRuns included
             evals = self.evals.T[i]  # i == 0 are the target values
             idx = np.logical_and(self.evals[:, 0] >= smallest_target, np.isfinite(evals))
@@ -2692,7 +2693,7 @@ class DataSet(object):
         plt.ylabel(r"$\Delta f$")
         plt.xlabel("function evaluations")
         plt.xlim(left=0.85)  # right=max(self.maxevals)
-        plt.ylim(bottom=smallest_target if smallest_target is not None else self.precision)
+        plt.ylim(bottom=smallest_target if smallest_target is not None else precision)
         plt.title("%s: F%d in dimension %d" % (self.algId[:33], self.funcId, self.dim))
         plt.grid(True)
         return plt.gca()  # not sure which makes most sense
