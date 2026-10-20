@@ -71,5 +71,6 @@ ignore = ['E401', 'E402',
 
 [dependency-groups]
 dev = [
+    "pytest>=9.1.1",
     "ruff>=0.14.3",
 ]

@@ -6,7 +6,7 @@ It replaces the former test runner `python -m cocopp.test`.
 ## Running
 
 ```sh
-uv venv && uv pip install -e . pytest      # or: pip install -e . pytest
+uv sync                                    # or: pip install -e . --group dev (pip >= 25.1)
 pytest tests                               # everything except network tests, ~10 minutes
 pytest tests -m "not slow"                 # unit, module and smoke tests, ~1 minute
 pytest tests --run-network                 # also tests using the online data archives
