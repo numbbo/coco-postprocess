@@ -110,7 +110,7 @@ def main(argv=None):
       to a location which is in the path)
 
     ``data_folder`` may be a name from the known data archive, see e.g.
-    `cocopp.bbob`, or a uniquely matching substring of such a name, or a
+    ``cocopp.bbob``, or a uniquely matching substring of such a name, or a
     matching substring with added "!" in which case the first match is taken, or
     a matching substring with added "*" in which case all matches are taken, or
     a regular expression containing a '*' before the last character, in which
@@ -138,8 +138,8 @@ def main(argv=None):
         cocopp.genericsettings.background = {None: cocopp.bbob.get_all("2009/")}
         cocopp.main("data_folder " + cocopp.data_archive.get("2009/BFGS_ros_noiseless"))
 
-    compares an experiment given in `"data_folder"` with BFGS and displays
-    all archived results from 2009 in the background. `cocopp.bbob` is a
+    compares an experiment given in ``"data_folder"`` with BFGS and displays
+    all archived results from 2009 in the background. ``cocopp.bbob`` is a
     `cocopp.archiving.COCODataArchive` class.
 
     This may take 5-15 minutes to complete, because more than 30 algorithm
@@ -149,15 +149,16 @@ def main(argv=None):
     ------
 
     The output figures and tables written by default to the output folder
-    :file:`ppdata` are used in the provided LaTeX templates:
+    ``ppdata`` are used in the provided LaTeX templates:
 
-    * :file:`*article.tex` and :file:`*1*.tex`
+    * ``*article.tex`` and ``*1*.tex``
       for results with a **single** algorithm
-    * :file:`*cmp.tex` and :file:`*2*.tex`
+    * ``*cmp.tex`` and ``*2*.tex``
       for showing the comparison of **2** algorithms
-    * :file:`*many.tex` and :file:`*3*.tex`
+    * ``*many.tex`` and ``*3*.tex``
       for showing the comparison of **more than 2** algorithms.
-    The templates with `noisy` mentioned in the filename have to be used
+
+    The templates with ``noisy`` mentioned in the filename have to be used
     for the noisy testbed, the others for the noise-less one.
 
     These latex templates need to be copied in the current working directory
@@ -173,65 +174,53 @@ def main(argv=None):
     *argv* must list folders containing COCO data files. Each of these
     folders should correspond to the data of ONE algorithm.
 
-    Furthermore, argv can begin with facultative option flags.
+    Furthermore, argv can begin with facultative option flags:
 
-        -h, --help
+    ``-h, --help``
+        displays this message.
 
-            displays this message.
+    ``-v, --verbose``
+        verbose mode, prints out operations.
 
-        -v, --verbose
+    ``-o, --output-dir=OUTPUTDIR``
+        changes the default output directory (``ppdata``) to
+        ``OUTPUTDIR``.
 
-            verbose mode, prints out operations.
+    ``--include-single``
+        calls the postprocessing and in particular
+        :py:func:`cocopp.rungeneric1.main` on each of the
+        single input arguments separately.
 
-        -o, --output-dir=OUTPUTDIR
+    ``--no-rld-single-fcts``
+        do not generate runlength distribution figures for each
+        single function.
 
-            changes the default output directory (:file:`ppdata`) to
-            :file:`OUTPUTDIR`.
+    ``--input-path=INPUTPATH``
+        all folder/file arguments are prepended with the given value
+        which must be a valid path.
 
-        --include-single
+    ``--parameter-sweep``
+        if given, parse the algorithm name for a float and use the
+        value to determine the color order in a colormap.
 
-            calls the postprocessing and in particular
-            :py:func:`cocopp.rungeneric1.main` on each of the
-            single input arguments separately.
+    ``--parameter-sweep-colormaps=colormaps``
+        ``colormaps`` can, for example, be ``plasma.0.9,viridis``
+        indicating (here two) map names separated by commata and
+        optionally the range for each map.
 
-        --no-rld-single-fcts
+    ``--in-a-hurry``
+        takes values between 0 (default) and 1000, fast processing that
+        does not write eps files and uses a small number of bootstrap samples
 
-            do not generate runlength distribution figures for each
-            single function.
+    ``--no-svg``
+        do not generate the svg figures which are used in html files
 
-        --input-path=INPUTPATH
+    ``--conv``
+        prepares also convergence plots with median function values over time
 
-            all folder/file arguments are prepended with the given value
-            which must be a valid path.
-
-        --parameter-sweep
-
-            if given, parse the algorithm name for a float and use the
-            value to determine the color order in a colormap.
-
-        --parameter-sweep-colormaps=colormaps
-
-            `colormaps` can, for example, be ``plasma.0.9,viridis``
-            indicating (here two) map names separated by commata and
-            optionally the range for each map.
-
-        --in-a-hurry
-
-            takes values between 0 (default) and 1000, fast processing that
-            does not write eps files and uses a small number of bootstrap samples
-
-        --no-svg
-
-            do not generate the svg figures which are used in html files
-
-        --conv
-
-            prepares also convergence plots with median function values over time
-
-        --include-fonts
-
-            generated pdfs will have the fonts included (important for ACM style
-            LaTeX submissions)
+    ``--include-fonts``
+        generated pdfs will have the fonts included (important for ACM style
+        LaTeX submissions)
 
 
     Exceptions raised:
@@ -254,9 +243,9 @@ def main(argv=None):
         >> cocopp.main('-o outputfolder folder1 folder2')
 
     This will execute the post-processing on the data found in
-    :file:`folder1` and :file:`folder2` and return the respective
+    ``folder1`` and ``folder2`` and return the respective
     `DataSetList`. The ``-o`` option changes the output folder from the
-    default :file:`ppdata` to :file:`outputfolder`. The arguments can
+    default ``ppdata`` to ``outputfolder``. The arguments can
     also be presented as a list of strings.
 
     """

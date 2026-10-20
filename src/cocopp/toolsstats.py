@@ -617,7 +617,7 @@ def zprob(z):
         - for z>0, 1.0-zprob(z) = 1-tail probability
         - for any z, 2.0*(1.0-zprob(abs(z))) = 2-tail probability
 
-    Adapted from z.c in Gary Perlman's |Stat.  Can handle multiple dimensions.
+    Adapted from z.c in Gary Perlman's ``|Stat``.  Can handle multiple dimensions.
 
     Usage:   azprob(z)    where z is a z-value
 
@@ -1069,7 +1069,7 @@ def equals_approximately(a, b, abs=1e-11, rel=1e-11):
 
 def in_approximately(a, list_, abs=1e-11, rel=1e-11):
     """return True if ``a`` equals approximately any of the elements
-    in ``list_``, in short
+    in ``list_``, in short::
 
         return any([equals_approximately(a, b) for b in list_])
 

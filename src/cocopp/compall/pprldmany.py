@@ -15,8 +15,7 @@ function evaluations of unsuccessful runs divided by dimension.
 
 **Example**
 
-.. plot::
-    :width: 50%
+::
 
     import cocopp
 

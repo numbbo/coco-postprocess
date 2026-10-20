@@ -591,7 +591,7 @@ def custom_generate(args=algs2009, algId="bestCustomAlg", suite=None):
     of the same name.
 
     This method is called from the python command line from a directory
-    containing all necessary data folders::
+    containing all necessary data folders:
 
     >>> import cocopp
     >>> def print_(*args, **kwargs): pass
@@ -787,11 +787,12 @@ def getAllContributingAlgorithmsToBest(algnamelist, target_lb=1e-8, target_ub=1e
 def extractBestAlgorithms(args=algs2009, f_factor=2, target_lb=1e-8, target_ub=1e22):
     """Returns (and prints) per dimension a list of algorithms within
     algorithm list args that contains an algorithm if for any
-        dimension/target/function pair this algorithm:
-        - is the best algorithm wrt ERT
-        - its own ERT lies within a factor f_factor of the best ERT
-        - there is no algorithm within a factor of f_factor of the best ERT
-          and the current algorithm is the second best.
+    dimension/target/function pair this algorithm:
+
+    - is the best algorithm wrt ERT
+    - its own ERT lies within a factor f_factor of the best ERT
+    - there is no algorithm within a factor of f_factor of the best ERT
+      and the current algorithm is the second best.
 
     """
 

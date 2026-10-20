@@ -22,7 +22,7 @@ A second argument may contain a `tuple` or `list` of the functions names
 applied to the files, by default ``("reduce_dat", "reduce_tdat",
 "remove_x")``.
 
-Under a *nix shell, the result can then be check with ``du -sh *``.
+Under a ``*nix`` shell, the result can then be check with ``du -sh *``.
 
 Details: this script removes lines in the data files which are not needed
 with `cocopp.main`. Comment lines starting with ``#`` or ``%`` are

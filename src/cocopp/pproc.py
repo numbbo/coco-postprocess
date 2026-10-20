@@ -191,10 +191,13 @@ class TargetValues(object):
 
     @staticmethod
     def cast(target_values_or_class_instance, *args, **kwargs):
-        """idempotent cast to ``TargetValues`` class type, specifically
-        ``return TargetValues(target_values_or_class_instance)
-            if not isinstance(target_values_or_class_instance, TargetValues)
-            else target_values_or_class_instance``
+        """idempotent cast to ``TargetValues`` class type.
+
+        Specifically, this is::
+
+            return (TargetValues(target_values_or_class_instance)
+                    if not isinstance(target_values_or_class_instance, TargetValues)
+                    else target_values_or_class_instance)
 
         """
         if isinstance(target_values_or_class_instance, TargetValues):
@@ -727,6 +730,7 @@ class DataSet(object):
         Note that the load of a data set depends on the set of instances
         specified in testbedsettings' TestBed class (or its children)
         (None means all instances are read in):
+
         >>> import sys
         >>> import os
         >>> import urllib
@@ -3891,7 +3895,7 @@ def processInputArgs(args, process_background_algorithms=False):
     corresponds to one algorithm.
 
     It is recommended that if a folder listed in args contain both
-    :file:`info` files and the associated :file:`pickle` files, they be
+    ``info`` files and the associated ``pickle`` files, they be
     kept in different locations for efficiency reasons.
 
     :keyword list args: string arguments for folder names
