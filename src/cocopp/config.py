@@ -172,6 +172,11 @@ def config_line_styles():
     ``input_position``.
 
     TODO: we may want to keep the original symbol colors?
+
+    TODO: `config_line_styles` fails when filenames do not contain a float,
+    probably due to the `_index_after_float` computation in
+    `map_indices_to_line_styles` or `sorted_line_styles`.
+
     """
     if not settings.parameter_sweep:
         return
@@ -184,7 +189,8 @@ def config_line_styles():
             cvals = s.split(",")
         else:
             warnings.warn(
-                "{0} doesn't conform with any ``matplotlib.colormaps()={1}``Hence we use the default {2}".format(
+                "{0} doesn't conform with any ``matplotlib.colormaps()={1}``."
+                " Hence we use the default {2}".format(
                     s, plt.colormaps(), settings.sequential_colormaps
                 )
             )
