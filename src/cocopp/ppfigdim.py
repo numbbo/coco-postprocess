@@ -27,8 +27,7 @@ target (if in the expensive/runlength-based targets setting).
 
 **Example**
 
-.. plot::
-    :width: 50%
+::
 
     import urllib
     import tarfile

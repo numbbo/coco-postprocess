@@ -5,8 +5,7 @@
 
 **Example**
 
-.. plot::
-   :width: 75%
+::
 
    import urllib
    import tarfile

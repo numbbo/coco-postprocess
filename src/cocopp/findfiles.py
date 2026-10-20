@@ -1,11 +1,11 @@
 #! /usr/bin/env python
 # -*- coding: utf-8 -*-
 
-"""Recursively find :file:`info` and zipped files within a directory and
+"""Recursively find ``info`` and zipped files within a directory and
 administer archives.
 
 This module can be called from the shell, it will recursively look for
-:file:`info` and :file:`pickle` files in the current working directory::
+``info`` and ``pickle`` files in the current working directory::
 
   $ python -c "from cocopp.findfiles import main; print(main())"
 
@@ -50,7 +50,7 @@ def main(directory="."):
     """Lists "data" files recursively in a given directory, tar files
     are extracted.
 
-    The "data" files have :file:`info` and :file:`pickle` extensions.
+    The "data" files have ``info`` and ``pickle`` extensions.
 
     TODO: not only recognize .tar and .tar.gz and .tgz but .zip...
 

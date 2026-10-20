@@ -11,8 +11,7 @@ functions.
 
 **Example:**
 
-.. plot::
-   :width: 75%
+::
 
    import glob
    from pylab import *

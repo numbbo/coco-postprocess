@@ -222,9 +222,9 @@ class DataWithFewSuccesses:
 def load(filename):
     """[currently broken when further used within `cocopp`, see `load2`] Create a :py:class:`DataSetList` instance from a file or folder.
 
-    Input argument filename can be a single :file:`info` file name, a
+    Input argument filename can be a single ``info`` file name, a
     single pickle filename or a folder name. In the latter case, the
-    folder is browsed recursively for :file:`info` or :file:`pickle`
+    folder is browsed recursively for ``info`` or ``pickle``
     files.
 
     Details: due to newly implemented side effects when data are read in,
@@ -251,8 +251,7 @@ def load2(args, keep=None, remove=None, flat_list=None):
     and `args` describes a single algorithm/experiment, return otherwise a
     `dict` of `dict` with dimension and pathname as keys, respectively.
 
-    Examples:
-    ::
+    Examples::
 
         # Get a single `DataSet`, here for F1 in 20-D
         >> ds = cocopp.load2('nelder!').by('dim')[20].by('funcId')[1][0]

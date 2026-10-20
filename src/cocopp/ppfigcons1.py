@@ -2,13 +2,16 @@
 # -*- coding: utf-8 -*-
 
 """Generate performance scaling figures wrt constraints.
+
 See also:
-    - ppfigdim for the unconstrained case
-    - compall/ppfigcons for the same plot but with a single target and 2 or more algorithms
+
+- ppfigdim for the unconstrained case
+- compall/ppfigcons for the same plot but with a single target and 2 or more algorithms
 
 TODOs:
-    - add legend: on first figure ?
-    - review the caption and html caption
+
+- add legend: on first figure ?
+- review the caption and html caption
 """
 
 from __future__ import absolute_import

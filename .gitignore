@@ -20,3 +20,4 @@ src/cocopp/**/*.info
 dist/
 ppdata/uv.lock
 uv.lock
+docs/

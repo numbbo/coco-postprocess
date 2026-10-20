@@ -5,7 +5,7 @@
 
 Calls the function main with arguments from the command line. Executes
 the postprocessing on the given files and folders arguments, using the
-:file:`.info` files found recursively.
+``.info`` files found recursively.
 
 Synopsis:
     ``python -m cocopp.rungeneric1 [OPTIONS] FOLDER``

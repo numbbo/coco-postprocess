@@ -647,6 +647,7 @@ def consecutiveNumbers(data, prefix=""):
     If the prefix is set then the it's placed before each number.
 
     Example::
+
       >>> import os
       >>> import cocopp
       >>> returnpath = os.getcwd()  # needed for no effect on other doctests

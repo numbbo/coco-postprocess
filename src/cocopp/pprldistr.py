@@ -15,8 +15,7 @@ function evaluations.
 
 **Example**
 
-.. plot::
-   :width: 75%
+::
 
    import urllib
    import tarfile
@@ -519,8 +518,9 @@ def plotRLDistr(dsList, target, label="", max_fun_evals=np.inf, **plotArgs):
     ``class pproc.TargetValues`` (see the ``pproc.TargetValues.__call__`` method).
 
     TODO: data generation and plotting should be in separate methods
+
     TODO: different number of runs/data biases the results, shouldn't
-          the number of data made the same, in case?
+    the number of data made the same, in case?
 
     """
     x = []
