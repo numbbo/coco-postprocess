@@ -668,6 +668,7 @@ class DataSet(object):
         instancenumbers_balanced
         isBiobjective
         isFinalized
+        keep_instances
         mMaxEvals
         max_eval
         maxevals
@@ -764,9 +765,8 @@ class DataSet(object):
         >>> cocopp.testbedsettings.GECCOBBOBTestbed.settings['instancesOfInterest'] = None
         >>> cocopp.config.config('bbob') # make sure that settings are used
 
-    """
-
-    # TODO: unit element of the post-processing: one algorithm, one problem
+"""
+    # TODO: unit element of the post-processing: one algorithm, one function instance
     # TODO: if this class was to evolve, how do we make previous data
     # compatible?
 
@@ -1165,6 +1165,96 @@ class DataSet(object):
         assert self.evals.shape[1] - 1 == len(self.maxevals), self
         return is_consistent
 
+    def keep_instances(self, instance_ids):
+        """keep only instances with id in `instance_ids`,
+
+        return list of deleted instance ids.
+        """
+        dropped = []
+        for i in self.instancenumbers:
+            if i not in instance_ids:
+                self.delete_instance(i)
+                dropped.append(i)
+        return dropped
+    def delete_instance(self, instance_number):
+        """Remove all runs with id `instance_number`.
+
+        Fix (hopefully) all related attributes, that is, drop the respective
+        values in lists or arrays.
+        """
+        ds_attrs = [  # tuple, list or vector attributes to be modified
+            "instancenumbers",
+            "_instance_multipliers",
+            "_instance_multipliers_instancenumbers",
+            "_lasttdatfilelines",
+            "_maxevals",
+            "_ert_nb_of_data",  # should not matter
+            "finalfunvals",
+            "readmaxevals",
+            "readfinalFminusFtarget",
+            "isFinalized",
+        ]
+
+        def delete_index(arr, index):
+            if isinstance(arr, np.ndarray):
+                return np.delete(arr, index)
+            if isinstance(arr, list):
+                del arr[index]
+                return arr
+            return type(arr)(v for i, v in enumerate(arr) if i != index)
+
+        ds = self
+        while instance_number in ds.instancenumbers:
+            if len(set(ds.instancenumbers)) == 1:
+                warnings.warn("Not deleting the last {} with id {}.\n"
+                              "To keep all instances being displayed, set\n"
+                              "  cocopp.genericsettings.use_only_common_instances = False\n"
+                              .format(f"{len(ds.instancenumbers)} instances"
+                                      if len(ds.instancenumbers) > 1 else "instance",
+                                      ds.instancenumbers[0]))
+                break
+            col = ds.instancenumbers.index(instance_number)
+            n_runs = len(ds.instancenumbers)
+
+            # _evals_appended, _maxevals_appended are abandoned!?
+
+            for name in ds_attrs:
+                if name not in vars(ds):
+                    warnings.warn(f'attribute {name} not found in {ds}')
+                    continue
+
+                arr = vars(ds)[name]
+                try:
+                    if len(arr) != n_runs:
+                        warnings.warn(f'len({name}) = {len(arr)} instead of {n_runs} ')
+                        continue
+                except TypeError:
+                    warnings.warn(f'attribute {name} = {arr} not indexable and hence skipped in {str(ds)}')
+                    continue
+
+                # print(name)
+                vars(ds)[name] = delete_index(arr, col)
+
+            # evals/funvals: column 0 is the alignment axis; columns 1..n are run records.
+            for name in ("_evals", "funvals"):
+                if name not in vars(ds):
+                    warnings.warn(f'attribute {name} not found in {ds}')
+                    continue
+
+                arr = vars(ds)[name]
+                if getattr(arr, "ndim", None) == 2 and arr.shape[1] == n_runs + 1:
+                    keep = np.ones(arr.shape[1], dtype=bool)
+                    keep[col + 1] = False
+                    vars(ds)[name] = arr[:, keep]
+                else:
+                    warnings.warn(f'column {col} in matrix attribute {name} = {arr} could not be deleted')
+
+            if hasattr(ds, '_evals_balanced'):
+                delattr(ds, '_evals_balanced')
+                ds._update_evals_balanced()
+
+            ds.computeERTfromEvals()
+    
     def computeERTfromEvals(self):
         """Sets the attributes ert and target from the attribute evals."""
         if isinstance(self.maxevals, dict):
@@ -3059,6 +3149,27 @@ class DataSetList(list):
             print("  {0} DataSets removed".format(len(removed)))
         if verbose in [2, 3]:
             return removed
+
+    @property
+    def common_instances(self):
+        """set of instances common to all DataSets in the list"""
+        s = set(self[0].instancenumbers)
+        for ds in self:
+            s.intersection_update(ds.instancenumbers)
+        return s
+    def delete_not_common_instances(self):
+        """delete not-common instances such that data sets have the same instances"""
+        common_instances = self.common_instances
+        if not common_instances:
+            warnings.warn('There are no common instances, all instances are kept')
+            self._deleted_instances_list = []
+            return
+        dropped = []
+        for ds in self:
+            dropped += ds.keep_instances(common_instances)
+        self._deleted_instances_list = dropped  # for the record or debugging
+        if genericsettings.warning_level >= 15:
+            print(f'deleted instances {dropped}')
 
     def remove_if(self, condition):
         """discard DataSets for which ``condition(self[i])`` is true.

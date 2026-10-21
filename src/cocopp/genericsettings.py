@@ -71,6 +71,11 @@ filter_data_condition = None
    functions of the 'bbob' testbed, set ``filter_data_condition = lambda
    ds: ds.funcId in [1, 2,] + list(range(5, 15))``"""
 
+use_only_common_instances = None
+"""If `True`, not-common instances are removed such that the set of instance ids
+   is the same for all data sets. By default, when ``use_only_common_instances
+   is None``, this is the case iff `current_testbed.instances_are_uniform`"""
+
 xlimit_pprldmany = 1e7
 """maximal run length multiplier used in `pprldmany`.
 
