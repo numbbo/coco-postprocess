@@ -2239,10 +2239,12 @@ class DataSet(object):
 
         Details: portfolio datasets can have rows with different lengths.
         Otherwise, the number of columns in ``evals`` depends on
-        `genericsettings.balance_instances`. The instance number on which
-        the first ``len(instancenumbers)`` trials were conducted are given
-        in the `instancenumbers` array. Further columns of `evals` are
-        generated according to `instance_multipliers`.
+        `genericsettings.balance_instances`. The instance number on which the
+        first ``len(instancenumbers)`` trials were conducted are given in the
+        `instancenumbers` array. Further columns of `evals` are generated
+        according to `instance_multipliers`. How experiments are conducted as of
+        2024, a DataSet has the same number of repetitions per instance, hence
+        balancing is not needed (anymore).
         """
         if self._need_balancing:
             self._update_evals_balanced()
@@ -2438,11 +2440,13 @@ class DataSet(object):
         return plt.gca()
 
     def median_evals(self, target_values=None, append_instances=True):
-        """DEPRECATED: use rather ``.percentiles(targets, 50)`` which applies
-        simulated restarts, within-instance only when instances are not
-        uniform, instead of appending runs with the same instance number.
-        Otherwise, ``ds.median_evals(targets, append_instances=False)`` can
-        be recovered like ``np.median(ds.detEvals(targets), 1)``.
+        """DEPRECATED: use rather ``.percentiles(targets, 50)`` or 
+        
+        ``np.median(ds.detEvals(targets, complement_unsuccessful=np.inf), 1)``
+        instead of ``ds.median_evals(targets, append_instances=False)``.
+        `.percentiles` applies simulated restarts, within-instance only when
+        instances are not uniform, instead of appending runs with the same
+        instance number.
 
         return median for each row in `self.evals`, unsuccessful runs count.
 
@@ -2476,7 +2480,8 @@ class DataSet(object):
         m[~np.isfinite(m)] = np.nan
         return m
 
-    def percentiles(self, target_values, prctiles=(5, 25, 50, 75, 95), instances_are_uniform=None):
+    def percentiles(self, target_values, prctiles=(5, 25, 50, 75, 95),
+                    instances_are_uniform=None):
         """return the evaluations percentiles for each target in `target_values`.
 
         Unsuccessful runs are indicated with `np.nan` and always sorted to
