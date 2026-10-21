@@ -112,13 +112,19 @@ def main(args, outputdir):
     # filter data set lists to be compliant with all suites
     dsList = DataSetList(testbedsettings.current_testbed.filter(dsList))
     dsList.filter(genericsettings.filter_data_condition)  # after the above filter to prevent unnecessary warnings
+    if genericsettings.use_only_common_instances or (
+        genericsettings.use_only_common_instances is None and
+        not testbedsettings.current_testbed.instances_are_uniform):
+        dsList.delete_not_common_instances()
+
     dictAlg = dsList.dictByAlgName()
     print_done()
 
     config.config()  # make sure that the filtered settings are taken into account
 
     if not dsList:
-        sys.exit()
+        print('No data found (or remains)!')
+        return DataSetList().dictByAlg()
 
     algorithm_folder = findfiles.get_output_directory_sub_folder(genericsettings.foreground_algorithm_list)
     prepend_to_file(latex_commands_file, ["\\providecommand{\\algsfolder}{" + algorithm_folder + "/}"])
