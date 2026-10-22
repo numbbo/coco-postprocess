@@ -111,7 +111,7 @@ def main(argv=None):
 
         if not args:
             usage()
-            sys.exit()
+            return
 
         matplotlib.use("Agg")  # To avoid window popup and use without X forwarding
 
@@ -138,7 +138,7 @@ def main(argv=None):
         for o, a in opts:
             if o in ("-h", "--help"):
                 usage()
-                sys.exit()
+                return
             elif o in ("-o", "--output-dir"):
                 outputdir = a.strip()  # like this ["-o folder"] + ... works as input
             elif o in ("--in-a-hurry",):

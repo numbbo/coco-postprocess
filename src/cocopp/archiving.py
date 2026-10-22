@@ -1236,13 +1236,27 @@ class OfficialArchives(object):
     A Quick Guide
     -------------
 
-    **1) To list all available data**:
+    **0) List all suites from the official archive**:
 
     >>> import cocopp
+    >>> list(vars(cocopp.archives))  # doctest:+SKIP
+    ['all',
+    '_base',
+    '_list',
+    'bbob',
+    'bbob_noisy',
+    'bbob_biobj',
+    'bbob_largescale',
+    'bbob_mixint',
+    'bbob_constrained',
+    'bbob_boxed']
+
+    **1) List all available data**:
+
     >>> cocopp.archives.all  # doctest:+ELLIPSIS,+SKIP,
     ['bbob/2009/AL...
 
-    **2) To see all available data from a given test suite**:
+    **2) See all available data from a given test suite**:
 
     >>> cocopp.archives.bbob  # doctest:+ELLIPSIS,+SKIP,
     ['2009/ALPS...
