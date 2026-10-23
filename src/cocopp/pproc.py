@@ -1188,7 +1188,7 @@ class DataSet(object):
             "_instance_multipliers_instancenumbers",
             "_lasttdatfilelines",
             "_maxevals",
-            "_ert_nb_of_data",  # should not matter
+            # "_ert_nb_of_data",  # may not be present and overwritten by computeERTfromEvals
             "finalfunvals",
             "readmaxevals",
             "readfinalFminusFtarget",
