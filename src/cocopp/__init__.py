@@ -75,7 +75,7 @@ def main(argv=None):
 
         python -c "import cocopp; cocopp.main('data_folder [more_data_folders]')"
 
-    or, as recommanded, from an IPython/Jupyter notebook shell, like
+    or, as recommended, from an IPython/Jupyter notebook shell, like
 
     >>> import cocopp
     >>> cocopp.main('exdata/my_output another_folder yet_another_or_not')  # doctest:+SKIP
@@ -83,7 +83,7 @@ def main(argv=None):
     which allows to better fine control settings and further investigate the
     returned data list, see also below.
 
-    Here ``data_folder`` is either a folder name containing experiment data,ef
+    Here ``data_folder`` is either a folder name containing experiment data,
     for example data generated with the `cocoex` module, usually into the
     `exdata` folder. Each folder should contain data of a single full experiment
     with a single algorithm. Within this folder, the data can be distributed
@@ -106,8 +106,8 @@ def main(argv=None):
     different output folder was specified with the ``-o`` option. By default, a
     browser opens to navigate the results.
 
-    CAVEAT: when running `main` or `load` repeatedly on data sets _from
-    different suites,_ the routine may bail out. Running
+    CAVEAT: when running `main` or `load` repeatedly on data sets *from
+    different suites*, the routine may bail out. Running
     ``cocopp.config.config()`` may solve the problem, however sometimes a
     restart of Python is necessary.
 
@@ -132,8 +132,8 @@ def main(argv=None):
     ``--budget-based`` or ``--runlength-based``
         Use budget-based target values for budgets between D/2 and 50xD
         evaluations (see ``genericsettings.target_runlength*``) and based on a
-        reference algorithm, by default best2009-bbob, best2009bbob-noisy,
-        best2016-bbob-biobj, best2019-bbob-largescale.
+        reference algorithm, by default ``best2009-bbob, best2009bbob-noisy,
+        best2016-bbob-biobj, best2019-bbob-largescale``.
 
     ``--expensive``
         Use budget-based targets and adapt xlim to data with low budgets.

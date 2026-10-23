@@ -3,11 +3,11 @@
 
 """This module contains some global variables settings for COCO.
 
-These variables may be modified (in particular in rungeneric1, -2, and
+These variables may be modified (in particular in rungeneric1, 2, and
 -many) and are used for producing figures and tables.
 
 For setting variables dynamically or changing other module settings
-here see `config.py`.
+here see `cocopp.config`.
 
 """
 
@@ -298,7 +298,7 @@ isRLDistr = True
 # background = {('#d8d8d8', '-'): ['data/BFGS_ros_noiseless.tgz'], ('#f88017', ':'): ['data/NEWUOA_ros_noiseless.tgz', 'data/RANDOMSEARCH_auger_noiseless.tgz']}
 background = {}
 """algorithms to shown for comparison "in the background".
-   Usage: `` background = {(color, linestyle): [path_to_data1, path_to_data2, ...], }``
+   Usage: ``background = {(color, linestyle): [path_to_data1, path_to_data2, ...], }``
    Examples: ``background = {None: cocopp.archives.bbob.get_all('2009/')}`` for all algorithms benchmarked in 2009 on the bbob test suite show with default line style, or
    ``background = {None: cocopp.archives.bbob_mixint.get_all('')}`` for all algorithms
    benchmarked on the bbob-mixint test suite."""
