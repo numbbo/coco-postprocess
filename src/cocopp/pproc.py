@@ -1250,7 +1250,7 @@ class DataSet(object):
                     warnings.warn(f'column {col} in matrix attribute {name} = {arr} could not be deleted')
 
             if hasattr(ds, '_evals_balanced'):
-                delattr(ds, '_evals_balanced')
+                del ds._evals_balanced
                 ds._update_evals_balanced()
 
             ds.computeERTfromEvals()
@@ -1657,10 +1657,11 @@ class DataSet(object):
         Depending on `genericsettings.balance_instances`, the average is
         weighted to make up for unbalanced problem instance occurances.
         """
-        if not isinstance(self.maxevals, dict) and (  # bestalg DataSets have correctly computed _ert
-            not hasattr(self, "_ert_nb_of_data")  # evals may contain column copies for balancing
-            or set((self._ert_nb_of_data, len(self.evals[0]) - 1, len(self.maxevals))).__len__() > 1
-        ):
+        if isinstance(self.maxevals, dict):
+            return self._ert  # bestalg DataSets have correctly computed _ert
+        if not hasattr(self, "_ert_nb_of_data") or not (
+                             # evals may contain column copies for balancing
+                self._ert_nb_of_data == len(self.evals[0]) - 1 == len(self.maxevals)):
             self.computeERTfromEvals()
         return self._ert
 

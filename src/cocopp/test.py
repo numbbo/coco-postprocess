@@ -1,11 +1,12 @@
 #!/usr/bin/env python
-"""Tests the cocopp module.
-::
+"""Tests the `cocopp` module.
+
+On a shell::
+
     python -m cocopp.test doctest
 
-runs only the doctests (which is quick).
+runs the doctests (which is quick) and::
 
-::
     python -m cocopp.test all
 
 runs also the most extensive tests.
