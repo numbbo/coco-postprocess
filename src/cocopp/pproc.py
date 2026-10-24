@@ -954,12 +954,22 @@ class DataSet(object):
             print("%s" % self.__repr__())
 
         # Treat successively the data in dat and tdat files:
-        # put into variable dataFiles the files where to look for data
-        # this should not be necessary, as we just re-add the same ending!?
-        dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0] + (".mdat" if _using_recommendations else ".dat")) for i in self.dataFiles)
+        # assign dataFiles as list of files where to look for data
+
+        # Read .dat or .mdat files
+        dataFiles = [os.path.join(filepath, os.path.splitext(fname)[0]
+                                  # .mdat logic was already done above!?
+                                  + (".mdat" if _using_recommendations else ".dat"))
+                     for fname in self.dataFiles]
         datasets, algorithms, reference_values, success_ratio = split(dataFiles, idx_to_load=idx_of_instances_to_load)
+        self._original_data_lines = {}  # never used, but may be handy
+        '''lists of some original data lines of the `.*dat` files in a `dict`,
+           like ``._original_data_lines['dat'][-1][instance_pos]``'''
+        self._original_data_lines['dat'] = {}
+        self._original_data_lines['dat'][0] = [d[0, :] for d in datasets]
+        self._original_data_lines['dat'][-1] = [d[-1, :] for d in datasets]
         dataformatsettings.current_data_format = dataformatsettings.data_format_name_to_class_mapping[self.get_data_format()]()
-        data = HMultiReader(datasets)
+        data = HMultiReader(datasets)  # .dat target f-value aligned files
         if genericsettings.verbose:
             print("Processing %s: %d/%d trials found." % (dataFiles, len(data), len(self.instancenumbers)))
 
@@ -988,13 +998,19 @@ class DataSet(object):
                 self._maxevals = maxevals
                 self.finalfunvals = finalfunvals
 
-        dataFiles = list(os.path.join(filepath, os.path.splitext(i)[0] + ".tdat") for i in self.dataFiles)
+        # Read .tdat files TODO: do we mixin nonrecommendations here, is this OK?
+        dataFiles = [os.path.join(filepath, os.path.splitext(i)[0] + ".tdat")
+                     for i in self.dataFiles]
 
         if not any(os.path.isfile(dataFile) for dataFile in dataFiles):
-            warnings.warn("Missing tdat files in '%s'. Please consider to rerun the experiments." % filepath)
+            warnings.warn(f"Missing tdat files in '{filepath}'. "
+                           "Please consider to rerun the experiments.")
 
-        datasets, algorithms, reference_values, success_ratio = split(dataFiles, idx_to_load=idx_of_instances_to_load)
-        data = VMultiReader(datasets)
+        datasets, algorithms, reference_values, success_ratio = split(dataFiles, idx_to_load=idx_of_instances_to_load)  # here the data files are read in
+        self._original_data_lines['tdat'] = {}
+        self._original_data_lines['tdat'][0] = [d[0, :] for d in datasets]
+        self._original_data_lines['tdat'][-1] = [d[-1, :] for d in datasets]
+        data = VMultiReader(datasets)  # .tdat evaluations-aligned files
         if genericsettings.verbose:
             print("Processing %s: %d/%d trials found." % (dataFiles, len(data), len(self.instancenumbers)))
 
@@ -1044,7 +1060,8 @@ class DataSet(object):
                 for i in range(min((len(self._maxevals), len(self.readmaxevals)))):
                     tmp.append(self._maxevals[i] == self.readmaxevals[i])
                 if not all(tmp) or len(self._maxevals) != len(self.readmaxevals):
-                    warnings.warn("The maxevals from {} and {} disagree:\n  {}\n  {}".format(indexfile, dataFiles, self.readmaxevals, self._maxevals))
+                    warnings.warn("The maxevals from {} and {} disagree:\n  {}\n  {}"
+                                  .format(indexfile, dataFiles, self.readmaxevals, self._maxevals))
             self._cut_data()
         if len(self._evals):
             self._target = self._evals[:, 0]  # needed for biobj best alg computation
@@ -2238,8 +2255,9 @@ class DataSet(object):
 
     @property
     def _need_balancing(self):
-        """return True of gs.balance_instances and self.instance_multipliers are >1"""
-        if not genericsettings.balance_instances or (not hasattr(self, "instancenumbers") or len(self.instancenumbers) == 0):
+        """return True if genericsettings.balance_instances and self.instance_multipliers are >1"""
+        if not genericsettings.balance_instances or not hasattr(self, "instancenumbers") or (
+                len(self.instancenumbers) == 0):
             return False
         return self.instance_multipliers is not None and set(self.instance_multipliers) != {1}
 
