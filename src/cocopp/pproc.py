@@ -1182,13 +1182,15 @@ class DataSet(object):
         Fix (hopefully) all related attributes, that is, drop the respective
         values in lists or arrays.
         """
+        if hasattr(self, '_ert_nb_of_data'):  # usually not the case
+            del self._ert_nb_of_data  # induces recomputation of ._ert by computeERTfromEvals
+
         ds_attrs = [  # tuple, list or vector attributes to be modified
             "instancenumbers",
             "_instance_multipliers",
             "_instance_multipliers_instancenumbers",
             "_lasttdatfilelines",
             "_maxevals",
-            # "_ert_nb_of_data",  # may not be present and overwritten by computeERTfromEvals
             "finalfunvals",
             "readmaxevals",
             "readfinalFminusFtarget",
@@ -1249,12 +1251,11 @@ class DataSet(object):
                 else:
                     warnings.warn(f'column {col} in matrix attribute {name} = {arr} could not be deleted')
 
-            if hasattr(ds, '_evals_balanced'):
-                del ds._evals_balanced
-                ds._update_evals_balanced()
+        if hasattr(ds, '_evals_balanced'):
+            del ds._evals_balanced
+            ds._update_evals_balanced()
 
-            ds.computeERTfromEvals()
-    
+
     def computeERTfromEvals(self):
         """Sets the attributes ert and target from the attribute evals."""
         if isinstance(self.maxevals, dict):
