@@ -75,6 +75,12 @@ use_only_common_instances = None
 """If `True`, not-common instances are removed such that the set of instance ids
    is the same for all data sets. By default, when ``use_only_common_instances
    is None``, this is the case iff `current_testbed.instances_are_uniform`"""
+pretend_initial_solution_was_evaluated = False
+"""pretend the initial_solution was evaluated in the first evaluation and modify
+   the data accordingly for any larger targets that were hit only later. This
+   increases the first loading time by 1-3s per algorithm. This does currently
+   not apply to MO suites like ``*-biobj`` as we do not have
+   ``HV_normalized(f(X0))`` and ``HV_normalized_opt``."""
 
 xlimit_pprldmany = 1e7
 """maximal run length multiplier used in `pprldmany`.
