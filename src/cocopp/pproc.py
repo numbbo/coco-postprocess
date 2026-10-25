@@ -58,11 +58,14 @@ _block_using_recommendations = True
     is blocked to `False` as postcondition.
     """
 _using_recommendations = None
-"""`bool` to determine which data are used in the `DataSet` constructor"""
+"""`bool` to determine which data are used in the `DataSet` constructor,
+   dynamically changed via `_set_using_recommendations`"""
 
 _ignore_pickle_files = False
 """if `True`, do not try to read data from pickle files.
    This is useful for regression testing."""
+_rewrite_pickle_files = False
+"""overwrite DataSet pickle files unconditionally"""
 
 _pickle_file_read = ""
 """record the name of last read pickle file or "" when file was not found or not read"""
@@ -2829,7 +2832,13 @@ def get_DataSetList(*args, **kwargs):
 
     def fallback():
         return DataSetList(*args, **kwargs)
-
+    def save_pickle(name, dsl):
+        try:
+            with open(name, "wb") as f:
+                pickle.dump(dsl, f)
+        except Exception as e:
+            warnings.warn(f"could not write pickle file {name} getting exception {e}")
+        return dsl
     global _pickle_file_read
     _pickle_file_read = ""
 
@@ -2844,40 +2853,37 @@ def get_DataSetList(*args, **kwargs):
         import pickle
     except Exception:
         return fallback()
-    name = arg1[0] + extension
-    if os.path.exists(name) and os.path.getmtime(name) > os.path.getmtime(arg1[0]):
-        if _using_recommendations:
-            warnings.warn("pickled DataSetLists do currently NOT have recommendations,\n hence the file {} is not used".format(name))
-            return fallback()
+    names = [arg1[0] + ('-rec' if _using_recommendations else '') + extension]
+    if _rewrite_pickle_files:
+        return save_pickle(names[0], fallback())
+    for name in names:
+        if not os.path.exists(name) or os.path.getmtime(name) <= os.path.getmtime(arg1[0]):
+            continue
         try:
             with open(name, "rb") as f:
                 dsl = pickle.load(f)
         except Exception as e:
-            warnings.warn("failed to load pickle file {} with exception {}".format(name, e))
-        else:
-            if isinstance(dsl, DataSetList):  # found valid pickle file
-                # to be compatible with DataSet.__init__:
-                if dsl[0].suite_name == 'bbob-constrained' and (
-                        not hasattr(dsl, '_cocopp_version')):  # before '2.8.2':
-                    os.remove(name)  # remove probably wrong pickle file
-                else:
-                    if not testbedsettings.current_testbed:
-                        testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
-                    if genericsettings.verbose > 0:
-                        print("  using pickled DataSetList {0}".format(name), end=" ")
-                    _pickle_file_read = name
-                    return dsl
+            warnings.warn(f"failed to load pickle file {name} with exception {e}")
+            continue
+        if not isinstance(dsl, DataSetList):  # found not valid pickle file
+            warnings.warn(f"object loaded from pickle file {name} is not a `DataSetList`"
+                          f"\n  but of type {type(dsl)}."
+                           "\n  Consider deleting the file or reprocessing this data with"
+                           "\n  setting ``cocopp.pproc._rewrite_pickle_files = True``")
+            continue
+        # to be compatible with DataSet.__init__:
+        if dsl[0].suite_name == 'bbob-constrained' and (
+                not hasattr(dsl, '_cocopp_version')):  # before '2.8.2':
+            os.remove(name)  # remove probably wrong pickle file
+            continue
+        if not testbedsettings.current_testbed:
+            testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
+        if genericsettings.verbose > 0:
+            print(f"  using pickled DataSetList {name}", end=" ")
+        _pickle_file_read = name
+        return dsl
     # no pickle file found
-    dsl = fallback()
-    if _using_recommendations:
-        return dsl  # do not pickle recommendations for the time being
-    # pickle read in data
-    try:
-        with open(name, "wb") as f:
-            pickle.dump(dsl, f)
-    except Exception as e:
-        warnings.warn("could not write pickle file {} getting exception {}".format(name, e))
-    return dsl
+    return save_pickle(names[0], fallback())
 
 
 class DataSetList(list):
