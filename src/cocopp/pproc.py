@@ -1074,6 +1074,81 @@ class DataSet(object):
         # assert self._evals.shape[1] - 1 == len(self.instancenumbers), self
         # assert self.evals.shape[1] - 1 == len(self.maxevals), self
 
+    @property
+    def _fvals_initial_solution(self):
+        """f-values of the initial solution for all instances.
+
+        Do not compute for any balancing instances.
+
+        CAVEAT: f-values are not directly comparable to the f-precision values
+        in ``.evals[:, 0]``, see `_fopts`.
+        """
+        if not _coco_suites(self.suite_name):
+            return []
+        fvals = []
+        for i in self.instancenumbers:
+            problem = _coco_problem(self.suite_name, self.funcId, self.dim, i)
+            fvals.append(problem(problem.initial_solution))
+        try: return [float(v) for v in fvals]
+        except: return fvals
+
+    @property
+    def _fopts(self):
+        """true optimal f-values by instance, meaningful only for
+
+        the option `genericsettings.pretend_initial_solution_was_evaluated`.
+
+        Do not compute for any balancing instances.
+
+        Details: use module variable `_coco_problem` which uses `cocoex` to
+        obtain these values.
+
+        CAVEAT: the noisy fopt is fopt + 1.01e-8!?
+        CAVEAT: measured fitness is meaningless for noisy function
+
+        ``fopt`` is also somewhere written in the ``.dat`` files header::
+
+            % f evaluations | g evaluations | best noise-free fitness - Fopt (7.948000000000e+01) + sum g_i+ | measured fitness | best measured fitness or single-digit g-values | x1 | x2...
+
+        and could be implied from the difference between the ``measure fitness``
+        (col 3) and the respective ``best noise-free fitness - Fopt`` (col 2) in
+        the first evaluation if ``sum g_i+ == 0``. As lines in `.dat` files are
+        triggered by improvements, ``measured fitness`` are the best-so-far
+        measured fitness (unless possibly in the last line) and ``Fopt = best
+        noise-free fitness - measured fitness``, see ``self._original_data_lines``.
+        """
+        if hasattr(self, '_fopts_'):
+            return self._fopts_
+        if not _coco_suites(self.suite_name):
+            return []
+        def coco_fopt(problem):
+            try:
+                return problem._best_value  # saves around 1 second per alg
+            except Exception as e:
+                str(e)  # currently the expected path
+                # warnings.warn("_best_value failed with exception " + str(e))
+            try:
+                problem._best_parameter('print')  # can't really exist for MO
+            except:
+                return 0  # for the time being, is probably fine for biobj?
+            try:
+                x_opt = np.loadtxt('._bbob_problem_best_parameter.txt')
+            except FileNotFoundError:
+                return 0  # not ideal
+            else:        
+                os.remove('._bbob_problem_best_parameter.txt')
+                try:
+                    return float(problem(x_opt))
+                except:
+                    return problem(x_opt)  # here we needed the HV
+
+        # being on the "safe" side (possibly undercorrect)
+        fadd = -1.01e-8 if self.suite_name == 'bbob_noisy' else 0
+        self._fopts_ = [fadd + coco_fopt(_coco_problem(
+                                    self.suite_name, self.funcId, self.dim, i))
+                        for i in self.instancenumbers]
+        return self._fopts_
+
     def _cut_data(self):
         """attributes `target`, `evals`, and `ert` are truncated to target values not
         much smaller than defined in attribute `precision` (typically ``1e-8``).
