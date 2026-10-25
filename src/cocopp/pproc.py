@@ -2816,6 +2816,26 @@ class DataSet(object):
         plt.grid(True)
         return plt.gca()  # not sure which makes most sense
 
+_coco_suites_ = {}
+def _coco_suites(name):
+    """return the suite `name` or `None`"""
+    if _coco_suites_.get(name) is None:
+        try:  # try each time
+            import cocoex
+        except ImportError:
+            if name not in _coco_suites_:
+                warnings.warn(f"``cocoex.Suite({name}, '', '')`` not available, hence the "
+                              "\n  option `pretent_initial_solution_was_evaluated` cannot be imposed"
+                              "\nTo fix this: ``pip install coco-experiment``")
+            _coco_suites_[name] = None
+        else:
+            _coco_suites_[name] = cocoex.Suite(name, '', '')
+    return _coco_suites_[name]
+
+def _coco_problem(suite_name, funId, dimension, instance=1):
+    if not (s := _coco_suites(suite_name)):
+        return
+    return s.get_problem_by_function_dimension_instance(funId, dimension, instance)
 
 def get_DataSetList(*args, **kwargs):
     """try to load pickle file or fall back to `DataSetList` constructor.
