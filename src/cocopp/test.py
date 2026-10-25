@@ -28,6 +28,7 @@ import numpy as np
 from cocopp import archiving
 from cocopp import official_archives
 from cocopp import pproc as _pproc
+from cocopp import genericsettings as settings
 
 import matplotlib  # just to make sure the following is actually done first
 
@@ -518,6 +519,8 @@ def do_pickle_regression_test(name='strained/2022/al3-cma'):
     Assumes that the pickled data already exist at the usually expected place
     side by side the original data.
     """
+    saved = settings.pretend_initial_solution_was_evaluated
+    settings.pretend_initial_solution_was_evaluated = False
     name = official_archives.all.get_extended(name)[0]
     dsl1 = _pproc.get_DataSetList(name)  # also called from cocopp.load2
     if not _pproc._pickle_file_read:
@@ -531,6 +534,8 @@ def do_pickle_regression_test(name='strained/2022/al3-cma'):
     assert not _pproc._pickle_file_read, (name, _pproc._pickle_file_read)
 
     dsl2._is_same_list_assert(dsl1)
+
+    settings.pretend_initial_solution_was_evaluated = saved
 
     print("*** readin_regression_test done ***")
 

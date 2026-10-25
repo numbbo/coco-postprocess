@@ -70,6 +70,14 @@ _rewrite_pickle_files = False
 _pickle_file_read = ""
 """record the name of last read pickle file or "" when file was not found or not read"""
 
+_pretend_initial_solution_was_evaluated_suites = (
+                'bbob', 'bbob-boxed', 'bbob-largescale',
+                'bbob-mixint',  # should be fine too
+                'bbob-noisy',   # should be fine too when using coco_fopt
+                'bbob-constrained',  # xopt and x0 are feasible
+                # 'bbob-biobj'  # requires the normalized HV of the initial_solution
+               )
+
 def _set_using_recommendations(index):
     """set module variable `_using_recommendations`
 
@@ -1066,6 +1074,8 @@ class DataSet(object):
                     warnings.warn("The maxevals from {} and {} disagree:\n  {}\n  {}"
                                   .format(indexfile, dataFiles, self.readmaxevals, self._maxevals))
             self._cut_data()
+        if genericsettings.pretend_initial_solution_was_evaluated:
+            self._impose_initial_solution_fitness()
         if len(self._evals):
             self._target = self._evals[:, 0]  # needed for biobj best alg computation
         # Compute ERT (will be done lazy from .ert access)
@@ -1073,6 +1083,34 @@ class DataSet(object):
         # asserts don't help though
         # assert self._evals.shape[1] - 1 == len(self.instancenumbers), self
         # assert self.evals.shape[1] - 1 == len(self.maxevals), self
+
+    def _impose_initial_solution_fitness(self):
+        """Set evals for targets above the initial solution fitness to ``evals[0, .]``
+
+        (ie 1), but don't modify nonfinite evals.
+
+        Do not modify balancing instances (hence assume that instance balancing
+        is done only afterwards).
+        
+        This makes algorithms (slightly) more comparable by assuming that they
+        achieved the fitness of the initial solution with the first evaluation.
+
+        Uses `._fopts` and `._fvals_initial_solution` and thereby needs `cocoex`.
+        """
+        if self.suite_name not in _pretend_initial_solution_was_evaluated_suites:
+            return
+        if not self._fopts:  # provide the f-shift
+            return
+        w = genericsettings.weight_evaluations_constraints[0] if self.suite_name == 'bbob-constrained' else 1
+        evals = self._evals
+        for i, (fval, fopt) in enumerate(zip(self._fvals_initial_solution, self._fopts)):
+            i += 1  # index zero is the f-value
+            df = w * (fval - fopt)
+            j = 0
+            while j < evals.shape[0] and np.isfinite(evals[j, i]) and (
+                    evals[j, 0] >= df):  # == is good enough for a hit
+                evals[j, i] = evals[0, i]
+                j += 1
 
     @property
     def _fvals_initial_solution(self):
@@ -2948,7 +2986,12 @@ def get_DataSetList(*args, **kwargs):
         import pickle
     except Exception:
         return fallback()
-    names = [arg1[0] + ('-rec' if _using_recommendations else '') + extension]
+    names = [arg1[0] + ('-rec' if _using_recommendations else '') +
+                       ('-ini' if genericsettings.pretend_initial_solution_was_evaluated
+                        else '') +  extension]
+    if genericsettings.pretend_initial_solution_was_evaluated:
+        names.append(arg1[0] + ('-rec' if _using_recommendations else '') + extension)
+    # CAVEAT: the order of names matters, names[0] will be created if only names[1] exists
     if _rewrite_pickle_files:
         return save_pickle(names[0], fallback())
     for name in names:
@@ -2976,7 +3019,12 @@ def get_DataSetList(*args, **kwargs):
         if genericsettings.verbose > 0:
             print(f"  using pickled DataSetList {name}", end=" ")
         _pickle_file_read = name
-        return dsl
+        if name == names[0]:
+            return dsl
+        # read data are without pretend_initial_solution_was_evaluated setting
+        for ds in dsl:
+            ds._impose_initial_solution_fitness()
+        return save_pickle(names[0], dsl)
     # no pickle file found
     return save_pickle(names[0], fallback())
 
