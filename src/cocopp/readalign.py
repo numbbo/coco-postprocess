@@ -26,7 +26,6 @@ import warnings
 
 from . import genericsettings, testbedsettings, dataformatsettings
 
-from six import advance_iterator
 
 
 # CLASS DEFINITIONS
@@ -118,7 +117,7 @@ class MultiReader(list):
             self.isNearlyFinished = False
             self.isFinished = False
             self.currentLine = None
-            self.nextLine = advance_iterator(self.it)
+            self.nextLine = next(self.it)
             if isHArray:
                 self.idxEvals = range(1, numpy.shape(data)[1])
             else:
@@ -134,7 +133,7 @@ class MultiReader(list):
                     self.currentLine = self.nextLine.copy()
                     # Update nextLine
                     try:
-                        self.nextLine = advance_iterator(self.it)
+                        self.nextLine = next(self.it)
                     except StopIteration:
                         self.isNearlyFinished = True
                 else:

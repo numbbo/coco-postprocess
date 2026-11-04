@@ -27,7 +27,6 @@ import gzip
 import warnings
 import numpy as np
 import tarfile
-from six import advance_iterator
 
 from . import readalign, pproc
 from .toolsdivers import print_done
@@ -266,7 +265,7 @@ class BestAlgSet(DataSet):
             curLine = dictcurLine.setdefault(alg, np.array([np.inf, 0]))
             while curLine[0] > funval:
                 try:
-                    curLine = advance_iterator(it)
+                    curLine = next(it)
                 except StopIteration:
                     break
             dictcurLine[alg] = curLine.copy()

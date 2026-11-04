@@ -11,7 +11,6 @@ import numpy
 import matplotlib.pyplot as plt
 from .. import toolsstats, pproc, toolsdivers
 from ..ppfig import save_figure, consecutiveNumbers, plotUnifLogXMarkers
-from six import advance_iterator
 
 # __all__ = []
 
@@ -244,17 +243,17 @@ def plotLogRel(indexEntries0, indexEntries1, isByInstance=True):
             it0 = iter(i0.funvals)
             it1 = iter(i1.funvals)
             try:
-                nline0 = advance_iterator(it0)
+                nline0 = next(it0)
                 while nline0[0] < curevals:
                     line0 = nline0
-                    nline0 = advance_iterator(it0)
+                    nline0 = next(it0)
             except StopIteration:
                 pass  # we keep the last line obtained.
             try:
-                nline1 = advance_iterator(it1)
+                nline1 = next(it1)
                 while nline1[0] < curevals:
                     line1 = nline1
-                    nline1 = advance_iterator(it1)
+                    nline1 = next(it1)
             except StopIteration:
                 pass  # we keep the last line obtained.
 

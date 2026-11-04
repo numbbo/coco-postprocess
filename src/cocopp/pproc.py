@@ -31,7 +31,6 @@ import hashlib
 import functools
 import collections
 import time
-from six import string_types, advance_iterator
 import numpy
 import numpy as np
 import matplotlib.pyplot as plt
@@ -375,7 +374,7 @@ class RunlengthBasedTargetValues(TargetValues):
 
             self.reference_data = bestalg.load_reference_algorithm(self.reference_algorithm, force=True)
             # TODO: remove targets smaller than 1e-8
-        elif isinstance(self.reference_data, string_types):  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work
+        elif isinstance(self.reference_data, str):  # self.reference_data in ('RANDOMSEARCH', 'IPOP-CMA-ES') should work
             self._short_info = "reference budgets from " + self.reference_data
             # dsl = DataSetList(os.path.join(sys.modules[globals()['__name__']].__file__.split('cocopp')[0],
             #                                'cocopp', 'data', self.reference_data))
@@ -386,7 +385,7 @@ class RunlengthBasedTargetValues(TargetValues):
                 dsd[(ds.funcId, ds.dim)] = ds
             self.reference_data = dsd
         elif isinstance(self.reference_data, list):
-            if not isinstance(self.reference_data[0], string_types):
+            if not isinstance(self.reference_data[0], str):
                 raise ValueError(
                     "RunlengthBasedTargetValues() expected a string, dict, or list of strings as second argument,"
                     + (" got a list of %s" % str(type(self.reference_data[0])))
@@ -2005,7 +2004,7 @@ class DataSet(object):
         it = reversed(self.evals)
         prevline = numpy.array([-numpy.inf] + [numpy.nan] * self.nbRuns())
         try:
-            line = advance_iterator(it)
+            line = next(it)
         except StopIteration:
             # evals is an empty array
             return res  # list()
@@ -2014,7 +2013,7 @@ class DataSet(object):
             while line[0] <= t:
                 prevline = line
                 try:
-                    line = advance_iterator(it)
+                    line = next(it)
                 except StopIteration:
                     break
             res[t] = prevline.copy()
@@ -2110,7 +2109,7 @@ class DataSet(object):
 
         prevline = numpy.array([-numpy.inf, numpy.inf])
         try:
-            line = advance_iterator(it)
+            line = next(it)
         except StopIteration:
             # evals is an empty array
             return list()
@@ -2119,7 +2118,7 @@ class DataSet(object):
             while line[0] <= t:
                 prevline = line
                 try:
-                    line = advance_iterator(it)
+                    line = next(it)
                 except StopIteration:
                     break
             res[t] = prevline.copy()  # is copy necessary? Yes.
@@ -2297,7 +2296,7 @@ class DataSet(object):
         it = reversed(self.evals)
         prevline = numpy.array([-numpy.inf] + [numpy.nan] * self.nbRuns())
         try:
-            line = advance_iterator(it)
+            line = next(it)
         except StopIteration:
             # evals is an empty array
             return tmp  # list()
@@ -2306,7 +2305,7 @@ class DataSet(object):
             while line[0] <= t:
                 prevline = line
                 try:
-                    line = advance_iterator(it)
+                    line = next(it)
                 except StopIteration:
                     break
             tmp[t] = prevline.copy()
@@ -2978,9 +2977,9 @@ def get_DataSetList(*args, **kwargs):
     if _ignore_pickle_files or len(args) != 1 or len(kwargs) or sys.version_info[0] < 3:
         return fallback()
     arg1 = args[0]
-    if isinstance(arg1, string_types):
+    if isinstance(arg1, str):
         arg1 = [arg1]
-    if len(args) != 1 or not isinstance(arg1[0], string_types) or not findfiles.is_recognized_repository_filetype2(arg1[0]):
+    if len(args) != 1 or not isinstance(arg1[0], str) or not findfiles.is_recognized_repository_filetype2(arg1[0]):
         return fallback()
     try:
         import pickle
@@ -3060,7 +3059,7 @@ class DataSetList(list):
             super(DataSetList, self).__init__()
             return
 
-        if isinstance(args, string_types):
+        if isinstance(args, str):
             args = [args]
 
         self._cocopp_version = _version.__version__
@@ -3078,7 +3077,7 @@ class DataSetList(list):
         fnames = []  # data file names
         alg_names = []  # may be the same algorithm name for (many) different fnames
         for name in args:
-            if isinstance(name, string_types) and findfiles.is_recognized_repository_filetype(name):
+            if isinstance(name, str) and findfiles.is_recognized_repository_filetype(name):
                 # the found names may not at all reflect name anymore
                 fnames.extend(findfiles.main(name))
             else:
@@ -3174,17 +3173,17 @@ class DataSetList(list):
                 while True:
                     try:
                         if "indicator" not in header:
-                            header = advance_iterator(f)
+                            header = next(f)
                             while not header.strip():  # remove blank lines
-                                header = advance_iterator(f)
+                                header = next(f)
                                 nbLine += 1
-                            comment = advance_iterator(f)
+                            comment = next(f)
                             if not comment.startswith("%"):
                                 warnings.warn("Entry in file %s at line %d is faulty: " % (indexFile, nbLine) + "it will be skipped.")
                                 nbLine += 2
                                 continue
 
-                        data = advance_iterator(f)  # this is the filename of the data file!?
+                        data = next(f)  # this is the filename of the data file!?
                         data_file_names.append(data)
                         nbLine += 3
                         # TODO: check that something is not wrong with the 3 lines.
@@ -4105,10 +4104,10 @@ def parseinfoold(s):
     res = []
     while True:
         try:
-            elem = advance_iterator(it)
+            elem = next(it)
             tmp = p.match(elem)
             while not tmp:
-                elem = advance_iterator(it) + elem
+                elem = next(it) + elem
                 # add up elements of list_kv until we have a whole key = value
 
             elem0, elem1 = tmp.groups()
