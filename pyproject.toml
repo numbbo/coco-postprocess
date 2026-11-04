@@ -42,6 +42,7 @@ dependencies = [
   "matplotlib >=3.5.0",
   "numpy >=1.21.0",
   "platformdirs >=3.8.1",
+  "six",
 ]
 dynamic = ["version"]
 
