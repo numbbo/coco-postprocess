@@ -309,19 +309,20 @@ def main(argv=None):
 class Interface:
     """collection of the most user-relevant modules, methods and data.
 
-    `archives`: online data archives of type `OfficialArchives`
-
-    `archiving`: methods to archive data and retrieve archived data put online
-
-    `remote_archives`: a function returning a list of URLs of known remote COCO archives
+    `archives`: online data archives of type `OfficialArchives`, ``list(vars(cocopp.archives))``
 
     `config`: dynamic configuration tool (advanced)
 
+    `find`': find experiment data sets in the official COCO online archives
+
     `genericsettings`: basic settings
 
-    `load`: loading data from disk
+    `load2`: load data from disk or (online) archive (as found by `find`)
 
-    `main`: post-processing data from disk
+    `main`: post-processing data from disk or (online) archives
+
+    `remote_archives`: return a list of URLs of known remote COCO archives
+
     """
 
     @classmethod
@@ -344,3 +345,16 @@ del absolute_import
 
 # cococommands, config, data_archive, dataformatsettings, findfiles,
 # genericsettings, info, load, main, rungeneric, set_seed, systeminfo, testbedsettings,
+
+found = None
+def find(*substrs, suite='all'):
+    """Find experiment data sets to compare against.
+
+"""
+    a = getattr(archives, suite)
+    res = a.find(*substrs)
+    global found
+    found = a.found
+    return res
+
+find.__doc__ += archives.all.find.__doc__ + "\n``cocopp.find(., suite='suite_name')`` is a shortcut for ``cocopp.suite_name.find``."
