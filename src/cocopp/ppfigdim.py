@@ -58,7 +58,6 @@ import warnings
 
 import matplotlib.pyplot as plt
 import numpy as np
-from six import advance_iterator
 
 from . import genericsettings, toolsstats, bestalg, pproc, ppfig, ppfigparam, htmldesc, toolsdivers
 from . import testbedsettings
@@ -241,13 +240,13 @@ def generateData(dataSet, targetFuncValue):
     """
 
     it = iter(reversed(dataSet.evals))
-    i = advance_iterator(it)
+    i = next(it)
     prev = np.array([np.nan] * len(i))
 
     while i[0] <= targetFuncValue:
         prev = i
         try:
-            i = advance_iterator(it)
+            i = next(it)
         except StopIteration:
             break
 

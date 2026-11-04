@@ -20,7 +20,6 @@ try:
 except ImportError:
     # compatibility matplotlib 0.8
     from matplotlib.transforms import blend_xy_sep_transform as blend
-from six import advance_iterator
 
 from . import toolsstats, toolsdivers, bestalg, genericsettings, captions
 from .pptex import writeFEvals2
@@ -593,10 +592,10 @@ def generateSingleTableTex(dsList, funcs, mFE, d, prcOfInterest, EVALS, data, ou
     for i in dsList:
         it = reversed(i.evals)
         curline = None
-        nextline = advance_iterator(it)
+        nextline = next(it)
         while nextline[0] <= f_thresh:
             curline = nextline[1:]
-            nextline = advance_iterator(it)
+            nextline = next(it)
         if curline is None:
             tmpdata.extend(i.maxevals)
         else:
@@ -660,10 +659,10 @@ def generateSingleTableHtml(dsList, funcs, mFE, d, prcOfInterest, EVALS, data, o
     for i in dsList:
         it = reversed(i.evals)
         curline = None
-        nextline = advance_iterator(it)
+        nextline = next(it)
         while nextline[0] <= f_thresh:
             curline = nextline[1:]
-            nextline = advance_iterator(it)
+            nextline = next(it)
         if curline is None:
             tmpdata.extend(i.maxevals)
         else:

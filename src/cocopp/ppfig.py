@@ -14,7 +14,6 @@ import warnings
 import numpy as np
 from matplotlib import pyplot as plt
 import shutil
-from six import advance_iterator
 # from pdb import set_trace
 
 # absolute_import => . refers to where ppfig resides in the package:
@@ -744,13 +743,13 @@ def generateData(dataSet, targetFuncValue):
     finally the median on successful runs.
     """
     it = iter(reversed(dataSet.evals))
-    i = advance_iterator(it)
+    i = next(it)
     prev = np.array([np.nan] * len(i))
 
     while i[0] <= targetFuncValue:
         prev = i
         try:
-            i = advance_iterator(it)
+            i = next(it)
         except StopIteration:
             break
 
