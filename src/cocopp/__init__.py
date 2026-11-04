@@ -304,7 +304,7 @@ def main(argv=None):
       (2 or more input arguments) for the input arguments altogether.
 
 """
-    return rungeneric.main(argv=None)
+    return rungeneric.main(argv)
 
 class Interface:
     """collection of the most user-relevant modules, methods and data.
