@@ -87,7 +87,9 @@ def _split_short_opt_list(short_opt_list):
 
 
 def usage():
-    print(main.__doc__)
+    from . import main as cocopp_main  # the options are documented in cocopp.main
+
+    print(cocopp_main.__doc__)
 
 
 def main(argv=None):
