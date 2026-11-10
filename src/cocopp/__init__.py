@@ -310,7 +310,7 @@ def main(argv=None):
     ...                       ' 2013/CMAES_Hutter')  # doctest:+ELLIPSIS
     Output:
     ...Post-processing (2 datasets...
-    ALL done
+    ALL done...
 
 """
     return rungeneric.main(argv)
