@@ -303,6 +303,15 @@ def main(argv=None):
     * call sub-routine :py:func:`cocopp.rungenericmany.main`
       (2 or more input arguments) for the input arguments altogether.
 
+    >>> with cocopp.toolsdivers.InfolderGoneWithTheWind():
+    ...     print('Output:')
+    ...     dsl = cocopp.main('--no-interactive'
+    ...                       ' 2009/DIRECT_posik'
+    ...                       ' 2013/CMAES_Hutter')  # doctest:+ELLIPSIS
+    Output:
+    ...Post-processing (2 datasets...
+    ALL done
+
 """
     return rungeneric.main(argv)
 
