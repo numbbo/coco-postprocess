@@ -364,7 +364,12 @@ def strip_pathname1(name):
     from input string ``name``, replace any remaining path separator
     with '/', and keep only the last part of the path"""
     return (
-        (name.replace(".." + os.sep, "").replace("." + os.sep, "").strip().strip(os.sep).split(os.sep)[-1])
+        (name
+         .replace(".." + os.sep, "")
+         .replace("." + os.sep, "")
+         .strip()
+         .strip(os.sep)
+         .split(os.sep)[-1])
         .replace("data", "")
         .replace("Data", "")
         .replace("DATA", "")

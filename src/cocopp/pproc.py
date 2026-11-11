@@ -340,7 +340,7 @@ class RunlengthBasedTargetValues(TargetValues):
 
         TODO: check use case where ``reference_data`` is a dictionary similar
         to ``bestalg.bestAlgorithmEntries`` with each key dim_fun a reference
-        DataSet, computed by bestalg module or portfolio module.
+        DataSet, computed by bestalg module or portfolio module::
 
             dsList, sortedAlgs, dictAlg = pproc.processInputArgs(args)
             ref_data = refalg.generate(dictAlg)
@@ -3086,10 +3086,12 @@ class DataSetList(list):
             alg_names.extend((len(fnames) - len(alg_names)) * [name])
         assert len(fnames) == len(alg_names)
         for name, alg_name in zip(fnames, alg_names):
+            # alg_names = main input arg full path from above args
             if isinstance(name, DataSet):
                 self.append(name)
                 # we could check here whether name.algId and alg_name are similar or consistent
             elif name.endswith(".info"):
+                # name = .info file full path
                 self.processIndexFile(name, alg_name)
             elif name.endswith(".pickle") or name.endswith(".pickle.gz"):
                 if _using_recommendations:
@@ -4241,7 +4243,7 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
     Output `dictAlg` is the `dsList` reorganized by algorithm name.
     """
     for ialg, alg in enumerate(args):
-        alg = alg.strip().rstrip(os.path.sep)  # lstrip would not be the same folder anymore
+        alg = alg.strip().rstrip(os.path.sep).rstrip('/').strip()  # lstrip(sep) would not be the same folder anymore
         if alg == "":  # might cure an lf+cr problem when using cywin under Windows
             continue
         if findfiles.is_recognized_repository_filetype(alg):
@@ -4258,7 +4260,7 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
                 ds._data_folder = alg
                 # to restore name information:
                 # ds.algId = toolsdivers.str_to_latex(toolsdivers.strip_pathname1(alg))
-            # Nota: findfiles will find all info AND pickle files in folder alg.
+            # Note: findfiles will find all info AND pickle files in folder alg.
             # No problem should arise if the info and pickle files have
             # redundant information. Only, the process could be more efficient
             # if pickle files were in a whole other location.
