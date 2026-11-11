@@ -297,7 +297,8 @@ def get_rld_flex_link(current_dir):
             configfile.write("\nconst config = " + j + "\n")
 
     # return the link
-    return add_link(current_dir, ".", "pprldflex.html", "Runtime profiles (with arrow keys navigation)")
+    return add_link(current_dir, ".", "pprldflex.html",
+                    "Runtime distributions (with arrow keys navigation)")
 
 
 def get_parent_link(html_page, parent_file_name):

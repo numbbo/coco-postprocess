@@ -385,28 +385,6 @@ def plotLegend(handles, maxval):
     ys = {}
     lh = 0
 
-    def label_length(label_list):
-        """Return either `genericsettings.len_of_names_in_pprldmany_legend`
-        or the minimal length for the names in `label_list` so that all
-        names are different in 2 or more characters. At least 9 characters
-        are displayed unless ``0 <
-        genericsettings.len_of_names_in_pprldmany_legend < 9``. This
-        function is used for the algorithm names legend.
-        """
-        if genericsettings.len_of_names_in_pprldmany_legend:
-            return genericsettings.len_of_names_in_pprldmany_legend
-
-        if not label_list:
-            return 0
-        maxLength = max(len(i) for i in label_list)
-        numberOfCharacters = 7  # == len("best 2009") - 2, we add 2 later
-        firstPart = [i[:numberOfCharacters] for i in label_list]
-        while len(firstPart) > len(set(firstPart)) and numberOfCharacters <= maxLength:
-            numberOfCharacters += 1
-            firstPart = [i[:numberOfCharacters] for i in label_list]
-
-        return min(numberOfCharacters + 2, maxLength)
-
     handles_with_legend = [h for h in handles if not plt.getp(h[-1], "label").startswith("_line")]
     # assert len(handles_with_legend)
     handles_with_legend = [
@@ -415,8 +393,6 @@ def plotLegend(handles, maxval):
         if not plt.getp(h[-1], "label").startswith("_child")
     ]
     # assert len(handles_with_legend)
-    label_list = [toolsdivers.strip_pathname1(plt.getp(h[-1], "label")) for h in handles_with_legend]
-    numberOfCharacters = label_length(label_list)
     for h in handles_with_legend:
         x2 = []
         y2 = []
@@ -481,7 +457,9 @@ def plotLegend(handles, maxval):
                         plt.text(
                             maxval ** (0.02 + annotation_line_end_relative),
                             y,
-                            toolsdivers.str_to_latex(toolsdivers.strip_pathname1(plt.getp(h, "label"))[:numberOfCharacters]),
+                            # TODO: this is the same for each figure, so it could be done just once!?
+                            genericsettings.main_input_args.to_numbered_short_name(
+                                        plt.getp(h, "label"), maxlen=True),
                             horizontalalignment="left",
                             verticalalignment="center",
                             color="darkviolet" if is_recommendation else "black",
