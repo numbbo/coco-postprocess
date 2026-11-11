@@ -309,6 +309,8 @@ background = {}
    ``background = {None: cocopp.archives.bbob_mixint.get_all('')}`` for all algorithms
    benchmarked on the bbob-mixint test suite."""
 background_default_style = (3 * (0.9,), "-")  # very light gray
+"""``(color, linestyle)`` tuple for background algorithms, by default
+   ``=(3 * (0.9,), "-")``"""
 
 foreground_algorithm_list = []
 """a list of data files/folders as those specified in cocopp.main"""
