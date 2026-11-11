@@ -311,6 +311,9 @@ def main(argv=None):
     Output:
     ...Post-processing (2 datasets...
     ALL done...
+    >>> [cocopp.genericsettings.main_input_args.to_numbered_short_name(i)
+    ...  for i in range(2)]
+    ['1:DIRECT_posik', '2:CMAES_Hutter_hutter']
 
 """
     return rungeneric.main(argv)

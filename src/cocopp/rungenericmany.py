@@ -15,6 +15,7 @@ import warnings
 
 from . import genericsettings, config, ppfig, testbedsettings, findfiles
 from . import pproc, pptex, pprldistr
+from . import toolsdivers as _td
 from .pproc import DataSetList, processInputArgs
 from .toolsdivers import prepend_to_file, strip_pathname1, str_to_latex, replace_in_file
 from .compall import pprldmany, pptables, ppfigs, ppfigcons
@@ -81,6 +82,8 @@ def main(args, outputdir):
     system shell arguments are handled there.
 
     """
+    args = _td.InputArguments(args)  # minor clean up of pathnames
+    genericsettings.main_input_args = args
 
     print("\nPost-processing (2+)")
     if not os.path.exists(outputdir):
