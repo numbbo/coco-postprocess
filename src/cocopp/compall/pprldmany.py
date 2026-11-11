@@ -54,7 +54,8 @@ perfprofsamplesize = (
 )  # number of bootstrap samples drawn for each fct+target in the performance profile
 nbperdecade = 1
 max_evals_marker_format = ["x", 12.5, 1]  # [symbol, size, edgewidth]
-max_evals_single_marker_format = ["+", 14, 1]  # [symbol, size, edgewidth]
+max_evals_single_marker_format = ["+", 14.5, 1]  # [symbol, size, edgewidth]
+max_evals_single_marker_format_unsucc = ["+", 11, 1]  # [symbol, size, edgewidth]
 max_evals_percentile = 90
 budget_cross_always = True  # was False before June 2024
 label_fontsize = 15  # was 17
@@ -268,7 +269,7 @@ def beautify():
     plt.ylim(-0.0, 1.0)
 
 
-def plotdata(data, maxval=None, maxevals=None, CrE=0.0, maxevals2=None, **kwargs):
+def plotdata(data, maxval=None, maxevals=None, CrE=0.0, maxevals2=None, maxevals3=None, **kwargs):
     """Draw a normalized ECDF. What means normalized?
 
     :param seq data: data set, a 1-D ndarray of runlengths
@@ -323,7 +324,9 @@ def plotdata(data, maxval=None, maxevals=None, CrE=0.0, maxevals2=None, **kwargs
         res = ppfig.plotUnifLogXMarkers(x2, y2, nbperdecade * 3 / np.log10(maxval), logscale=False, clip_on=False, **kwargs)
         # res = plotUnifLogXMarkers(x2, y2, nbperdecade, logscale=False, **kwargs)
 
-        for maxeval_, format in ((maxevals, max_evals_marker_format), (maxevals2, max_evals_single_marker_format)):
+        for maxeval_, format in ((maxevals, max_evals_marker_format),
+                                 (maxevals2, max_evals_single_marker_format),
+                                 (maxevals3, max_evals_single_marker_format_unsucc)):
             if not maxeval_:  # cover the case where maxevals is None or empty
                 continue
             x3 = np.median(maxeval_)  # change it only here
@@ -746,7 +749,8 @@ def main(
 
     dictData = {}  # list of (ert per function) per algorithm
     dictMaxEvals = collections.defaultdict(list)  # sum(maxevals) / max(1, #success) per instance
-    dictMaxEvals2 = collections.defaultdict(list)  # max of successf and unsucc 90%tile runtime over all instances
+    dictMaxEvals2 = collections.defaultdict(list)  # successful 90%tile runtime over all instances
+    dictMaxEvals3 = collections.defaultdict(list)  # unsuccessful 90%tile runtime over all instances
 
     # funcsolved = [set()] * len(targets) # number of functions solved per target
     xbest = []
@@ -842,11 +846,15 @@ def main(
                         if 1 < 3:
                             if "entry" in locals():  # entry was assigned under a try
                                 dictMaxEvals[keyValue].append(percentile(entry.budget_effective_estimates.values()) / divisor)
-                        if 1 < 3:
+                        if 11 < 3:  # just one + cross for successful and unsuccessful
                             maxmed = percentile(runlengthunsucc)
                             if len(runlengthsucc):
                                 maxmed = max((maxmed, percentile(runlengthsucc)))
                             dictMaxEvals2[keyValue].append(maxmed)
+                        else:  # two + crosses
+                            if len(runlengthsucc):
+                                dictMaxEvals2[keyValue].append(percentile(runlengthsucc))
+                            dictMaxEvals3[keyValue].append(percentile(runlengthunsucc))
 
             displaybest = plotType == PlotType.ALG
             if displaybest:
@@ -949,7 +957,9 @@ def main(
 
             args.update(plotting_style.pprldmany_styles)  # no idea what this does, maybe update for background algorithms?
 
-            lines.append(plotdata(np.array(data), x_limit, dictMaxEvals[alg], maxevals2=dictMaxEvals2[alg], CrE=CrEperAlg[alg], **args))
+            lines.append(plotdata(np.array(data), x_limit, dictMaxEvals[alg],
+                                  maxevals2=dictMaxEvals2[alg], maxevals3=dictMaxEvals3[alg],
+                                  CrE=CrEperAlg[alg], **args))
 
     if 11 < 3:
         import time
