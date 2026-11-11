@@ -265,6 +265,114 @@ class AlgorithmList(list):
         assert res == algorithms_dict  # compares keys and values
         return res
 
+def clean_path(p):
+    """return ``p`` without trailing path separator or white spaces.
+    """
+    return p.strip().rstrip(os.path.sep).rstrip('/').strip()
+
+algorithm_name_min_len = 4
+'''take the parent folder into accound when the constructed name is shorter'''
+def algorithm_name_from_path(p, maxlen=None):
+    """`maxlen` may remove leading or trailing chars.
+
+    return a short name used to set algId and display. This is not guarantied to
+    stay the same, the name could be different in future.
+
+    Depends on `tooldivers.algorithm_name_min_len`.
+    """
+    import cocopp
+    def after_strip(s):
+        s = s.replace('experiment', 'exp')
+        s = s.replace('noiseless', '').rstrip("_")  # is most likely a suite attribute
+        return s
+    s = after_strip(strip_pathname1(p))
+    if len(s) >= algorithm_name_min_len or len(cocopp.find(s)) == 1:
+        s = s[:maxlen] if maxlen else s
+    else:    
+        s = after_strip(strip_pathname2(p))
+        s = s[-maxlen:] if maxlen else s
+    # print('algorithm_name_from_path', s)
+    return s
+                     
+class InputArguments(list):
+    """Store clean input argument paths.
+
+    Allow to compute short names from paths which may be numbered or made
+    unique.
+
+    Usecases::
+
+        input_args = InputArguments(args)
+        args = list(input_args)
+        algId = input_args.to_unique_short_name(args[1])
+        plt.text(input_args.to_numbered_short_name(alg, maxlen=True))
+
+"""
+    def __init__(self, args=()):
+        for arg in args:
+            self.append(arg)
+        # print([self.to_short_name(p) for p in self])
+        # print([self.to_short_name(p, True) for p in self])
+        # print([self.to_numbered_short_name(p) for p in self])
+        # print([self.to_numbered_short_name(p, True) for p in self])
+        # print(self.label_length)
+    def append(self, p):
+        """return slightly cleaned path"""
+        p = clean_path(p)
+        list.append(self, p)
+        return p
+    def _to_path(self, path):
+        """return also a path when ``isinstance(path, int)``"""
+        return self[path] if isinstance(path, int) else path
+    def to_short_name(self, path, maxlen=None):
+         """The name is independent of `self` unless ``maxlen is True``"""
+         if maxlen is True:
+             maxlen = self.label_length
+         return algorithm_name_from_path(self._to_path(path), maxlen)
+    def to_unique_short_name(self, path):
+        """append a number in case name(path) has previous duplicates"""
+        i = 1
+        path = self._to_path(path)
+        n = self.to_short_name(path)
+        for p in self:
+            if path == p:
+                break
+            i += n == self.to_short_name(p)
+        return n if i == 1 else n + str(i)
+    def to_numbered_short_name(self, path, maxlen=None):
+         """return a unique label like `"1:Nelder"` by position on input"""
+         path = self._to_path(path)
+         n = self.to_short_name(path, maxlen)
+         return f"{self.index(path) + 1}:{n}" if path in self else n
+    @property
+    def short_names(self):
+        return [self.to_short_name(p) for p in self]
+    @property
+    def label_length(self):
+        """Return either `genericsettings.len_of_names_in_pprldmany_legend`
+        or the minimal length for the names in `self.short_names` so that all
+        names are different in 2 or more characters. At least 12 characters
+        are displayed unless ``0 <
+        genericsettings.len_of_names_in_pprldmany_legend < 12``. This
+        function is used for the algorithm names legend.
+
+        Copy-pasted old code.
+        """
+        if genericsettings.len_of_names_in_pprldmany_legend:
+            return genericsettings.len_of_names_in_pprldmany_legend
+
+        label_list = self.short_names
+        if not label_list:
+            return 0
+        maxLength = max(len(i) for i in label_list)
+        numberOfCharacters = 10  # was == len("best 2009") - 2, we add 2 later
+        firstPart = [i[:numberOfCharacters] for i in label_list]
+        while len(firstPart) > len(set(firstPart)) and numberOfCharacters <= maxLength:
+            numberOfCharacters += 1
+            firstPart = [i[:numberOfCharacters] for i in label_list]
+        return min(numberOfCharacters + 2, maxLength)
+
+genericsettings.main_input_args = InputArguments()
 
 def print_done(message="  done"):
     """prints a message with time stamp"""
@@ -400,7 +508,7 @@ def strip_pathname2(name):
 
 def strip_pathname3(name):
     """as `strip_pathname1` and also remove `'noiseless'` from the name"""
-    return strip_pathname1(name).replace("noiseless", "")
+    return strip_pathname1(name).replace("noiseless", "").rstrip("_")
 
 
 def str_to_latex(string):

@@ -3017,6 +3017,9 @@ def get_DataSetList(*args, **kwargs):
                 not hasattr(dsl, '_cocopp_version')):  # before '2.8.2':
             os.remove(name)  # remove probably wrong pickle file
             continue
+        for ds in dsl:  # covers only the pickle case
+            ds._data_folder = arg1[0]  # update as data may have moved to a different location
+            ds.algId = genericsettings.main_input_args.to_short_name(arg1[0])
         if not testbedsettings.current_testbed:
             testbedsettings.load_current_testbed(dsl[0].suite_name, TargetValues)
         if genericsettings.verbose > 0:
@@ -3089,7 +3092,8 @@ class DataSetList(list):
             alg_names.extend((len(fnames) - len(alg_names)) * [name])
         assert len(fnames) == len(alg_names)
         for name, alg_name in zip(fnames, alg_names):
-            # alg_names = main input arg full path from above args
+            # alg_name is expected to be in genericsettings.main_input_args
+            # it is a full path, input argument to main, from the above args
             if isinstance(name, DataSet):
                 self.append(name)
                 # we could check here whether name.algId and alg_name are similar or consistent
@@ -3161,12 +3165,7 @@ class DataSetList(list):
             # will give too many false positives.
             # Also, making exception is usually a bad thing. So we should better
             # rename the zip files to give the standards we want.
-
-            alg_name = toolsdivers.strip_pathname1(alg_name)
-            if archiving.official_archives.bbob.find(alg_name):
-                alg_name = alg_name.replace("noiseless", "").rstrip("_").rstrip()
-            if 11 < 3:  # would break searching of algId in archives
-                alg_name = toolsdivers.str_to_latex(alg_name)  # not really necessary but ' ' seems nicer than '_'
+            alg_name = toolsdivers.algorithm_name_from_path(alg_name)
         try:
             with openfile(indexFile, errors="replace") as f:  # strange chars in names may cause errors
                 if genericsettings.verbose:
@@ -3196,7 +3195,7 @@ class DataSetList(list):
                         ds = DataSet(header, comment, data, indexFile)
                         # data extension may have been modified to .mdat
                         if alg_name is not None:
-                            ds.algId = alg_name
+                            ds.algId = alg_name  # may later be overwritten by unique name
                         if len(ds.instancenumbers) > 0:
                             self.append(ds)
                     except StopIteration:
@@ -4163,29 +4162,6 @@ def align_list(list_to_process, evals):
     return list_to_process
 
 
-def set_unique_algId(ds_list, ds_list_reference, taken_ids=None):
-    """on return, elements in ``ds_list`` do not have an ``algId``
-    attribute value from ``taken_ids`` or from
-    ``ds_list_reference`` ``if taken_ids is None``.
-
-    In case, ``BFGS`` becomes ``BFGS 2`` etc.
-
-    """
-    if taken_ids is None:
-        taken_ids = []
-        for ds in ds_list_reference:
-            taken_ids.append(ds.algId)
-    taken_ids = set(taken_ids)
-
-    for ds in ds_list:
-        if ds.algId in taken_ids:
-            algId = ds.algId
-            i = 2
-            while algId + " " + str(i) in taken_ids:
-                i += 1
-            ds.algId = algId + " " + str(i)
-
-
 def processInputArgs(args, process_background_algorithms=False):
     """Process command line arguments.
 
@@ -4214,6 +4190,16 @@ def processInputArgs(args, process_background_algorithms=False):
         name to a DataSetList
 
     """
+    # if genericsettings.warning_level >= 1:
+    #     missing = [alg for alg in args if alg not in genericsettings.main_input_args
+    #                and 'cocopp/refalgs' not in alg
+    #                and 'bestCustomAlg' not in alg
+    #                and (alg not in names
+    #                     for names in genericsettings.background.values())]
+    #     if missing:
+    #         warnings.warn(f"Data path(s) {missing} are not in genericsettings.main_input_args = "
+    #                       f"{genericsettings.main_input_args}")
+    #         # raise ValueError
     dsList = list()
     sortedAlgs = list()
     dictAlg = {}
@@ -4246,7 +4232,6 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
     Output `dictAlg` is the `dsList` reorganized by algorithm name.
     """
     for ialg, alg in enumerate(args):
-        alg = alg.strip().rstrip(os.path.sep).rstrip('/').strip()  # lstrip(sep) would not be the same folder anymore
         if alg == "":  # might cure an lf+cr problem when using cywin under Windows
             continue
         if findfiles.is_recognized_repository_filetype(alg):
@@ -4259,10 +4244,10 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
             _old = _set_using_recommendations(ialg)
             tmpDsList = get_DataSetList(alg)
             _set_using_recommendations(_old)
-            for ds in tmpDsList:
+            for ds in tmpDsList:  # those may not have been assigned yet or are not unique
                 ds._data_folder = alg
-                # to restore name information:
-                # ds.algId = toolsdivers.str_to_latex(toolsdivers.strip_pathname1(alg))
+                ds.algId = genericsettings.main_input_args.to_unique_short_name(alg)
+
             # Note: findfiles will find all info AND pickle files in folder alg.
             # No problem should arise if the info and pickle files have
             # redundant information. Only, the process could be more efficient
@@ -4271,7 +4256,6 @@ def process_arguments(args, current_hash, dictAlg, dsList, sortedAlgs):
             if current_hash is not None and current_hash != tmpDsList.get_reference_values_hash():
                 warnings.warn(" Reference values for the algorithm '%s' are different!" % alg)
 
-            set_unique_algId(tmpDsList, dsList)
             dsList.extend(tmpDsList)
             current_hash = tmpDsList.get_reference_values_hash()
             # alg = os.path.split(i.rstrip(os.sep))[1]  # trailing slash or backslash

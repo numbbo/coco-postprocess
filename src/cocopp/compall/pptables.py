@@ -14,7 +14,7 @@ from .. import toolsdivers as td
 from .. import genericsettings, bestalg, toolsstats, pproc, ppfigparam, testbedsettings, captions, ppfig
 from ..pptex import writeFEvals2, writeFEvalsMaxPrec, tableXLaTeX, numtotext
 from ..toolsstats import significance_all_best_vs_other, best_alg_indices
-from ..toolsdivers import str_to_latex, strip_pathname1, strip_pathname3, replace_in_file, get_version_label, prepend_to_file
+from ..toolsdivers import str_to_latex, strip_pathname1, replace_in_file, get_version_label, prepend_to_file
 
 
 def get_table_caption():
@@ -557,7 +557,9 @@ def main(dict_alg, sorted_algs, output_dir=".", function_targets_line=True, late
             if df[0] == testbedsettings.current_testbed.tabDimsOfInterest[0]:
                 additional_commands.append("\\providecommand{%s}{\\StrLeft{%s}{\\ntables}}" % (command_name, str_to_latex(strip_pathname1(alg))))
             curline = [command_name + r"\hspace*{\fill}"]  # each list element becomes a &-separated table entry?
-            curlineHtml = ['<th style="width:%dpx">%s</th>\n' % (table_first_column_width, str_to_latex(strip_pathname3(alg)))]
+            curlineHtml = ['<th style="width:%dpx">%s</th>\n' % (
+                            table_first_column_width, 
+                            genericsettings.main_input_args.to_numbered_short_name(alg, maxlen=True))]
 
             zipToEnumerate = (
                 zip(algerts[i], algdisp[i], algsucc[i], isBoldArray[i], algtestres[i]) if refalgentries else zip(algerts[i], algdisp[i], algsucc[i], isBoldArray[i])
