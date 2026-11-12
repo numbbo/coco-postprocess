@@ -531,10 +531,11 @@ def main(dictAlg, html_file_prefix, sorted_algorithms=None, output_dir="ppdata",
 
                 # For legend
                 # tmp = plt.plot([], [], label=alg.replace('..' + os.sep, '').strip(os.sep), **line_styles[i])
-                algorithm_name = toolsdivers.str_to_latex(toolsdivers.strip_pathname1(alg))
+                algorithm_name = genericsettings.main_input_args.to_numbered_short_name(
+                                                            alg, maxlen=legend_text_max_len)
                 if plotting_style.in_background:
                     algorithm_name = "_" + algorithm_name
-                tmp = plt.plot([], [], label=algorithm_name[:legend_text_max_len], **line_styles[i])
+                tmp = plt.plot([], [], label=algorithm_name, **line_styles[i])
                 plt.setp(tmp[0], markersize=12.0, markeredgecolor=plt.getp(tmp[0], "color"))
 
                 if dimmaxevals:
