@@ -1039,6 +1039,7 @@ def main(
     num_of_instances_functions = []
     num_of_instance_numbers = []
     for alg in algorithms_with_data:
+        i0 = len(num_of_instances)
         try:
             # DONE (fix #49): we need all functions of alg
             for _f, dictAlgperFunc in sorted(dictFunc.items()):
@@ -1047,14 +1048,25 @@ def main(
                 num_of_instance_numbers.append(len(set(dictAlgperFunc[alg][0].instancenumbers)))
         except IndexError:
             pass
-    min_num = max((1/1.1, min(num_of_instance_numbers)))  # should never be < 1
-    # issue a warning if number of instances is inconsistent
-    # number of instances (repetitions) are rarely the same with the ExperimentRepeater
-    if len(set(num_of_instances)) > 1 and any(
-            (n / min_num) % 1 for n in num_of_instances
-            ) and genericsettings.warning_level >= 1:
-        warnings.warn("Number of instances was not a multiple of %s for all algorithms:"
-                      " %s instances found." % (str(min_num), str(num_of_instances)))
+        else:
+            # taking the opportunity to make a consistency check for the
+            # number of instances, this should ideally go elsewhere like
+            # at the end of get_DataSetList or DataSet (which may miss pickle data)
+            if genericsettings.warning_level >= 1 and (
+                    genericsettings.count_instance_consistency_checks < len(algorithms_with_data)):
+                genericsettings.count_instance_consistency_checks += 1
+                # check that the very same instances are used in all DataSets of a single algorithm
+                if len(set(num_of_instance_numbers[i0:])) > 1:
+                    warnings.warn(f"Different set of instances = {set(num_of_instance_numbers[i0:])}"
+                                  f"\n  found for algorithm {alg}.\n"
+                                  "Generally, all functions should be run on the same set of instances.")
+                # check that all instances are repeated the same number of times by DataSet
+                min_num = max((1/1.1, min(num_of_instance_numbers[i0:])))  # should never be < 1
+                if len(set(num_of_instances[i0:])) > 1 and any(
+                        (n / min_num) % 1 for n in num_of_instances[i0:]):
+                    warnings.warn("The number of instances of algorithm %s was not a "
+                                  "multiple of %s: %s instances found." % (
+                                  alg, str(min_num), str(num_of_instances[i0:])))
     # display each number of instances once, i.e. remove copies
     # and now also the respective lowest/first function number
     # (somewhat adapted to higher number of instance repetitions)

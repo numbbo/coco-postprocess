@@ -320,3 +320,6 @@ isLogLoss = True  # only affects rungeneric1
 isPickled = False  # only affects rungeneric1
 ##
 isScatter = True  # only affects rungenericmany
+
+count_instance_consistency_checks = 0
+"""counter of checks done in `pprldmany`, avoids repeated checks and warning floods"""

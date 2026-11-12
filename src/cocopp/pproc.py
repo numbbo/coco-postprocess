@@ -2961,6 +2961,7 @@ def get_DataSetList(*args, **kwargs):
     executed.
     """
     extension = ".pickle"
+    genericsettings.count_instance_consistency_checks = 0  # reset for new data sets
 
     def fallback():
         return DataSetList(*args, **kwargs)
