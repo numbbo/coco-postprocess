@@ -2963,15 +2963,18 @@ def get_DataSetList(*args, **kwargs):
     extension = ".pickle"
     genericsettings.count_instance_consistency_checks = 0  # reset for new data sets
 
+    def final_checks(dsl):
+        """allow for final checks"""
+        return dsl
     def fallback():
-        return DataSetList(*args, **kwargs)
+        return final_checks(DataSetList(*args, **kwargs))
     def save_pickle(name, dsl):
         try:
             with open(name, "wb") as f:
                 pickle.dump(dsl, f)
         except Exception as e:
             warnings.warn(f"could not write pickle file {name} getting exception {e}")
-        return dsl
+        return final_checks(dsl)
     global _pickle_file_read
     _pickle_file_read = ""
 
@@ -3020,7 +3023,7 @@ def get_DataSetList(*args, **kwargs):
             print(f"  using pickled DataSetList {name}", end=" ")
         _pickle_file_read = name
         if name == names[0]:
-            return dsl
+            return final_checks(dsl)
         # read data are without pretend_initial_solution_was_evaluated setting
         for ds in dsl:
             ds._impose_initial_solution_fitness()
