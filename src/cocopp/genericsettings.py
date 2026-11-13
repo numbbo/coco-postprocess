@@ -33,6 +33,17 @@ parameter_sweep_sort = True
 sequential_colormaps = ["plasma..9"]  # 'viridis', 'gnuplot2.0.85', 'Greens_r..7', 'Greys_r..7', 'Reds_r..7']
 """default color maps for a parameter sweep"""
 
+main_input_args = []
+"""A `list` of all data path arguments to the latest call of `main` or `load2`
+   in an `InputArguments` type, this is not a user setting"""
+algorithm_names = {}
+"""`dict`, display algorithm names for some or all input arguments. The names
+   are used for display and as id, instead of a name derived from the path or
+   the archive name. The `dict` key is the position in `main_input_args`."""
+number_algorithm_names = True
+"""`bool`, signal whether to prepend algorithm names with a count when
+   displaying unless ``parameter_sweep is True``"""
+
 line_style_mapping = {}
 """map the input argument position to a line style position, by default the identity.
    This could be useful to get the same style for several algorithm variants. Only effective with when ``bool(parameter_sweep) is True``."""
