@@ -280,7 +280,8 @@ def load2(args, keep=None, remove=None, flat_list=None):
     OK...
 
     """
-    args2 = official_archives.all.get_extended(args)
+    args2 = _td.InputArguments(official_archives.all.get_extended(args))
+    _genericsettings.main_input_args = args2
     dsList, _sortedAlgs, dictAlg = _pproc.processInputArgs(args2, True)  # takes ~1 minutes per 10 data sets
     dsList2 = _pproc.DataSetList(_testbedsettings.current_testbed.filter(dsList))
     if keep:
