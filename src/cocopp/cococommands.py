@@ -57,19 +57,17 @@ Examples:
 
 """
 
-from __future__ import absolute_import
-
 import collections as _collections
 import warnings as _warnings
+
 import numpy as np
 
-from .pproc import get_DataSetList as _DataSetList
-from .toolsdivers import StringList as _StringList
-from .archiving import official_archives
 from . import config as _config
-from . import pproc as _pproc
 from . import genericsettings as _genericsettings
+from . import pproc as _pproc
 from . import testbedsettings as _testbedsettings
+from . import toolsdivers as _td
+from .archiving import official_archives
 
 
 def true_number_of_trials(ds):
@@ -235,7 +233,7 @@ def load(filename):
     the returned data set list may not work anymore when used with plotting
     functions of the `cocopp` module, see also `load2`.
     """
-    return _DataSetList(official_archives.all.get_extended(_StringList(filename)))
+    return _pproc.get_DataSetList(official_archives.all.get_extended(_td.StringList(filename)))
 
 
 def load2(args, keep=None, remove=None, flat_list=None):
