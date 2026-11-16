@@ -538,7 +538,7 @@ class CONSBBOBTestbed(GECCOBBOBTestbed):
         shortinfo_filename=shortinfo_filename,
         short_names=get_short_names(shortinfo_filename),
         name=suite_name_cons,
-        flex_navigation_json_file="",
+        flex_navigation_json_file="bbob-constrained-benchmarkinfos.json",
         functions_with_legend=(1, 54),
         first_function_number=1,
         last_function_number=54,
