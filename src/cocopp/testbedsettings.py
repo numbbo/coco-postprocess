@@ -644,7 +644,7 @@ class GECCOBBOBNoisyTestbed(GECCOBBOBTestbed):
         info_filename="bbob-noisy-benchmarkinfos.txt",
         shortinfo_filename=shortinfo_filename,
         short_names=get_short_names(shortinfo_filename),
-        flex_navigation_json_file="",
+        flex_navigation_json_file="bbob-noisy-benchmarkinfos.json",
         name=suite_name_single,  # TODO: until we clean the code which uses this name, we need to use it also here.
         functions_with_legend=(101, 130),
         first_function_number=101,
